@@ -1,19 +1,19 @@
 Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
-Version:	1.4.5
-Release:	10
+Version:	1.4.7
+Release:	1
 License:	GPL
 Group:		Daemons
 Group(de):	Server
 Group(pl):	Serwery
-Source0:	http://www.balabit.hu/downloads/syslog-ng/source/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Patch0:		%{name}-autoconf.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
-BuildRequires:	libol-static >= 0.2.16
+BuildRequires:	libol-static >= 0.2.20
 BuildRequires:	flex
 Requires:	rc-scripts >= 0.2.0
 Requires:	logrotate
@@ -62,7 +62,6 @@ install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog-ng
 
 gzip -9nf doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt \
-	$RPM_BUILD_ROOT%{_mandir}/man[58]/*
 
 touch $RPM_BUILD_ROOT/var/log/syslog
 
