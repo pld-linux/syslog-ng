@@ -2,22 +2,20 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	1.4.17
+Version:	1.5.26
 Release:	1
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/1.5/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Patch0:		%{name}-autoconf.patch
-Patch1:		%{name}-notestlibolver.patch
 Patch2:		%{name}-ac25x.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.2.21
+BuildRequires:	libol-static >= 0.3.9
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	fileutils
@@ -26,6 +24,7 @@ Requires:	psmisc >= 20.1
 Provides:	syslogdaemon
 Obsoletes:	syslog
 Obsoletes:	msyslog
+Obsoletes:	klogd
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -53,8 +52,6 @@ facility/prioridade como o syslog original.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p0
-%patch2 -p1
 
 %build
 rm -f missing
@@ -90,12 +87,9 @@ done
 
 /sbin/chkconfig --add syslog-ng
 if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart >/dev/null 2>&1
+	/etc/rc.d/init.d/syslog-ng restart >&2
 else
 	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
-fi
-if [ -f /var/lock/subsys/klogd ]; then
-	/etc/rc.d/init.d/klogd restart 1>&2
 fi
 
 %preun
