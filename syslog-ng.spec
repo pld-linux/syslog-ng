@@ -17,7 +17,7 @@ Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Patch0:		%{name}-ac25x.patch
-URL:		http://www.balabit.hu/products/syslog-ng/
+URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
