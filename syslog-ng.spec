@@ -2,7 +2,7 @@ Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
 Version:	1.4.5
-Release:	2
+Release:	3
 License:	GPL
 Group:		Daemons
 Group(pl):	Serwery
@@ -51,7 +51,7 @@ LDFLAGS="-s"; export LDFLAGS
 rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/syslog-ng} \
-	$RPM_BUILD_ROOT/var/log/news
+	$RPM_BUILD_ROOT/var/log/{news,mail}
 
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
@@ -64,7 +64,7 @@ gzip -9nf doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt \
 touch $RPM_BUILD_ROOT/var/log/syslog
 
 %post
-for n in /var/log/{auth.log,syslog,cron.log,daemon.log,kern.log,lpr.log,user.log,uucp.log,ppp.log,mail.log,mail.info,mail.warn,mail.err,debug,messages}
+for n in /var/log/{kernel,messages,secure,maillog,spooler,debug,cron,syslog,daemon,lpr,user,ppp,mail/{info,warn,err}}
 do
 	[ -f $n ] && continue
 	touch $n
@@ -96,6 +96,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng
-
 %{_mandir}/man[58]/*
-%attr(640,root,root) %config(noreplace) %verify(not mtime md5 size) /var/log/*
+
+%attr(640,root,root) %ghost /var/log/syslog
+%attr(750,root,root) %ghost /var/log/news
+%attr(750,root,root) %dir /var/log/mail
