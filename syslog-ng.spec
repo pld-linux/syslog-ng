@@ -11,6 +11,7 @@ License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
 # Source0-md5:	ce70b4230e73ad79191618530c8c3a72
+# Source0-size:	396947
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
