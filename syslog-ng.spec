@@ -13,6 +13,8 @@ Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Patch0:		%{name}-autoconf.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	libol-static >= 0.2.20
 BuildRequires:	flex
 Prereq:		rc-scripts >= 0.2.0
@@ -47,12 +49,12 @@ mo¿liwosci logowanie i kontrolowanie zbieranych informacji.
 %build
 aclocal
 autoconf
+automake -a -c
 %configure
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/{syslog-ng,logrotate.d}} \
 	$RPM_BUILD_ROOT/var/log/{archiv,}/{news,mail}
 
