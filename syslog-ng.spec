@@ -1,8 +1,8 @@
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Name:		syslog-ng
-Version:	1.4.14
-Release:	1
+Version:	1.4.15
+Release:	0.1
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
@@ -10,6 +10,7 @@ Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Patch0:		%{name}-autoconf.patch
+Patch1:		%{name}-notestlibolver.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -44,7 +45,8 @@ mo¿liwo¶ci logowania i kontrolowania zbieranych informacji.
 
 %prep
 %setup -q
-%patch -p1
+%patch0 -p1
+%patch1 -p0
 
 %build
 rm -f missing
