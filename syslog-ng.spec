@@ -17,6 +17,7 @@ BuildRequires:	libol-static >= 0.2.20
 BuildRequires:	flex
 Requires:	rc-scripts >= 0.2.0
 Requires:	logrotate
+Requires:	fileutils
 Provides:	syslogdaemon
 Obsoletes:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
