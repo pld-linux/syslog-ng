@@ -15,7 +15,7 @@ Patch0:		%{name}-autoconf.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	libol-static >= 0.2.20
+BuildRequires:	libol-static >= 0.2.21
 BuildRequires:	flex
 Prereq:		rc-scripts >= 0.2.0
 Requires:	logrotate
