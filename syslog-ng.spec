@@ -1,8 +1,8 @@
-Summary:	Syslog-ng - new generation fo the system logger
-Summary(pl):	Syslog-ng - zamiennik sysklog'a
+Summary:	Syslog-ng - new generation of the system logger
+Summary(pl):	Syslog-ng - zamiennik syskloga
 Name:		syslog-ng
 Version:	1.4.12
-Release:	1
+Release:	2
 License:	GPL
 Group:		Daemons
 Group(de):	Server
@@ -18,6 +18,7 @@ BuildRequires:	automake
 BuildRequires:	libol-static >= 0.2.21
 BuildRequires:	flex
 Prereq:		rc-scripts >= 0.2.0
+Prereq:		/sbin/chkconfig
 Requires:	logrotate
 Requires:	fileutils
 Requires:	psmisc >= 20.1
@@ -40,8 +41,8 @@ modification on the line.
 
 %description -l pl
 Syslog-ng jest zamiennikiem dla standartowo u¿ywanych programów typu
-sysklog Dzia³a w systemie SunON, BSD, Linux. Daje znacznie wiêksze
-mo¿liwosci logowanie i kontrolowanie zbieranych informacji.
+sysklog. Dzia³a w systemie SunOS, BSD, Linux. Daje znacznie wiêksze
+mo¿liwo¶ci logowania i kontrolowania zbieranych informacji.
 
 %prep
 %setup -q
@@ -69,6 +70,9 @@ gzip -9nf doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt \
 
 touch $RPM_BUILD_ROOT/var/log/syslog
 
+%clean
+rm -rf $RPM_BUILD_ROOT
+
 %post
 for n in /var/log/{kernel,messages,secure,maillog,spooler,debug,cron,syslog,daemon,lpr,user,ppp,mail/{info,warn,err}}
 do
@@ -94,9 +98,6 @@ if [ "$1" = "0" ]; then
 	fi
 	/sbin/chkconfig --del syslog-ng
 fi
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
