@@ -2,7 +2,7 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	1.5.20
+Version:	1.5.21
 Release:	1
 License:	GPL
 Group:		Daemons
