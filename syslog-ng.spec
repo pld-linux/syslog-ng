@@ -2,18 +2,20 @@ Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
 Version:	1.4.5
-Release:	3
+Release:	4
 License:	GPL
 Group:		Daemons
 Group(pl):	Serwery
 Source0:	http://www.balabit.hu/downloads/syslog-ng/source/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
+Source3:	%{name}.logrotate
 Patch0:		%{name}-autoconf.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	libol-static >= 0.2.16
 BuildRequires:	flex
 Requires:	rc-scripts >= 0.2.0
+Requires:	logrotate
 Provides:	syslogdaemon
 Obsoletes:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -57,6 +59,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/syslog-ng} \
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog-ng
 
 gzip -9nf doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt \
 	$RPM_BUILD_ROOT%{_mandir}/man[58]/*
@@ -94,6 +97,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc doc/*.gz doc/sgml/syslog-ng.txt*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
+%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %{_mandir}/man[58]/*
