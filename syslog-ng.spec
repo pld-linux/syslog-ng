@@ -1,7 +1,5 @@
 %define		mainver		1.6
-%define		minorver	4
-%define		subver		%{nil}
-%define		fullver		%{mainver}.%{minorver}
+%define		minorver	5
 
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
@@ -11,17 +9,16 @@ Version:	%{mainver}.%{minorver}
 Release:	1
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{fullver}.tar.gz
-# Source0-md5:	ef6121a305a4f6f6208d909ca41e6624
+Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
+# Source0-md5:	ce70b4230e73ad79191618530c8c3a72
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Patch0:		%{name}-ac25x.patch
 URL:		http://www.balabit.com/products/syslog_ng/
-BuildRequires:	autoconf
+BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.3.13
+BuildRequires:	libol-static >= 0.3.14
 BuildRequires:	libwrap-devel
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
@@ -57,11 +54,9 @@ por seu conteúdo (usando expressões regulares) e não apenas pelo par
 facility/prioridade como o syslog original.
 
 %prep
-%setup -q -n %{name}-%{fullver}
-%patch0 -p1
+%setup -q
 
 %build
-rm -f missing
 %{__aclocal}
 %{__autoconf}
 %{__automake}
