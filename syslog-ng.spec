@@ -14,7 +14,7 @@ BuildRequires:	libol-static >= 0.2.16
 BuildRequires:	flex
 Requires:	rc-scripts >= 0.2.0
 Obsoletes:	syslog
-Buildroot:	/tmp/%{name}-%{version}-root
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc
 
