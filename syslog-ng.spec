@@ -25,6 +25,7 @@ Requires:	logrotate
 Requires:	psmisc >= 20.1
 Provides:	syslogdaemon
 Obsoletes:	syslog
+Obsoletes:	msyslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
