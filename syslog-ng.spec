@@ -1,8 +1,8 @@
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Name:		syslog-ng
-Version:	1.4.13
-Release:	2
+Version:	1.4.14
+Release:	1
 License:	GPL
 Group:		Daemons
 Group(de):	Server
