@@ -1,23 +1,27 @@
+%define		mainver		1.6
+%define		minorver	0
+%define		subver		rc3
+%define		fullver		%{mainver}.%{minorver}%{subver}
+
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	1.4.17
-Release:	3
+Version:	%{mainver}.%{minorver}
+Release:	0.%{subver}.2
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{fullver}.tar.gz
+# Source0-md5:	5bec56b1663ca32bea9d48edac399887
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Patch0:		%{name}-autoconf.patch
-Patch1:		%{name}-notestlibolver.patch
-Patch2:		%{name}-ac25x.patch
+Patch0:		%{name}-ac25x.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.2.21
+BuildRequires:	libol-static >= 0.3.10
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	fileutils
@@ -52,10 +56,8 @@ por seu conteúdo (usando expressões regulares) e não apenas pelo par
 facility/prioridade como o syslog original.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{fullver}
 %patch0 -p1
-%patch1 -p0
-%patch2 -p1
 
 %build
 rm -f missing
@@ -68,7 +70,7 @@ rm -f missing
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng}
-install -d $RPM_BUILD_ROOT/var/log/{mail,archiv{,/mail}}
+install -d $RPM_BUILD_ROOT/var/log/{mail,archiv}
 
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
@@ -117,4 +119,3 @@ fi
 %attr(640,root,root) %ghost /var/log/syslog
 %dir /var/log/mail
 %dir /var/log/archiv
-%dir /var/log/archiv/mail
