@@ -1,15 +1,16 @@
 Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
-Version:	1.4.3
-Release:	3
+Version:	1.4.5
+Release:	1
 License:	GPL
 Group:		Daemons
 Group(pl):	Serwery
-Source0:	http://www.balabit.hu//downloads/syslog-ng/source/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/source/%{name}-%{version}.tar.gz
 Source1:	syslog-ng.init
 Source2:	syslog-ng.conf
 Patch0:		syslog-ng-autoconf.patch
+URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	libol-static >= 0.2.16
 BuildRequires:	flex
 Requires:	rc-scripts >= 0.2.0
