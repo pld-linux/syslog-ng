@@ -53,7 +53,7 @@ LDFLAGS="-s"; export LDFLAGS
 rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/{syslog-ng,logrotate.d}} \
-	$RPM_BUILD_ROOT/var/log/{news,mail}
+	$RPM_BUILD_ROOT/var/log/{archiv,}/{news,mail}
 
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
