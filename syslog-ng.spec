@@ -1,5 +1,5 @@
 %define		mainver		1.6
-%define		minorver	2
+%define		minorver	3
 %define		subver		%{nil}
 %define		fullver		%{mainver}.%{minorver}
 
@@ -12,7 +12,7 @@ Release:	1
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{fullver}.tar.gz
-# Source0-md5:	c84bf2b80bc44a5716c9c20402c85eaf
+# Source0-md5:	43cd9301077ea4ef47ab5cde7f428894
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
