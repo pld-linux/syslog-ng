@@ -3,10 +3,11 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	1.4.17
-Release:	3
+Release:	4
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/src/%{name}-%{version}.tar.gz
+# Source0-md5:	dc1e520c96cf290d237711bcee14f8ed
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -26,7 +27,7 @@ Requires:	psmisc >= 20.1
 Provides:	syslogdaemon
 Obsoletes:	syslog
 Obsoletes:	msyslog
-Obsoletes:	klogd
+#Obsoletes:	klogd
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
