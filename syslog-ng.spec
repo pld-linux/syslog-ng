@@ -49,6 +49,7 @@ mo¿liwo¶ci logowania i kontrolowania zbieranych informacji.
 %patch -p1
 
 %build
+rm -f missing
 aclocal
 autoconf
 automake -a -c
