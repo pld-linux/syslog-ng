@@ -8,7 +8,7 @@ diff -Nur syslog-ng-1.6.0rc3.orig/configure.in syslog-ng-1.6.0rc3.chng/configure
 -AC_CHECK_FUNC(getopt_long,,[LIBOBJS="getopt.o getopt1.o $LIBOBJS"])
 -AC_CHECK_FUNC(strcasecmp,,[LIBOBJS="strcasecmp.o $LIBOBJS"])
 -AC_CHECK_FUNC(strptime,,[LIBOBJS="strptime.o $LIBOBJS"])
-+AC_CHECK_FUNC(getopt_long,,[AC_LIBOBJ([getopt]); AC_LIBOBJ([getopt1])])
++AC_CHECK_FUNC(getopt_long,,[AC_LIBOBJ([getopt]) AC_LIBOBJ([getopt1])])
 +AC_CHECK_FUNC(strcasecmp,,[AC_LIBOBJ([strcasecmp])])
 +AC_CHECK_FUNC(strptime,,[AC_LIBOBJ([strptime])])
  
