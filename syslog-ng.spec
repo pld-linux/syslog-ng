@@ -1,5 +1,6 @@
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
+Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	1.4.14
 Release:	2
@@ -41,6 +42,12 @@ modification on the line.
 Syslog-ng jest zamiennikiem dla standartowo u¿ywanych programów typu
 sysklog. Dzia³a w systemie SunOS, BSD, Linux. Daje znacznie wiêksze
 mo¿liwo¶ci logowania i kontrolowania zbieranych informacji.
+
+%description -l pt_BR
+Syslog-ng é um substituto para o syslog tradicional, mas com diversas
+melhorias, como, por exemplo, a habilidade de filtrar mensagens de log
+por seu conteúdo (usando expressões regulares) e não apenas pelo par
+facility/prioridade como o syslog original.
 
 %prep
 %setup -q
