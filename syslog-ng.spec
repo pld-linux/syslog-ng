@@ -57,7 +57,7 @@ facility/prioridade como o syslog original.
 
 %build
 rm -f missing
-aclocal
+%{__aclocal}
 %{__autoconf}
 %{__automake}
 %configure
