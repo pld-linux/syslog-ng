@@ -66,7 +66,7 @@ aclocal
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
-	$RPM_BUILD_ROOT/var/log/{,archiv}}
+	$RPM_BUILD_ROOT/var/log/{mail,archiv}}
 
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
@@ -116,3 +116,5 @@ fi
 %{_mandir}/man[58]/*
 
 %attr(640,root,root) %ghost /var/log/syslog
+%dir /var/log/mail
+%dir /var/log/archiv
