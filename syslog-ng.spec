@@ -2,14 +2,14 @@ Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
 Version:	1.4.5
-Release:	1
+Release:	2
 License:	GPL
 Group:		Daemons
 Group(pl):	Serwery
 Source0:	http://www.balabit.hu/downloads/syslog-ng/source/%{name}-%{version}.tar.gz
-Source1:	syslog-ng.init
-Source2:	syslog-ng.conf
-Patch0:		syslog-ng-autoconf.patch
+Source1:	%{name}.init
+Source2:	%{name}.conf
+Patch0:		%{name}-autoconf.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	libol-static >= 0.2.16
 BuildRequires:	flex
@@ -21,14 +21,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir	/etc
 
 %description
-syslog-ng is a syslogd replacement for unix and unix-like systems. It has
-been tested on Solaris, BSDi and Linux, and were found to run reliably.
-syslog-ng gives you a much enhanced configuration scheme, which lets you
-filter messages based on not only priority/facility pairs, but also on
-message content. You can use regexps to direct log stream to different
-destinations. A destination can be anything from a simple file to a network
-connection. syslog-ng supports TCP logforwarding, together with hashing to
-prevent unauthorized modification on the line.
+syslog-ng is a syslogd replacement for unix and unix-like systems. It
+has been tested on Solaris, BSDi and Linux, and were found to run
+reliably. syslog-ng gives you a much enhanced configuration scheme,
+which lets you filter messages based on not only priority/facility
+pairs, but also on message content. You can use regexps to direct log
+stream to different destinations. A destination can be anything from a
+simple file to a network connection. syslog-ng supports TCP
+logforwarding, together with hashing to prevent unauthorized
+modification on the line.
 
 %description -l pl
 Syslog-ng jest zamiennikiem dla standartowo u¿ywanych programów typu
