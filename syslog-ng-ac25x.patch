@@ -1,13 +1,15 @@
 --- syslog-ng-1.4.15/configure.in.orig	Mon May 13 21:12:40 2002
 +++ syslog-ng-1.4.15/configure.in	Mon May 13 21:15:15 2002
-@@ -97,12 +97,12 @@
+@@ -97,13 +97,13 @@
  AC_FUNC_VPRINTF
  AC_CHECK_LIB(door, door_create)
  AC_CHECK_FUNCS(select snprintf vsnprintf strerror inet_aton strncpy getutent)
 -AC_CHECK_FUNC(getopt_long,,[LIBOBJS="getopt.o getopt1.o $LIBOBJS"])
 -AC_CHECK_FUNC(strcasecmp,,[LIBOBJS="strcasecmp.o $LIBOBJS"])
+-AC_CHECK_FUNC(strptime,,[LIBOBJS="strptime.o $LIBOBJS"])
 +AC_CHECK_FUNC(getopt_long,,[AC_LIBOBJ([getopt]); AC_LIBOBJ([getopt1]);])
 +AC_CHECK_FUNC(strcasecmp,,[AC_LIBOBJ([strcasecmp])])
++AC_CHECK_FUNC(strptime,,[AC_LIBOBJ(strptime)])
  
  if test "x$ac_cv_func_snprintf" = "xno" -o \
  	"x$ac_cv_func_vsnprintf" = "xno"; then
