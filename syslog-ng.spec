@@ -5,8 +5,6 @@ Version:	1.4.14
 Release:	1
 License:	GPL
 Group:		Daemons
-Group(de):	Server
-Group(pl):	Serwery
 Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
