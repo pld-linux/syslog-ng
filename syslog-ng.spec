@@ -5,7 +5,7 @@ Version:	1.4.3
 Release:	2 
 License:	GPL
 Group:		Daemons
-Group(pl):	Demony
+Group(pl):	Serwery
 Source0:	http://www.balabit.hu//downloads/syslog-ng/source/%{name}-%{version}.tar.gz
 Source1:	syslog-ng.init
 Source2:	syslog-ng.conf
