@@ -64,23 +64,23 @@ touch $RPM_BUILD_ROOT/var/log/syslog
 for n in /var/log/{auth.log,syslog,cron.log,daemon.log,kern.log,lpr.log,user.log,uucp.log,ppp.log,mail.log,mail.info,mail.warn,mail.err,debug,messages}
 do
 	[ -f $n ] && continue
-	touch &n
-	chmod 640 &n
+	touch $n
+	chmod 640 $n
 done
 
-/sbin/checkconfig --add syslog
+/sbin/chkconfig --add syslog-ng
 if [ -f /var/lock/subsys/ ]; then
 	/etc/rc.d/init.d/syslog restart &>/dev/null
 else
-	echo "Run \"/etc/rc.d/init.d/syslog start\" to start syslog-ng daemon."
+	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
 fi
 
 %preun
 if [ "$1" = "0" ]; then
-	if if [ -f /var/lock/subsys/ ]; then
-		/etc/rc.d/init.d/syslog stop >&2
+	if [ -f /var/lock/subsys/ ]; then
+		/etc/rc.d/init.d/syslog-ng stop >&2
 	fi
-	/sbin/checkconfig --del syslog
+	/sbin/chkconfig --del syslog-ng
 fi
 
 %clean
