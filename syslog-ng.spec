@@ -12,6 +12,7 @@ Source0:	%name-%version.tar.gz
 Source1:	syslog-ng
 Source2:	syslog-ng.conf
 BuildRequires:	libol >= 0.2
+Requires:	rc-scripts
 Obsolotes:	syslog
 Buildroot:	/tmp/%{name}-%{version}-root
 
