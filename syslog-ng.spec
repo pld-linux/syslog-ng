@@ -1,25 +1,25 @@
 %define		mainver		1.6
-%define		minorver	5
+%define		minorver	6
 
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	4
+Release:	1
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
-# Source0-md5:	ce70b4230e73ad79191618530c8c3a72
-# Source0-size:	396947
+# Source0-md5:	2d955e93a5b07295de3fc8bf71ffeb48
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
+Patch0:		%{name}-link.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.3.14
+BuildRequires:	libol-static >= 0.3.15
 BuildRequires:	libwrap-devel
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
@@ -56,6 +56,7 @@ facility/prioridade como o syslog original.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %{__aclocal}
