@@ -70,7 +70,7 @@ rm -f missing
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
-	$RPM_BUILD_ROOT/var/log/{mail,archiv}
+	$RPM_BUILD_ROOT/var/log/{mail,archiv/mail}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -120,3 +120,4 @@ fi
 %attr(640,root,root) %ghost /var/log/syslog
 %dir /var/log/mail
 %dir /var/log/archiv
+%dir /var/log/archiv/mail
