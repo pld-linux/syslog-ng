@@ -6,7 +6,7 @@ Version:	1.5.26
 Release:	1
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/1.5/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/1.5/src/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
