@@ -3,7 +3,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	1.4.17
-Release:	2
+Release:	3
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
@@ -25,6 +25,8 @@ Requires:	logrotate
 Requires:	psmisc >= 20.1
 Provides:	syslogdaemon
 Obsoletes:	syslog
+Obsoletes:	msyslog
+Obsoletes:	klogd
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -89,12 +91,9 @@ done
 
 /sbin/chkconfig --add syslog-ng
 if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart >/dev/null 2>&1
+	/etc/rc.d/init.d/syslog-ng restart >&2
 else
 	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
-fi
-if [ -f /var/lock/subsys/klogd ]; then
-	/etc/rc.d/init.d/klogd restart 1>&2
 fi
 
 %preun
