@@ -116,5 +116,5 @@ fi
 
 %attr(640,root,root) %ghost /var/log/syslog
 %dir /var/log/mail
-%dir /var/log/archiv
+##%dir /var/log/archiv
 %dir /var/log/archiv/mail
