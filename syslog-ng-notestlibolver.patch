@@ -1,0 +1,15 @@
+--- configure.in.org	Mon Apr 29 10:58:05 2002
++++ configure.in	Mon Apr 29 11:07:04 2002
+@@ -151,12 +151,6 @@
+ LIBOL_MAJOR=[`echo $LIBOL_VERSION | sed -e 's/\([0-9]*\)\.[0-9]*\.[0-9]*/\1/'`]
+ LIBOL_MINOR=[`echo $LIBOL_VERSION | sed -e 's/[0-9]*\.\([0-9]*\)\.[0-9]*/\1/'`]
+ LIBOL_PATCH=[`echo $LIBOL_VERSION | sed -e 's/[0-9]*\.[0-9]*\.\([0-9]*\)/\1/'`]
+-if test "$LIBOL_MAJOR" != "$LIBOL_REQ_MAJOR" -o \
+-	"$LIBOL_MINOR" -lt "$LIBOL_REQ_MINOR" -o \
+-	"$LIBOL_PATCH" -lt "$LIBOL_REQ_PATCH"; then
+-	AC_MSG_RESULT(no)
+-	AC_MSG_ERROR(Required libol version not found)
+-fi
+ AC_MSG_RESULT(ok)
+ 
+ if test "$with_debug" = "yes" ; then
