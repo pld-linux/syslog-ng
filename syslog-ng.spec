@@ -1,31 +1,30 @@
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
+Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	1.4.15
-Release:	0.1
+Version:	1.5.20
+Release:	1
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.hu/downloads/syslog-ng/1.5/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Patch0:		%{name}-autoconf.patch
-Patch1:		%{name}-notestlibolver.patch
+Patch0:		%{name}-ac25x.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	libol-static >= 0.2.21
 BuildRequires:	flex
-Prereq:		rc-scripts >= 0.2.0
-Prereq:		/sbin/chkconfig
+BuildRequires:	libol-static >= 0.3.3
+PreReq:		rc-scripts >= 0.2.0
+Requires(post,preun):	/sbin/chkconfig
+Requires(post):	fileutils
 Requires:	logrotate
-Requires:	fileutils
 Requires:	psmisc >= 20.1
 Provides:	syslogdaemon
 Obsoletes:	syslog
+Obsoletes:	klogd
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%define		_sysconfdir	/etc
 
 %description
 syslog-ng is a syslogd replacement for unix and unix-like systems. It
@@ -39,43 +38,46 @@ logforwarding, together with hashing to prevent unauthorized
 modification on the line.
 
 %description -l pl
-Syslog-ng jest zamiennikiem dla standartowo u¿ywanych programów typu
+Syslog-ng jest zamiennikiem dla standardowo u¿ywanych programów typu
 sysklog. Dzia³a w systemie SunOS, BSD, Linux. Daje znacznie wiêksze
 mo¿liwo¶ci logowania i kontrolowania zbieranych informacji.
+
+%description -l pt_BR
+Syslog-ng é um substituto para o syslog tradicional, mas com diversas
+melhorias, como, por exemplo, a habilidade de filtrar mensagens de log
+por seu conteúdo (usando expressões regulares) e não apenas pelo par
+facility/prioridade como o syslog original.
 
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p0
 
 %build
 rm -f missing
 aclocal
-autoconf
-automake -a -c -f
+%{__autoconf}
+%{__automake}
 %configure
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/{syslog-ng,logrotate.d}} \
-	$RPM_BUILD_ROOT/var/log/{archiv,}/{news,mail}
+install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng}
+install -d $RPM_BUILD_ROOT/var/log/{mail,archiv}
 
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/syslog-ng
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
-gzip -9nf doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt \
-
-touch $RPM_BUILD_ROOT/var/log/syslog
+> $RPM_BUILD_ROOT/var/log/syslog
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for n in /var/log/{kernel,messages,secure,maillog,spooler,debug,cron,syslog,daemon,lpr,user,ppp,mail/{info,warn,err}}
+for n in /var/log/{cron,daemon,debug,kernel,lpr,maillog,messages,ppp,secure,spooler,syslog,user,mail/{info,warn,err}}
 do
 	[ -f $n ] && continue
 	touch $n
@@ -84,12 +86,9 @@ done
 
 /sbin/chkconfig --add syslog-ng
 if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart &>/dev/null
+	/etc/rc.d/init.d/syslog-ng restart >/dev/null 2>&1
 else
 	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
-fi
-if [ -f /var/lock/subsys/klogd ]; then
-	/etc/rc.d/init.d/klogd restart 1>&2
 fi
 
 %preun
@@ -102,15 +101,14 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc doc/*.gz doc/sgml/syslog-ng.txt*
+%doc doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
-%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
-%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/logrotate.d/syslog-ng
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %{_mandir}/man[58]/*
 
 %attr(640,root,root) %ghost /var/log/syslog
-%attr(750,root,root) %ghost /var/log/news
-%attr(750,root,root) %dir /var/log/mail
-%attr(750,root,root) %dir /var/log/archiv/mail
+%dir /var/log/mail
+%dir /var/log/archiv
