@@ -14,6 +14,7 @@ URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	libol-static >= 0.2.16
 BuildRequires:	flex
 Requires:	rc-scripts >= 0.2.0
+Provides:	syslogdaemon
 Obsoletes:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
