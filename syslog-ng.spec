@@ -7,6 +7,7 @@ Release:	1
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/1.5/src/%{name}-%{version}.tar.gz
+# Source0-md5: f32d82c4cce416014754a8c1171c323b
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
