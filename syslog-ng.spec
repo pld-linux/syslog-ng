@@ -24,14 +24,14 @@ been tested on Solaris, BSDi and Linux, and were found to run reliably.
 syslog-ng gives you a much enhanced configuration scheme, which lets you
 filter messages based on not only priority/facility pairs, but also on
 message content. You can use regexps to direct log stream to different
-destinations. A destination can be anything from a simple file to a
-network connection. syslog-ng supports TCP logforwarding, together with
-hashing to prevent unauthorized  modification on the line.
+destinations. A destination can be anything from a simple file to a network
+connection. syslog-ng supports TCP logforwarding, together with hashing to
+prevent unauthorized modification on the line.
 
 %description -l pl
-Syslog-ng jest zamiennikiem dla standartowo u¿ywanych programów typu sysklog
-Dzia³a w systemie SunON, BSD, Linux. Daje znacznie wiêksze mo¿liwosci
-logowanie i kontrolowanie zbieranych informacji.
+Syslog-ng jest zamiennikiem dla standartowo u¿ywanych programów typu
+sysklog Dzia³a w systemie SunON, BSD, Linux. Daje znacznie wiêksze
+mo¿liwosci logowanie i kontrolowanie zbieranych informacji.
 
 %prep
 %setup -q
