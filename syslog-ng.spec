@@ -3,7 +3,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	1.4.15
-Release:	4
+Release:	5
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
@@ -66,7 +66,7 @@ aclocal
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
-	$RPM_BUILD_ROOT/var/log/{,archiv}/{mail,news}
+	$RPM_BUILD_ROOT/var/log/{,archiv}}
 
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
@@ -116,6 +116,3 @@ fi
 %{_mandir}/man[58]/*
 
 %attr(640,root,root) %ghost /var/log/syslog
-%attr(750,root,root) %ghost /var/log/news
-%attr(750,root,root) %dir /var/log/mail
-%attr(750,root,root) %dir /var/log/archiv/mail
