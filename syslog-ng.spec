@@ -3,7 +3,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	1.4.15
-Release:	2
+Release:	3
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/1.4/%{name}-%{version}.tar.gz
@@ -12,13 +12,14 @@ Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Patch0:		%{name}-autoconf.patch
 Patch1:		%{name}-notestlibolver.patch
+Patch2:		%{name}-ac25x.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	libol-static >= 0.2.21
 BuildRequires:	flex
+BuildRequires:	libol-static >= 0.2.21
 Prereq:		rc-scripts >= 0.2.0
-Prereq:		/sbin/chkconfig
+Requires(post,preun):	/sbin/chkconfig
 Requires:	logrotate
 Requires:	fileutils
 Requires:	psmisc >= 20.1
@@ -54,6 +55,7 @@ facility/prioridade como o syslog original.
 %setup -q
 %patch0 -p1
 %patch1 -p0
+%patch2 -p1
 
 %build
 rm -f missing
@@ -91,7 +93,7 @@ done
 
 /sbin/chkconfig --add syslog-ng
 if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart &>/dev/null
+	/etc/rc.d/init.d/syslog-ng restart >/dev/null 2>&1
 else
 	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
 fi
@@ -111,8 +113,8 @@ fi
 %defattr(644,root,root,755)
 %doc doc/*.gz doc/sgml/syslog-ng.txt*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
-%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
-%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/logrotate.d/syslog-ng
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %{_mandir}/man[58]/*
