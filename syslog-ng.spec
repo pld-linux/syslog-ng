@@ -2,7 +2,7 @@ Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
 Version:	1.4.5
-Release:	6
+Release:	7
 License:	GPL
 Group:		Daemons
 Group(pl):	Serwery
@@ -105,3 +105,4 @@ rm -rf $RPM_BUILD_ROOT
 %attr(640,root,root) %ghost /var/log/syslog
 %attr(750,root,root) %ghost /var/log/news
 %attr(750,root,root) %dir /var/log/mail
+%attr(750,root,root) %dir /var/log/archiv/mail
