@@ -6,7 +6,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	2
+Release:	3
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
@@ -116,5 +116,4 @@ fi
 
 %attr(640,root,root) %ghost /var/log/syslog
 %dir /var/log/mail
-##%dir /var/log/archiv
 %dir /var/log/archiv/mail
