@@ -1,7 +1,7 @@
 Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
-Version:	1.1.27
+Version:	1.1.28
 Release:	1 
 Copyright:	GPL
 Group:		Daemons
@@ -10,7 +10,9 @@ Group(pl):	Demony
 #path:		/downloads/syslog-ng/source
 Source0:	%name-%version.tar.gz
 Source1:	syslog-ng
+Source2:	syslog-ng.conf
 BuildRequires:	libol >= 0.2
+Obsolotes:	syslog
 Buildroot:	/tmp/%{name}-%{version}-root
 
 %define	_prefix	/usr
@@ -37,7 +39,7 @@ Daje znacznie wiêksze mo¿liwosci logowanie i kontrolowanie zbieranych informacji
 
 %build
 autoconf
-./configure --prefix=/usr
+./configure --prefix=%{_prefix}
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS"
 make dvi
 make info
@@ -46,12 +48,13 @@ make info
 
 rm -rf $RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -d $RPM_BUILD_ROOT/etc/{syslog-ng,rc.d/init.d}
 
-install -d $RPM_BUILD_ROOT/var/log/
+install -d $RPM_BUILD_ROOT/var/log/news
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog
-install doc/syslog-ng.conf.sample $RPM_BUILD_ROOT/etc/syslog-ng.conf
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
+
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/syslog-ng
 
 make prefix=$RPM_BUILD_ROOT/usr install
 
@@ -90,7 +93,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644, root, root, 755)
 %doc doc/*.bz2 doc/syslog-ng.html.tar.gz
 
-%attr(640,root,root) %config %verify(not size mtime md5)/etc/syslog-ng.conf
+%attr(640,root,root) %config %verify(not size mtime md5)/etc/syslog-ng/syslog-ng.conf
 
 %attr(755,root,root) /etc/rc.d/init.d/syslog
 
