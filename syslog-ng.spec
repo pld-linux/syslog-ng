@@ -10,7 +10,7 @@ Source0:	http://www.balabit.hu/downloads/syslog-ng/1.5/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Patch2:		%{name}-ac25x.patch
+Patch0:		%{name}-ac25x.patch
 URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
