@@ -92,7 +92,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
-%attr(755,root,root) %{_sbindir}/syslog-ng/
+%attr(755,root,root) %{_sbindir}/syslog-ng
 
 %{_mandir}/man[58]/*
 %attr(640,root,root) %config(noreplace) %verify(not mtime md5 size) /var/log/*
