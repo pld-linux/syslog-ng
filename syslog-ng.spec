@@ -20,7 +20,7 @@ BuildRequires:	flex
 BuildRequires:	libol-static >= 0.2.21
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
-Requires:	fileutils
+Requires(post):	fileutils
 Requires:	logrotate
 Requires:	psmisc >= 20.1
 Provides:	syslogdaemon
