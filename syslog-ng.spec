@@ -10,7 +10,7 @@ Source0:	http://www.balabit.hu//downloads/syslog-ng/source/%{name}-%{version}.ta
 Source1:	syslog-ng.init
 Source2:	syslog-ng.conf
 Patch0:		syslog-ng-autoconf.patch
-BuildRequires:	libol >= 0.2.16
+BuildRequires:	libol-static >= 0.2.16
 BuildRequires:	flex
 Requires:	rc-scripts
 Obsoletes:	syslog
