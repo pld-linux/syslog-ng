@@ -21,7 +21,7 @@ URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.3.10
+BuildRequires:	libol-static >= 0.3.13
 BuildRequires:	libwrap-devel
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
