@@ -1,15 +1,15 @@
---- syslog-ng-1.5.23/configure.in.orig	Mon May 13 21:12:40 2002
-+++ syslog-ng-1.5.23/configure.in	Mon May 13 21:15:15 2002
-@@ -97,13 +97,13 @@
+--- syslog-ng-1.5.26/configure.in.orig	Fri Jan 31 10:39:59 2003
++++ syslog-ng-1.5.26/configure.in	Fri Feb 14 14:12:27 2003
+@@ -161,13 +161,13 @@
+ AC_CHECK_LIB(resolv, __res_init)
  AC_CHECK_LIB(door, door_create)
  AC_CHECK_FUNCS(select snprintf vsnprintf strerror inet_aton strncpy getutent)
- AC_CHECK_FUNCS(res_init)
 -AC_CHECK_FUNC(getopt_long,,[LIBOBJS="getopt.o getopt1.o $LIBOBJS"])
 -AC_CHECK_FUNC(strcasecmp,,[LIBOBJS="strcasecmp.o $LIBOBJS"])
 -AC_CHECK_FUNC(strptime,,[LIBOBJS="strptime.o $LIBOBJS"])
-+AC_CHECK_FUNC(getopt_long,,[AC_LIBOBJ([getopt]); AC_LIBOBJ([getopt1]);])
++AC_CHECK_FUNC(getopt_long,,[AC_LIBOBJ([getopt]); AC_LIBOBJ([getopt1])])
 +AC_CHECK_FUNC(strcasecmp,,[AC_LIBOBJ([strcasecmp])])
-+AC_CHECK_FUNC(strptime,,[AC_LIBOBJ(strptime)])
++AC_CHECK_FUNC(strptime,,[AC_LIBOBJ([strptime])])
  
  if test "x$ac_cv_func_snprintf" = "xno" -o \
  	"x$ac_cv_func_vsnprintf" = "xno"; then
@@ -18,11 +18,11 @@
  fi
  
  if test "x$ac_cv_lib_door_door_create" = "xyes"; then
-@@ -166,7 +166,6 @@
- 	AC_DEFINE(WITH_DEBUG)
- fi
+@@ -263,7 +263,6 @@
+ 
+ LIBS="$LIBS $LEXLIB $LIBOL_LIBS"
  AC_SUBST(YFLAGS)
 -AC_SUBST(LIBOBJS)
  
  AC_SUBST(MAKE_CLASS)
- 
+ AC_DEFINE_UNQUOTED(PATH_SYSCONFDIR, "`eval echo $sysconfdir`")
