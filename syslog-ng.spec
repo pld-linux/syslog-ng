@@ -2,9 +2,10 @@ Summary:	Syslog-ng - new generation fo the system logger
 Summary(pl):	Syslog-ng - zamiennik sysklog'a
 Name:		syslog-ng
 Version:	1.4.5
-Release:	8
+Release:	9
 License:	GPL
 Group:		Daemons
+Group(de):	Server
 Group(pl):	Serwery
 Source0:	http://www.balabit.hu/downloads/syslog-ng/source/%{name}-%{version}.tar.gz
 Source1:	%{name}.init
@@ -45,7 +46,6 @@ mo¿liwosci logowanie i kontrolowanie zbieranych informacji.
 %build
 aclocal
 autoconf
-LDFLAGS="-s"; export LDFLAGS
 %configure
 %{__make}
 
@@ -79,6 +79,9 @@ if [ -f /var/lock/subsys/syslog-ng ]; then
 	/etc/rc.d/init.d/syslog-ng restart &>/dev/null
 else
 	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
+fi
+if [ -f /var/lock/subsys/klogd ]; then
+	/etc/rc.d/init.d/klogd restart 1>&2
 fi
 
 %preun
