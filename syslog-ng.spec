@@ -8,7 +8,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	0.%{subver}.1
+Release:	0.%{subver}.2
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{fullver}.tar.gz
@@ -21,7 +21,7 @@ URL:		http://www.balabit.hu/products/syslog-ng/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.3.9
+BuildRequires:	libol-static >= 0.3.10
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	fileutils
