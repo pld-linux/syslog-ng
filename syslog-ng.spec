@@ -77,23 +77,13 @@ do
 	chmod 640 $n
 done
 
-/sbin/chkconfig --add syslog-ng
-if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart &>/dev/null
-else
-	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
-fi
+DESC="syslog-ng daemon"; %chkconfig_add
 if [ -f /var/lock/subsys/klogd ]; then
 	/etc/rc.d/init.d/klogd restart 1>&2
 fi
 
 %preun
-if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/syslog-ng ]; then
-		/etc/rc.d/init.d/syslog-ng stop >&2
-	fi
-	/sbin/chkconfig --del syslog-ng
-fi
+%chkconfig_del
 
 %clean
 rm -rf $RPM_BUILD_ROOT
