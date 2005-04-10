@@ -1,27 +1,26 @@
 %define		mainver		1.6
-%define		minorver	0
-%define		subver		rc3
-%define		fullver		%{mainver}.%{minorver}%{subver}
+%define		minorver	7
 
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	0.%{subver}.1
+Release:	1
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{fullver}.tar.gz
-# Source0-md5:	5bec56b1663ca32bea9d48edac399887
+Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
+# Source0-md5:	dc4d7cdbc5792e7ba0fd836bbdd4c62d
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Patch0:		%{name}-ac25x.patch
-URL:		http://www.balabit.hu/products/syslog-ng/
-BuildRequires:	autoconf
+Patch0:		%{name}-link.patch
+URL:		http://www.balabit.com/products/syslog_ng/
+BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.3.9
+BuildRequires:	libol-static >= 0.3.15
+BuildRequires:	libwrap-devel
 PreReq:		rc-scripts >= 0.2.0
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	fileutils
@@ -56,23 +55,26 @@ por seu conteúdo (usando expressões regulares) e não apenas pelo par
 facility/prioridade como o syslog original.
 
 %prep
-%setup -q -n %{name}-%{fullver}
+%setup -q
 %patch0 -p1
 
 %build
-rm -f missing
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-%configure
+%configure \
+	--enable-tcp-wrapper
 %{__make}
+
+tar zxvf doc/sgml/syslog-ng.html.tar.gz
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng}
-install -d $RPM_BUILD_ROOT/var/log/{mail,archiv}
+install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
+	$RPM_BUILD_ROOT/var/log/{mail,archiv/mail}
 
-%{__make} DESTDIR=$RPM_BUILD_ROOT install
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
@@ -108,7 +110,8 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt*
+%doc doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
+%doc syslog-ng.html/*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/logrotate.d/syslog-ng
@@ -118,4 +121,4 @@ fi
 
 %attr(640,root,root) %ghost /var/log/syslog
 %dir /var/log/mail
-%dir /var/log/archiv
+%dir /var/log/archiv/mail
