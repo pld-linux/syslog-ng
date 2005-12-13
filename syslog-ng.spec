@@ -21,11 +21,11 @@ BuildRequires:	automake
 BuildRequires:	flex
 BuildRequires:	libol-static >= 0.3.17
 BuildRequires:	libwrap-devel
-PreReq:		rc-scripts >= 0.2.0
-Requires(post,preun):	/sbin/chkconfig
 Requires(post):	fileutils
+Requires(post,preun):	/sbin/chkconfig
 Requires:	logrotate
 Requires:	psmisc >= 20.1
+Requires:	rc-scripts >= 0.2.0
 Provides:	syslogdaemon
 Obsoletes:	syslog
 Obsoletes:	msyslog
@@ -113,8 +113,8 @@ fi
 %doc doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
 %doc syslog-ng.html/*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/logrotate.d/syslog-ng
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %{_mandir}/man[58]/*
