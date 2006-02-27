@@ -1,4 +1,4 @@
-%define		mainver		1.6
+%define		mainver		1.9
 %define		minorver	9
 
 Summary:	Syslog-ng - new generation of the system logger
@@ -6,11 +6,11 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	3.1
+Release:	0.1
 License:	GPL
 Group:		Daemons
-Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
-# Source0-md5:	5280a86b4f5c25b2ba157c8cea302cf0
+Source0:	http://www.balabit.com/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
+# Source0-md5:	76dfb7ea910d1b033031aca2f40bf723
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -18,8 +18,9 @@ Patch0:		%{name}-link.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
+BuildRequires:	eventlog-devel
 BuildRequires:	flex
-BuildRequires:	libol-static >= 0.3.17
+BuildRequires:	glib2-static
 BuildRequires:	libwrap-devel
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -62,8 +63,8 @@ facility/prioridade como o syslog original.
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-%configure \
-	--enable-tcp-wrapper
+%configure
+
 %{__make}
 
 tar zxvf doc/sgml/syslog-ng.html.tar.gz
