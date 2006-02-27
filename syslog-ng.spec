@@ -71,7 +71,7 @@ tar zxvf doc/sgml/syslog-ng.html.tar.gz
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
-	$RPM_BUILD_ROOT/var/log/{mail,archiv/mail}
+	$RPM_BUILD_ROOT/var/log/
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -80,13 +80,16 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
-> $RPM_BUILD_ROOT/var/log/syslog
+for n in debug kernel maillog messages secure syslog user spooler lpr daemon
+do
+	> $RPM_BUILD_ROOT/var/log/$n
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for n in /var/log/{cron,daemon,debug,kernel,lpr,maillog,messages,ppp,secure,spooler,syslog,user,mail/{info,warn,err}}
+for n in /var/log/{cron,daemon,debug,kernel,lpr,maillog,messages,ppp,secure,spooler,syslog,user}
 do
 	[ -f $n ] && continue
 	touch $n
@@ -119,6 +122,4 @@ fi
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %{_mandir}/man[58]/*
 
-%attr(640,root,root) %ghost /var/log/syslog
-%dir /var/log/mail
-%dir /var/log/archiv/mail
+%attr(640,root,root) %ghost /var/log/*
