@@ -6,7 +6,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	0.1
+Release:	1
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
@@ -63,11 +63,12 @@ facility/prioridade como o syslog original.
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-%configure
+%configure \
+	--sysconfdir=%{_sysconfdir}/syslog-ng
 
 %{__make}
 
-tar zxvf doc/sgml/syslog-ng.html.tar.gz
+tar zxvf doc/reference/syslog-ng.html.tar.gz
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -114,7 +115,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
+%doc doc/examples/syslog-ng.conf.sample doc/reference/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
 %doc syslog-ng.html/*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
