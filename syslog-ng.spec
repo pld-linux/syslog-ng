@@ -1,3 +1,6 @@
+# TODO
+# - use shared eventlog
+
 %define		mainver		1.9
 %define		minorver	9
 
@@ -19,18 +22,20 @@ URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	eventlog-devel
+BuildRequires:	eventlog-static
 BuildRequires:	flex
 BuildRequires:	glib2-static
 BuildRequires:	libwrap-devel
+BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires:	logrotate
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.2.0
 Provides:	syslogdaemon
-Obsoletes:	syslog
-Obsoletes:	msyslog
 Obsoletes:	klogd
+Obsoletes:	msyslog
+Obsoletes:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -99,17 +104,11 @@ do
 done
 
 /sbin/chkconfig --add syslog-ng
-if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart >&2
-else
-	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
-fi
+%service syslog-ng restart "syslog-ng daemon"
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/syslog-ng ]; then
-		/etc/rc.d/init.d/syslog-ng stop >&2
-	fi
+	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
 
