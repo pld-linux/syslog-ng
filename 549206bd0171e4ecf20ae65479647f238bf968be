@@ -1,0 +1,4 @@
+- updated to version 1.4.17
+- from changelog:
+  * Fixed a possible off-by-one problem
+  * A more correct version of the previous security update was added.
