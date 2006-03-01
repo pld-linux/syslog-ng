@@ -1,0 +1,4 @@
+- added ac25x patch needed for autoconf 2.53
+- use config(noreplace)
+- fixed bashism in %post
+- release 3
