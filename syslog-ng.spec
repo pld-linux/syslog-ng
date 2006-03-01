@@ -1,5 +1,3 @@
-# TODO
-# - use shared eventlog
 
 %define		mainver		1.9
 %define		minorver	9
@@ -21,7 +19,6 @@ Patch0:		%{name}-link.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
-BuildRequires:	eventlog-devel
 BuildRequires:	eventlog-static
 BuildRequires:	flex
 BuildRequires:	glib2-static
