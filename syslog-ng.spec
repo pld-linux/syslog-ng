@@ -1,4 +1,7 @@
-
+#
+# Conditional build:
+%bcond_with	dynamic		# link dynamically with glib and eventlog
+#
 %define		mainver		1.9
 %define		minorver	9
 
@@ -19,11 +22,16 @@ Patch0:		%{name}-link.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
-BuildRequires:	eventlog-static
 BuildRequires:	flex
-BuildRequires:	glib2-static
 BuildRequires:	libwrap-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
+%if %{with dynamic}
+BuildRequires:	eventlog-devel
+BuildRequires:	glib2-devel >= 2.0.0
+%else
+BuildRequires:	eventlog-static
+BuildRequires:	glib2-static >= 2.0.0
+%endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires:	logrotate
@@ -66,7 +74,10 @@ facility/prioridade como o syslog original.
 %{__autoconf}
 %{__automake}
 %configure \
-	--sysconfdir=%{_sysconfdir}/syslog-ng
+	--sysconfdir=%{_sysconfdir}/syslog-ng \
+%if %{with dynamic}
+	--enable-dynamic-linking
+%endif
 
 %{__make}
 
