@@ -11,7 +11,7 @@ Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
 Release:	2
-License:	GPL
+License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
 # Source0-md5:	76dfb7ea910d1b033031aca2f40bf723
