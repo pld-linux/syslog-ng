@@ -1,11 +1,3 @@
-# TODO
-# - weird configure error
-#checking for getopt_long... yes
-#checking whether to enable Sun STREAMS support... no
-#checking whether to enable Sun door support... no
-#./configure[6057]: syntax error: `GLIB,' unexpected
-#error: Bad exit status from /var/tmp/rpm-tmp.36085 (%build)
-#
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib and eventlog
 #
@@ -32,6 +24,7 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	libwrap-devel
+BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with dynamic}
 BuildRequires:	eventlog-devel
