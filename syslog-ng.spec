@@ -86,8 +86,8 @@ tar zxvf doc/reference/syslog-ng.html.tar.gz
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
-	$RPM_BUILD_ROOT/var/log/
+install -d $RPM_BUILD_ROOT{/etc/{sysconfig,logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
+	$RPM_BUILD_ROOT/var/log
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -100,6 +100,7 @@ for n in debug kernel maillog messages secure syslog user spooler lpr daemon
 do
 	> $RPM_BUILD_ROOT/var/log/$n
 done
+touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -125,6 +126,7 @@ fi
 %defattr(644,root,root,755)
 %doc doc/examples/syslog-ng.conf.sample doc/reference/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
 %doc syslog-ng.html/*
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
