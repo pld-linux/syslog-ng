@@ -6,7 +6,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	3
+Release:	4
 License:	GPL
 Group:		Daemons
 Source0:	http://www.balabit.hu/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
@@ -21,15 +21,16 @@ BuildRequires:	automake
 BuildRequires:	flex
 BuildRequires:	libol-static >= 0.3.17
 BuildRequires:	libwrap-devel
-PreReq:		rc-scripts >= 0.2.0
-Requires(post,preun):	/sbin/chkconfig
+BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	fileutils
+Requires(post,preun):	/sbin/chkconfig
 Requires:	logrotate
 Requires:	psmisc >= 20.1
+Requires:	rc-scripts >= 0.2.0
 Provides:	syslogdaemon
-Obsoletes:	syslog
-Obsoletes:	msyslog
 Obsoletes:	klogd
+Obsoletes:	msyslog
+Obsoletes:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -94,17 +95,11 @@ do
 done
 
 /sbin/chkconfig --add syslog-ng
-if [ -f /var/lock/subsys/syslog-ng ]; then
-	/etc/rc.d/init.d/syslog-ng restart >&2
-else
-	echo "Run \"/etc/rc.d/init.d/syslog-ng start\" to start syslog-ng daemon."
-fi
+%service syslog-ng restart "syslog-ng daemon"
 
 %preun
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/syslog-ng ]; then
-		/etc/rc.d/init.d/syslog-ng stop >&2
-	fi
+	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
 
@@ -113,8 +108,8 @@ fi
 %doc doc/syslog-ng.conf.{demo,sample} doc/sgml/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
 %doc syslog-ng.html/*
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/syslog-ng/syslog-ng.conf
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/logrotate.d/syslog-ng
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %{_mandir}/man[58]/*
