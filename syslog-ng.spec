@@ -10,7 +10,7 @@ Summary(pl):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minorver}
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
@@ -97,7 +97,7 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
-for n in debug kernel maillog messages secure syslog user spooler lpr daemon
+for n in debug kernel maillog messages secure syslog user spooler lpr daemon xferlog
 do
 	> $RPM_BUILD_ROOT/var/log/$n
 done
@@ -107,7 +107,7 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for n in /var/log/{cron,daemon,debug,kernel,lpr,maillog,messages,ppp,secure,spooler,syslog,user}
+for n in /var/log/{cron,daemon,debug,kernel,lpr,maillog,messages,ppp,secure,spooler,syslog,user,xferlog}
 do
 	[ -f $n ] && continue
 	touch $n
