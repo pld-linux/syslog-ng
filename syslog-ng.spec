@@ -29,10 +29,10 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with dynamic}
 BuildRequires:	eventlog-devel
-BuildRequires:	glib2-devel >= 2.0.0
+BuildRequires:	glib2-devel >= 1:2.0.0
 %else
 BuildRequires:	eventlog-static
-BuildRequires:	glib2-static >= 2.0.0
+BuildRequires:	glib2-static >= 1:2.0.0
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -71,6 +71,8 @@ facility/prioridade como o syslog original.
 %setup -q
 %patch0 -p1
 
+%{__tar} zxvf doc/reference/syslog-ng.html.tar.gz
+
 %build
 %{__aclocal}
 %{__autoconf}
@@ -82,8 +84,6 @@ facility/prioridade como o syslog original.
 %endif
 
 %{__make}
-
-tar zxvf doc/reference/syslog-ng.html.tar.gz
 
 %install
 rm -rf $RPM_BUILD_ROOT
