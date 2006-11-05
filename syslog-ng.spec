@@ -34,6 +34,7 @@ BuildRequires:	glib2-devel >= 1:2.0.0
 %else
 BuildRequires:	eventlog-static
 BuildRequires:	glib2-static >= 1:2.0.0
+BuildRequires:	glibc-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
