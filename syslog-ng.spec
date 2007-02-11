@@ -28,10 +28,10 @@ BuildRequires:	libwrap-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with dynamic}
-BuildRequires:	eventlog-devel
+BuildRequires:	eventlog-devel >= 0.2
 BuildRequires:	glib2-devel >= 1:2.0.0
 %else
-BuildRequires:	eventlog-static
+BuildRequires:	eventlog-static >= 0.2
 BuildRequires:	glib2-static >= 1:2.0.0
 BuildRequires:	glibc-static
 %endif
