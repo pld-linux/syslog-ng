@@ -6,8 +6,8 @@
 %define		minver		2
 
 Summary:	Syslog-ng - new generation of the system logger
-Summary(pl.UTF-8):   Syslog-ng - zamiennik syskloga
-Summary(pt_BR.UTF-8):   Daemon de log nova geração
+Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
+Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	%{mainver}.%{minver}
 Release:	1
