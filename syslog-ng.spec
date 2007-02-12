@@ -6,8 +6,8 @@
 %define		minver		2
 
 Summary:	Syslog-ng - new generation of the system logger
-Summary(pl):	Syslog-ng - zamiennik syskloga
-Summary(pt_BR):	Daemon de log nova geraÁ„o
+Summary(pl.UTF-8):   Syslog-ng - zamiennik syskloga
+Summary(pt_BR.UTF-8):   Daemon de log nova gera√ß√£o
 Name:		syslog-ng
 Version:	%{mainver}.%{minver}
 Release:	1
@@ -57,15 +57,15 @@ simple file to a network connection. syslog-ng supports TCP
 logforwarding, together with hashing to prevent unauthorized
 modification on the line.
 
-%description -l pl
-Syslog-ng jest zamiennikiem dla standardowo uøywanych programÛw typu
-sysklog. Dzia≥a w systemie SunOS, BSD, Linux. Daje znacznie wiÍksze
-moøliwo∂ci logowania i kontrolowania zbieranych informacji.
+%description -l pl.UTF-8
+Syslog-ng jest zamiennikiem dla standardowo u≈ºywanych program√≥w typu
+sysklog. Dzia≈Ça w systemie SunOS, BSD, Linux. Daje znacznie wiƒôksze
+mo≈ºliwo≈õci logowania i kontrolowania zbieranych informacji.
 
-%description -l pt_BR
-Syslog-ng È um substituto para o syslog tradicional, mas com diversas
+%description -l pt_BR.UTF-8
+Syslog-ng √© um substituto para o syslog tradicional, mas com diversas
 melhorias, como, por exemplo, a habilidade de filtrar mensagens de log
-por seu conte˙do (usando expressıes regulares) e n„o apenas pelo par
+por seu conte√∫do (usando express√µes regulares) e n√£o apenas pelo par
 facility/prioridade como o syslog original.
 
 %prep
