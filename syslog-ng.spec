@@ -3,7 +3,7 @@
 %bcond_with	dynamic		# link dynamically with glib and eventlog
 #
 %define		mainver		2.0
-%define		minver		2
+%define		minver		3
 
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
@@ -14,7 +14,7 @@ Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/syslog-ng/%{mainver}/src/%{name}-%{version}.tar.gz
-# Source0-md5:	7ef12e1e43a99c5b6b8d1984dde72151
+# Source0-md5:	01cafcfebf1c05f9253c3f3c9a987434
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -24,16 +24,18 @@ BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	libwrap-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with dynamic}
 BuildRequires:	eventlog-devel >= 0.2
-BuildRequires:	glib2-devel >= 1:2.0.0
+BuildRequires:	glib2-devel >= 1:2.2.0
+BuildRequires:	libnet-devel >= 1:1.1.2.1-3
+BuildRequires:	libwrap-devel
 %else
 BuildRequires:	eventlog-static >= 0.2
-BuildRequires:	glib2-static >= 1:2.0.0
-BuildRequires:	glibc-static
+BuildRequires:	glib2-static >= 1:2.2.0
+BuildRequires:	libnet-static >= 1:1.1.2.1-3
+BuildRequires:	libwrap-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
