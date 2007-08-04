@@ -44,7 +44,7 @@ Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.2.0
 Provides:	syslogdaemon
 Obsoletes:	klogd
-Obsoletes:	msyslog
+Conflicts:	msyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
