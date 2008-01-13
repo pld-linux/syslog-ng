@@ -2,19 +2,16 @@
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib and eventlog
 #
-%define		mainver		2.0
-%define		minver		6
-
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	%{mainver}.%{minver}
-Release:	2
+Version:	2.0.7
+Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/stable/src/%{name}-%{version}.tar.gz
-# Source0-md5:	16fa7595834765537650b390e93fe5e7
+# Source0-md5:	dc3726fbedb738901c5588fa36e00bbf
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -137,6 +134,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
+%attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %dir %{_var}/lib/%{name}
 %{_mandir}/man[58]/*
