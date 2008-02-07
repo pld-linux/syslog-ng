@@ -47,7 +47,7 @@ Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-syslog-ng is a syslogd replacement for unix and unix-like systems. It
+syslog-ng is a syslogd replacement for Unix and Unix-like systems. It
 has been tested on Solaris, BSDi and Linux, and were found to run
 reliably. syslog-ng gives you a much enhanced configuration scheme,
 which lets you filter messages based on not only priority/facility
@@ -59,7 +59,7 @@ modification on the line.
 
 %description -l pl.UTF-8
 Syslog-ng jest zamiennikiem dla standardowo używanych programów typu
-sysklog. Działa w systemie SunOS, BSD, Linux. Daje znacznie większe
+syslog. Działa w systemie SunOS, BSD, Linux. Daje znacznie większe
 możliwości logowania i kontrolowania zbieranych informacji.
 
 %description -l pt_BR.UTF-8
