@@ -16,6 +16,8 @@ Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/3.0.1/source/%
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
+Source4:	http://www.balabit.com/dl/guides/syslog-ng-v3.0-guide-admin-en.pdf
+# Source4-md5:	d85266ac9155ad6df9844aadf830b379
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
 URL:		http://www.balabit.com/products/syslog_ng/
@@ -88,7 +90,7 @@ facility/prioridade como o syslog original.
 %patch0 -p1
 %patch1 -p1
 
-#%{__tar} xzf doc/reference/syslog-ng.html.tar.gz
+install %{SOURCE4} doc/
 
 %build
 %{__aclocal}
@@ -155,9 +157,7 @@ fi
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/{relogger.pl,syslog-ng.vim}
 %doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,RedHat}
-%doc contrib/{apparmor,selinux}
-#%doc doc/reference/syslog-ng.txt*
-#%doc syslog-ng.html/*
+%doc contrib/{apparmor,selinux} doc/syslog-ng-v3.0-guide-admin-en.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
