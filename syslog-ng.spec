@@ -129,6 +129,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
+%doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/{relogger.pl,syslog-ng.vim}
 %doc doc/examples/syslog-ng.conf.sample doc/reference/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
 %doc syslog-ng.html/*
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
