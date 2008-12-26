@@ -1,4 +1,6 @@
 #
+# TODO:	upgrade to 2.1 or 3.0.1
+#
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib and eventlog
 #
@@ -10,7 +12,7 @@ Version:	2.0.10
 Release:	2
 License:	GPL v2
 Group:		Daemons
-Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/stable/src/%{name}-%{version}.tar.gz
+Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/2.0/src/%{name}-%{version}.tar.gz
 # Source0-md5:	3f96ccf13dda0b9e150e511bcffde795
 Source1:	%{name}.init
 Source2:	%{name}.conf
