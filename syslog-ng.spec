@@ -1,19 +1,18 @@
 #
-# TODO:	upgrade to 2.1 or 3.0.1
-#
 # Conditional build:
-%bcond_with	dynamic		# link dynamically with glib and eventlog
+%bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
+%bcond_without	sql		# build without support for logging to SQL DB
 #
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	2.0.10
-Release:	2
+Version:	3.0.1
+Release:	1
 License:	GPL v2
 Group:		Daemons
-Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/2.0/src/%{name}-%{version}.tar.gz
-# Source0-md5:	3f96ccf13dda0b9e150e511bcffde795
+Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/3.0.1/source/%{name}_%{version}.tar.gz
+# Source0-md5:	14e13519bad47d0a6308905292385321
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -28,14 +27,28 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with dynamic}
 BuildRequires:	eventlog-devel >= 0.2
-BuildRequires:	glib2-devel >= 1:2.2.0
+BuildRequires:	glib2-devel >= 1:2.10.1
+BuildRequires:	libcap-devel
+%if %{with sql}
+BuildRequires:	libdbi-devel >= 0.8.3-2
+%endif
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libwrap-devel
+BuildRequires:	openssl-devel >= 0.9.8
+BuildRequires:	pcre-devel
 %else
 BuildRequires:	eventlog-static >= 0.2
 BuildRequires:	glib2-static >= 1:2.2.0
+BuildRequires:	glibc-static
+BuildRequires:	libcap-static
+%if %{with sql}
+BuildRequires:	libdbi-static >= 0.8.3-2
+%endif
 BuildRequires:	libnet-static >= 1:1.1.2.1-3
 BuildRequires:	libwrap-static
+BuildRequires:	openssl-static >= 0.9.8
+BuildRequires:	pcre-static
+BuildRequires:	zlib-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -75,7 +88,7 @@ facility/prioridade como o syslog original.
 %patch0 -p1
 %patch1 -p1
 
-%{__tar} xzf doc/reference/syslog-ng.html.tar.gz
+#%{__tar} xzf doc/reference/syslog-ng.html.tar.gz
 
 %build
 %{__aclocal}
@@ -83,6 +96,17 @@ facility/prioridade como o syslog original.
 %{__automake}
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
+	--with-timezone-dir=%{_datadir}/zoneinfo \
+	--with-pidfile-dir=/var/run \
+	--enable-ssl \
+	--enable-ipv6 \
+	--enable-tcp-wrapper \
+	--enable-spoof-source \
+	--enable-linux-caps \
+	--enable-pcre \
+%if %{with sql}
+	--enable-sql \
+%endif
 %if %{with dynamic}
 	--enable-dynamic-linking
 %endif
@@ -130,8 +154,10 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/{relogger.pl,syslog-ng.vim}
-%doc doc/examples/syslog-ng.conf.sample doc/reference/syslog-ng.txt* contrib/syslog-ng.conf.{doc,RedHat}
-%doc syslog-ng.html/*
+%doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,RedHat}
+%doc contrib/{apparmor,selinux}
+#%doc doc/reference/syslog-ng.txt*
+#%doc syslog-ng.html/*
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
