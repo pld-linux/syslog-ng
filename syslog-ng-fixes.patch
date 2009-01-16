@@ -1,0 +1,11 @@
+--- syslog-ng-3.0.1/src/misc.c~	2008-11-05 20:57:42.000000000 +0100
++++ syslog-ng-3.0.1/src/misc.c	2009-01-16 11:43:30.896633603 +0100
+@@ -274,7 +274,7 @@
+   struct passwd *pw;
+ 
+   *uid = 0;
+-  if (*user)
++  if (!*user)
+     return FALSE;
+     
+   pw = getpwnam(user);
