@@ -9,3 +9,58 @@
      return FALSE;
      
    pw = getpwnam(user);
+commit 11f8d45b016107a686dbfa29497960ae3f6145ac
+Author: Balazs Scheidler <bazsi@balabit.hu>
+Date:   Fri Jan 16 14:44:53 2009 +0100
+
+    [config parser] "syslog" became a reserved word, make it possible to use that as a facility name
+    
+    	In syslog-ng 3.0, "syslog" became a reserved word, thus the facility()
+    	filter couldn't use it as name for the facility named syslog.
+    
+    	To avoid having to quote this word, I added a kludge to the
+    	config grammar, to make it recognize syslog as a facility name
+    	based on context.
+
+diff --git a/src/cfg-grammar.y b/src/cfg-grammar.y
+index c40b7fb..d54ba8f 100644
+--- a/src/cfg-grammar.y
++++ b/src/cfg-grammar.y
+@@ -277,6 +277,7 @@ cfg_check_template(LogTemplate *template)
+ 
+ %type	<cptr> string
+ %type	<cptr> string_or_number
++%type	<cptr> facility_string
+ %type   <ptr> string_list
+ %type   <ptr> string_list_build
+ 
+@@ -464,7 +465,7 @@ source_affile_option
+               affile_sd_set_pri_level(last_driver, level); 
+             free($3);
+           }
+-        | KW_FACILITY '(' string ')'    
++        | KW_FACILITY '(' facility_string ')'
+ 
+           {
+             int facility = -1;
+@@ -1305,7 +1306,7 @@ filter_fac_list
+ 	;
+ 
+ filter_fac
+-	: string				
++	: facility_string
+ 	  { 
+ 	    int n = syslog_name_lookup_facility_by_name($1);
+ 	    if (n == -1)
+@@ -1499,6 +1500,11 @@ string_list_build
+         |					{ $$ = NULL; }
+         ;
+ 
++facility_string
++        : string                                { $$ = $1; };
++        | KW_SYSLOG                             { $$ = strdup("syslog"); }
++        ;
++
+ %%
+ 
+ extern int linenum;
