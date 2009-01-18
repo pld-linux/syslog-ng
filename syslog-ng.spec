@@ -8,7 +8,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.1
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/3.0.1/source/%{name}_%{version}.tar.gz
@@ -154,6 +154,16 @@ if [ "$1" = "0" ]; then
 	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
+
+%triggerun -- syslog-ng < 3.0
+sed -i -e 's#pipe ("/proc/kmsg"#file ("/proc/kmsg"#g' /etc/syslog-ng/syslog-ng.conf
+sed -i -e 's#log_prefix#program_override#g' /etc/syslog-ng/syslog-ng.conf
+sed -i -e 's#^destination #destination d_#g' /etc/syslog-ng/syslog-ng.conf
+sed -i -e 's#destination(#destination(d_#g' /etc/syslog-ng/syslog-ng.conf
+sed -i -e 's#match("IN\=\[A-Za-z0-9\]\* OUT=\[A-Za-z0-9\]\*");#match("IN=[A-Za-z0-9]* OUT=[A-Za-z0-9]*" value("MESSAGE"));#g' /etc/syslog-ng/syslog-ng.conf
+sed -i -e "1 s#\(.*\)\$#@version: 3.0\n\1#g" /etc/syslog-ng/syslog-ng.conf
+rm -f %{_var}/lib/%{name}/syslog-ng.persist
+exit 0
 
 %files
 %defattr(644,root,root,755)
