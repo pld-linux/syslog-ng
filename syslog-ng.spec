@@ -164,6 +164,7 @@ sed -i -e 's#destination(#destination(d_#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#match("IN\=\[A-Za-z0-9\]\* OUT=\[A-Za-z0-9\]\*");#match("IN=[A-Za-z0-9]* OUT=[A-Za-z0-9]*" value("MESSAGE"));#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e "1 s#\(.*\)\$#@version: 3.0\n\1#g" /etc/syslog-ng/syslog-ng.conf
 rm -f %{_var}/lib/%{name}/syslog-ng.persist
+%service syslog-ng restart "syslog-ng daemon"
 exit 0
 
 %files
