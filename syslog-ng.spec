@@ -8,7 +8,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.1
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/3.0.1/source/%{name}_%{version}.tar.gz
@@ -156,6 +156,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %triggerun -- syslog-ng < 3.0
+sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#pipe ("/proc/kmsg"#file ("/proc/kmsg"#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#log_prefix#program_override#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#^destination #destination d_#g' /etc/syslog-ng/syslog-ng.conf
