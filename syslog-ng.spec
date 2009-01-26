@@ -8,7 +8,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.1
-Release:	6
+Release:	7
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/3.0.1/source/%{name}_%{version}.tar.gz
@@ -139,8 +139,7 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for n in /var/log/{daemon,debug,iptables,kernel,lpr,maillog,messages,secure,spooler,syslog,user,xferlog}
-do
+for n in /var/log/{daemon,debug,iptables,kernel,lpr,maillog,messages,secure,spooler,syslog,user,xferlog}; do
 	[ -f $n ] && continue
 	touch $n
 	chmod 640 $n
@@ -161,6 +160,7 @@ sed -i -e 's#pipe ("/proc/kmsg"#file ("/proc/kmsg"#g' /etc/syslog-ng/syslog-ng.c
 sed -i -e 's#log_prefix#program_override#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#^destination #destination d_#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#destination(#destination(d_#g' /etc/syslog-ng/syslog-ng.conf
+sed -i -e 's,\bstats\b,stats_freq,' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#match("IN\=\[A-Za-z0-9\]\* OUT=\[A-Za-z0-9\]\*");#match("IN=[A-Za-z0-9]* OUT=[A-Za-z0-9]*" value("MESSAGE"));#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e "1 s#\(.*\)\$#@version: 3.0\n\1#g" /etc/syslog-ng/syslog-ng.conf
 rm -f %{_var}/lib/%{name}/syslog-ng.persist
