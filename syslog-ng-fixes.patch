@@ -107,3 +107,57 @@ index f9567ff..40e2ae7 100644
              {
                msg_trace("log_reader_fd_check file moved eof",
                          evt_tag_int("pos", pos),
+commit 8ad0edb1e4198bbf657708d07360bbac8b30b55a
+Author: Balazs Scheidler <bazsi@balabit.hu>
+Date:   Thu Feb 5 11:26:18 2009 +0100
+
+    [affile] validate file type before opening
+    
+    report an error if a file is opened using the pipe() driver, OR a
+    fifo is opened using the file() driver. named pipes should really be
+    driven by the pipe() driver.
+
+diff --git a/src/affile.c b/src/affile.c
+index f9264a7..e582a5d 100644
+--- a/src/affile.c
++++ b/src/affile.c
+@@ -45,6 +45,7 @@ affile_open_file(gchar *name, gint flags,
+                  gboolean create_dirs, gboolean privileged, gboolean is_pipe, gint *fd)
+ {
+   cap_t saved_caps;
++  struct stat st;
+ 
+   if (strstr(name, "../") || strstr(name, "/..")) 
+     {
+@@ -63,6 +64,23 @@ affile_open_file(gchar *name, gint flags,
+       g_process_cap_modify(CAP_DAC_READ_SEARCH, TRUE);
+       g_process_cap_modify(CAP_SYS_ADMIN, TRUE);
+     }
++  if (stat(name, &st) >= 0)
++    {
++      if (is_pipe && !S_ISFIFO(st.st_mode))
++        {
++          msg_error("Error opening pipe, underlying file is not a FIFO, it should be used by file()",
++                    evt_tag_str("filename", name),
++                    NULL);
++          goto exit;
++        }
++      else if (!is_pipe && S_ISFIFO(st.st_mode))
++        {
++          msg_error("Error opening file, underlying file is a FIFO, it should be used by pipe()",
++                    evt_tag_str("filename", name),
++                    NULL);
++          goto exit;
++        }
++    }
+   *fd = open(name, flags, mode);
+   if (is_pipe && *fd < 0 && errno == ENOENT)
+     {
+@@ -82,6 +100,7 @@ affile_open_file(gchar *name, gint flags,
+       if (mode != -1)
+         fchmod(*fd, mode);
+     }
++ exit:
+   if (privileged)
+     {
+       g_process_cap_restore(saved_caps);
