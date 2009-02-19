@@ -139,12 +139,6 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for n in /var/log/{daemon,debug,iptables,kernel,lpr,maillog,messages,secure,spooler,syslog,user,xferlog}; do
-	[ -f $n ] && continue
-	touch $n
-	chmod 640 $n
-done
-
 /sbin/chkconfig --add syslog-ng
 %service syslog-ng restart "syslog-ng daemon"
 
