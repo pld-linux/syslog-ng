@@ -621,6 +621,19 @@ index f0fee58..d819a3c 100755
                  return $SMF_EXIT_OK
          fi
          return $SMF_EXIT_ERR_FATAL
+diff --git a/debian/control b/debian/control
+index c0689a5..0dcc8b3 100644
+--- a/debian/control
++++ b/debian/control
+@@ -2,7 +2,7 @@ Source: syslog-ng
+ Section: admin
+ Priority: extra
+ Maintainer: SZALAY Attila <sasa@debian.org>
+-Build-depends: debhelper (>=3.0.0), libevtlog-dev, libnet1-dev, libglib2.0-dev (>= 2.4), pkg-config, libdbi-dev
++Build-depends: debhelper (>=3.0.0), libevtlog-dev, libnet1-dev, libglib2.0-dev (>= 2.4), pkg-config, libdbi0-dev, libssl-dev
+ Standards-Version: 3.6.1
+ 
+ Package: syslog-ng
 diff --git a/src/affile.c b/src/affile.c
 index 6d48915..5721a1a 100644
 --- a/src/affile.c
@@ -787,8 +800,24 @@ index 96c5b22..dcbc02e 100644
    
    init_sequence_number(&self->seq_num);
    return &self->super;  
+diff --git a/src/apphook.c b/src/apphook.c
+index ab9cb02..6115b27 100644
+--- a/src/apphook.c
++++ b/src/apphook.c
+@@ -54,10 +54,10 @@ run_application_hook(gint type)
+       
+       if (e->type == type)
+         {
++          l_next = l->next;
+           application_hooks = g_list_remove_link(application_hooks, l);
+           e->func(type, e->user_data);
+           g_free(e);
+-          l_next = l->next;
+           g_list_free_1(l);
+         }
+       else
 diff --git a/src/cfg-grammar.y b/src/cfg-grammar.y
-index 9902d84..2ad453a 100644
+index 9902d84..056783d 100644
 --- a/src/cfg-grammar.y
 +++ b/src/cfg-grammar.y
 @@ -52,6 +52,7 @@ LogParser *last_parser;
@@ -940,6 +969,15 @@ index 9902d84..2ad453a 100644
  	    free($1); 
  	    last_writer_options = &((AFFileDestDriver *) last_driver)->writer_options;
  	    last_writer_options->flush_lines = 0;
+@@ -895,7 +945,7 @@ dest_afinet_tcp_option
+ 	: dest_afinet_option
+ 	| KW_TLS 
+ 	  {
+-#if ENABLE_TLS
++#if ENABLE_SSL
+ 	    last_tls_context = tls_context_new(TM_CLIENT);
+ #endif
+ 	  }
 @@ -1282,7 +1332,7 @@ filter_fac_list
  	;
  
@@ -1003,7 +1041,7 @@ index 9902d84..2ad453a 100644
 -  last_template = NULL;
 -}
 diff --git a/src/cfg-lex.l b/src/cfg-lex.l
-index c9db716..dba726a 100644
+index c9db716..b3c893c 100644
 --- a/src/cfg-lex.l
 +++ b/src/cfg-lex.l
 @@ -31,6 +31,7 @@
@@ -1102,7 +1140,7 @@ index c9db716..dba726a 100644
            return keywords[i].kw_token;
          }
      }
-@@ -364,3 +378,246 @@ append_char(char c)
+@@ -364,3 +378,251 @@ append_char(char c)
    str++;
    *str = 0;
  }
@@ -1171,6 +1209,7 @@ index c9db716..dba726a 100644
 +    {
 +      yybuf = YY_CURRENT_BUFFER;
 +      g_free(level->current_file);
++      fclose(yybuf->yy_input_file);
 +      level->current_file = NULL;
 +      include_depth--;
 +      yy_switch_to_buffer(include_stack[include_depth].yybuf);
@@ -1198,12 +1237,16 @@ index c9db716..dba726a 100644
 +            evt_tag_str("filename", filename),
 +            evt_tag_int("depth", include_depth),
 +            NULL);
++  yybuf = YY_CURRENT_BUFFER;
 +  if (level->current_file)
-+    g_free(level->current_file);
++    {
++      g_free(level->current_file);
++      if (yybuf)
++        fclose(yybuf->yy_input_file);
++    }
 +  level->current_file = filename;
 +  level->linenum = 1;
 +  
-+  yybuf = YY_CURRENT_BUFFER;
 +  yy_switch_to_buffer(yy_create_buffer(include_file, YY_BUF_SIZE));
 +  if (!first_on_this_level)
 +    yy_delete_buffer(yybuf);
@@ -1438,6 +1481,39 @@ index d7b4edc..91f3060 100644
  static inline gboolean 
  cfg_check_current_config_version(gint req)
  {
+diff --git a/src/dnscache.c b/src/dnscache.c
+index ef8cc8f..bd23648 100644
+--- a/src/dnscache.c
++++ b/src/dnscache.c
+@@ -66,6 +66,7 @@ static gint dns_cache_expire_failed = 60;
+ static gint dns_cache_persistent_count = 0;
+ static gchar *dns_cache_hosts = NULL;
+ static time_t dns_cache_hosts_mtime = -1;
++static time_t dns_cache_hosts_checktime = 0;
+ 
+ static gboolean 
+ dns_cache_key_equal(DNSCacheKey *e1, DNSCacheKey *e2)
+@@ -156,6 +157,12 @@ static void
+ dns_cache_check_hosts(void)
+ {
+   struct stat st;
++  time_t t = time(NULL);
++
++  if (G_LIKELY(dns_cache_hosts_checktime == t))
++    return;
++
++  dns_cache_hosts_checktime = t;
+   
+   if (!dns_cache_hosts || stat(dns_cache_hosts, &st) < 0)
+     {
+@@ -299,6 +306,7 @@ dns_cache_set_params(gint cache_size, gint expire, gint expire_failed, const gch
+   dns_cache_expire_failed = expire_failed;
+   dns_cache_hosts = g_strdup(hosts);
+   dns_cache_hosts_mtime = -1;
++  dns_cache_hosts_checktime = 0;
+ }
+ 
+ void
 diff --git a/src/filter.c b/src/filter.c
 index 0d1fe57..3a14fdd 100644
 --- a/src/filter.c
@@ -1969,9 +2045,18 @@ index 8e5bc7c..11ff0da 100644
  void log_reader_restore_state(LogReader *self, SerializeArchive *archive);
  
 diff --git a/src/logwriter.c b/src/logwriter.c
-index bb01148..5f77293 100644
+index bb01148..4d586e5 100644
 --- a/src/logwriter.c
 +++ b/src/logwriter.c
+@@ -236,7 +236,7 @@ log_writer_fd_dispatch(GSource *source,
+       log_writer_broken(self->writer, NC_CLOSE);
+       return FALSE;
+     }
+-  else if (self->pollfd.revents & (G_IO_ERR))
++  else if (self->pollfd.revents & (G_IO_ERR) && num_elements == 0)
+     {
+       msg_error("POLLERR occurred while idle",
+                 evt_tag_int("fd", log_proto_get_fd(self->proto)),
 @@ -595,9 +595,20 @@ log_writer_format_log(LogWriter *self, LogMessage *lm, GString *result)
            g_string_append_len(result, lm->host, lm->host_len);
            g_string_append_c(result, ' ');
