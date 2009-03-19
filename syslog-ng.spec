@@ -8,7 +8,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.1
-Release:	12
+Release:	13
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/3.0.1/source/%{name}_%{version}.tar.gz
@@ -55,7 +55,6 @@ BuildRequires:	zlib-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
-Requires:	logrotate
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.2.0
 Provides:	syslogdaemon
