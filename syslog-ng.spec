@@ -2,6 +2,7 @@
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
 %bcond_without	sql		# build without support for logging to SQL DB
+%bcond_without	tests
 #
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
@@ -115,6 +116,8 @@ install %{SOURCE4} doc/
 %endif
 
 %{__make}
+
+%{?with_tests:%{__make} check}
 
 %install
 rm -rf $RPM_BUILD_ROOT
