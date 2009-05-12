@@ -21,6 +21,8 @@ Source4:	http://www.balabit.com/dl/guides/syslog-ng-v3.0-guide-admin-en.pdf
 # Source4-md5:	1a801f138a9a2245009ecb617be4338b
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
+Patch2:		%{name}-tz.patch
+Patch3:		%{name}-pyssl.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -89,6 +91,8 @@ facility/prioridade como o syslog original.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 install %{SOURCE4} doc/
 
