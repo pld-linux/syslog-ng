@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.2
-Release:	0.1
+Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -17,8 +17,9 @@ Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/sou
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/dl/guides/syslog-ng-v3.0-guide-admin-en.pdf
+Source4:	http://www.balabit.com/dl/guides/%{name}-v3.0-guide-admin-en.pdf
 # Source4-md5:	1a801f138a9a2245009ecb617be4338b
+Source5:	%{name}-simple.conf
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
 Patch2:		%{name}-tz.patch
@@ -93,7 +94,8 @@ facility/prioridade como o syslog original.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-install %{SOURCE4} doc
+cp -a %{SOURCE4} doc
+cp -a %{SOURCE5} contrib
 
 %build
 %{__aclocal}
@@ -169,8 +171,8 @@ exit 0
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/{relogger.pl,syslog-ng.vim}
-%doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,RedHat}
-%doc contrib/{apparmor,selinux} doc/syslog-ng-v3.0-guide-admin-en.pdf
+%doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,RedHat} contrib/syslog-ng-simple.conf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-v3.0-guide-admin-en.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
