@@ -9,7 +9,8 @@
 /var/log/spooler
 /var/log/syslog
 /var/log/user
-/var/log/xferlog {
+/var/log/xferlog
+{
 	sharedscripts
 	
 	postrotate
