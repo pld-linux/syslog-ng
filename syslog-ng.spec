@@ -93,8 +93,7 @@ facility/prioridade como o syslog original.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-
-install %{SOURCE4} doc/
+install %{SOURCE4} doc
 
 %build
 %{__aclocal}
@@ -139,6 +138,8 @@ do
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
+rm $RPM_BUILD_ROOT%{_bindir}/loggen
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -175,7 +176,6 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
-%attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %dir %{_var}/lib/%{name}
 %{_mandir}/man5/syslog-ng.conf.5*
