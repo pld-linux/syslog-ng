@@ -1,0 +1,74 @@
+diff --git a/src/afinter.c b/src/afinter.c
+index 0085d85..a67a9a7 100644
+--- a/src/afinter.c
++++ b/src/afinter.c
+@@ -34,6 +34,7 @@ typedef struct _AFInterSourceDriver
+ } AFInterSourceDriver;
+ 
+ static gint next_mark_target = -1;
++static GSource *global_internal_source;
+ 
+ void 
+ afinter_postpone_mark(gint mark_freq)
+@@ -121,6 +122,7 @@ afinter_source_dispatch(GSource *source,
+ static void
+ afinter_source_finalize(GSource *source)
+ {
++  global_internal_source = NULL;
+ }
+ 
+ GSourceFuncs afinter_source_watch_funcs =
+@@ -161,11 +163,26 @@ afinter_source_init(LogPipe *s)
+   
+   if (!log_source_init(s))
+     return FALSE;
++
++  if (cfg->internal_source_present)
++    {
++      msg_error("You have two internal() sources in your configuration, this is not supported and would cause hangs", NULL);
++      return FALSE;
++    }
+   
++  if (global_internal_source)
++    {
++      msg_error("Internal error, internal() GSource was duplicated, this is bad", NULL);
++      g_assert_not_reached();
++      return FALSE;
++    }
++    
+   /* the source added below references this logreader, it will be unref'd
+      when the source is destroyed */ 
+   self->watch = afinter_source_watch_new(&self->super.super, cfg->mark_freq);
+   g_source_attach(self->watch, NULL);
++  global_internal_source = self->watch;
++  cfg->internal_source_present = TRUE;
+   return TRUE;
+ }
+ 
+@@ -204,8 +221,13 @@ afinter_sd_init(LogPipe *s)
+ 
+   log_source_options_init(&self->source_options, cfg, self->super.group);
+   self->source = afinter_source_new(self, &self->source_options);
++  if (!log_pipe_init(&self->source->super, cfg))
++    {
++      log_pipe_unref(&self->source->super);
++      self->source = NULL;
++      return FALSE;
++    }
+   log_pipe_append(&self->source->super, s);
+-  log_pipe_init(&self->source->super, cfg);
+   return TRUE;
+ }
+ 
+diff --git a/src/cfg.h b/src/cfg.h
+index 5e3f1bd..cc2005d 100644
+--- a/src/cfg.h
++++ b/src/cfg.h
+@@ -98,6 +98,7 @@ struct _GlobalConfig
+   
+   struct _LogTemplate *file_template;
+   struct _LogTemplate *proto_template;
++  gboolean internal_source_present;
+   
+   /* */
+   GHashTable *sources;
