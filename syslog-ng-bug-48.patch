@@ -1,0 +1,43 @@
+commit 51d40371d5e2abf636220470c8257b8426fa648c
+Author: Balazs Scheidler <bazsi@balabit.hu>
+Date:   Sun Aug 30 11:41:24 2009 +0200
+
+    [afinter] don't block on the internal_msg_queue even in the threaded case (fixes: pub#48)
+    
+    A hang was reported in bugzilla ticket #48 which seems to have
+    been caused by MARK messages interfering with local messages:
+    
+      * if the MARK is due in the same poll iteration as a local message
+      * the MARK timeout is checked and the internal source is marked as having
+        input available
+      * then the local message comes in pushing the mark timeout further ahead
+        in time
+      * then the internal() dispatch callback checks the mark timeout again,
+        but at this time it is already in the future ->
+      * the dispatch callback falls back to fetching the internal message from
+        internal_msg_queue, assuming it was that which caused the dispatch
+        callback to be scheduled
+      * this blocks indefinitely.
+    
+    The solution is very simple: use g_async_queue_try_pop() instead of
+    g_async_queue_pop(), the dispatch code already takes care about a
+    NULL message value.
+    
+    Thanks for the helpful reporters to hunt down the issue.
+    
+    Reported-By: Arkadiusz Miśkiewicz, Elan Ruusamäe
+
+diff --git a/src/messages.h b/src/messages.h
+index d3148fd..305d0b3 100644
+--- a/src/messages.h
++++ b/src/messages.h
+@@ -49,7 +49,8 @@ void msg_add_option_group(GOptionContext *ctx);
+ 
+ #define MsgQueue         GAsyncQueue
+ #define msg_queue_push   g_async_queue_push
+-#define msg_queue_pop    g_async_queue_pop
++/* we're using try_pop here as we don't want to block in our dispatch callback */
++#define msg_queue_pop    g_async_queue_try_pop
+ #define msg_queue_new    g_async_queue_new
+ #define msg_queue_free   g_async_queue_unref
+ #define msg_queue_length g_async_queue_length
