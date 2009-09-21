@@ -1,10 +1,11 @@
-/var/log/messages
 /var/log/daemon
 /var/log/debug
 /var/log/iptables
 /var/log/kernel
 /var/log/lpr
 /var/log/maillog
+/var/log/messages
+/var/log/pgsql
 /var/log/secure
 /var/log/spooler
 /var/log/syslog
