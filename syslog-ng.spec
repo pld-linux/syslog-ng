@@ -8,12 +8,12 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.0.2
-Release:	5
+Version:	3.0.5
+Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	0dce90ddd4f0f417ce2b9d88ccbca2e9
+# Source0-md5:	28f0d9ff2243b330e8cd6311ef9b2f12
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -22,10 +22,8 @@ Source4:	http://www.balabit.com/dl/guides/%{name}-v3.0-guide-admin-en.pdf
 Source5:	%{name}-simple.conf
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
-Patch2:		%{name}-tz.patch
-Patch3:		%{name}-pyssl.patch
-Patch4:		bug-15.patch
-Patch5:		%{name}-bug-48.patch
+Patch2:		%{name}-pyssl.patch
+Patch3:		bug-15.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -34,6 +32,7 @@ BuildRequires:	flex
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.268
 %if %{with tests}
+BuildRequires:	libdbi-drivers-sqlite3
 BuildRequires:	tzdata
 %endif
 %if %{with dynamic}
@@ -99,8 +98,6 @@ facility/prioridade como o syslog original.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
-%patch5 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib
 
