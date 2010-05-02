@@ -3,13 +3,14 @@
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
 %bcond_without	sql		# build without support for logging to SQL DB
 %bcond_without	tests
-#
+
+%define		glib2_ver	2.24.0
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.5
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -37,7 +38,7 @@ BuildRequires:	tzdata
 %endif
 %if %{with dynamic}
 BuildRequires:	eventlog-devel >= 0.2
-BuildRequires:	glib2-devel >= 1:2.10.1
+BuildRequires:	glib2-devel >= 1:%{glib2_ver}
 BuildRequires:	libcap-devel
 %if %{with sql}
 BuildRequires:	libdbi-devel >= 0.8.3-2
@@ -48,7 +49,7 @@ BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel
 %else
 BuildRequires:	eventlog-static >= 0.2
-BuildRequires:	glib2-static >= 1:2.2.0
+BuildRequires:	glib2-static >= 1:%{glib2_ver}
 BuildRequires:	glibc-static
 BuildRequires:	libcap-static
 %if %{with sql}
@@ -62,6 +63,7 @@ BuildRequires:	zlib-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
+Requires:	glib2 >= 1:%{glib2_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.2.0
 Provides:	syslogdaemon
