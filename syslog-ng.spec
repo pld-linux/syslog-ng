@@ -66,7 +66,7 @@ Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires:	glib2 >= 1:%{glib2_ver}
 Requires:	psmisc >= 20.1
-Requires:	rc-scripts >= 0.2.0
+Requires:	rc-scripts > 0.4.2.8
 Provides:	syslogdaemon
 Conflicts:	klogd
 Conflicts:	msyslog
@@ -117,8 +117,7 @@ Summary:	Upstart job description for syslog-ng
 Summary(pl.UTF-8):	Opis zadania Upstart dl syslog-ng
 Group:		Daemons
 Requires:	%{name} = %{version}-%{release}
-Requires:	upstart
-Requires:	rc-scripts > 0.4.2.8
+Requires:	upstart >= 0.6
 
 %description upstart
 Upstart job description for syslog-ng.
