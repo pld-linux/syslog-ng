@@ -1,0 +1,14 @@
+
+start on pld.sysinit-done
+stop on pld.shutdown-started
+
+env SERVICE=syslog
+export SERVICE
+
+respawn
+
+console output
+
+exec /usr/sbin/syslog-ng -F -f /etc/syslog-ng/syslog-ng.conf
+
+# vi: ft=upstart
