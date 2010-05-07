@@ -99,8 +99,7 @@ flush_logs() {
 	fi
 }
 
-# configtest handled locally
-upstart_controlled start stop status restart reload force-reload try-restart flush-logs
+upstart_controlled --except configtest
 
 RETVAL=0
 # See how we were called.
