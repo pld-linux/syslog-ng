@@ -42,7 +42,9 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/syslog-ng ]; then
 		msg_starting "syslog-ng"
+		emit starting JOB=syslog-ng SERVICE=syslog
 		daemon /usr/sbin/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
+		emit started JOB=syslog-ng SERVICE=syslog
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
 	else
@@ -53,7 +55,9 @@ start() {
 stop() {
 	if [ -f /var/lock/subsys/syslog-ng ]; then
 		msg_stopping "syslog-ng"
+		emit stopping JOB=syslog-ng SERVICE=syslog
 		killproc syslog-ng
+		emit stopped JOB=syslog-ng SERVICE=syslog
 		rm -f /var/lock/subsys/syslog-ng >/dev/null 2>&1
 	else
 		msg_not_running "syslog-ng"
@@ -94,6 +98,9 @@ flush_logs() {
 		exit 7
 	fi
 }
+
+# configtest handled locally
+upstart_controlled start stop status restart reload force-reload try-restart flush-logs
 
 RETVAL=0
 # See how we were called.
