@@ -81,6 +81,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 	if [ -f /var/lock/subsys/"%1" ] ; then \
 		/sbin/service --no-upstart "%1" stop \
 		/sbin/service "%1" start \
+	else \
+		/sbin/service "%1" try-restart \
 	fi
 
 # restart the job after upgrade or migrate to init script on removal
