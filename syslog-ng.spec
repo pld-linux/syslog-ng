@@ -10,7 +10,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.5
-Release:	2
+Release:	2.1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -21,6 +21,7 @@ Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/dl/guides/%{name}-v3.0-guide-admin-en.pdf
 # Source4-md5:	1a801f138a9a2245009ecb617be4338b
 Source5:	%{name}-simple.conf
+Source6:	%{name}.upstart
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
 Patch2:		%{name}-pyssl.patch
@@ -65,12 +66,29 @@ Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires:	glib2 >= 1:%{glib2_ver}
 Requires:	psmisc >= 20.1
-Requires:	rc-scripts >= 0.2.0
+Requires:	rc-scripts > 0.4.3.0
 Provides:	syslogdaemon
 Conflicts:	klogd
 Conflicts:	msyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+## to be moved to rpm-build-macros
+## TODO: handle RPM_SKIP_AUTO_RESTART
+
+# migrate from init script to upstart job
+%define	upstart_post() \
+	if [ -f /var/lock/subsys/"%1" ] ; then \
+		/sbin/service --no-upstart "%1" stop \
+		/sbin/service "%1" start \
+	fi
+
+# restart the job after upgrade or migrate to init script on removal
+%define	upstart_postun() \
+	if [ -x /sbin/initctl ] && /sbin/initctl status "%1" 2>/dev/null | grep -q 'running' ; then \
+		/sbin/initctl stop "%1" 2>/dev/null \
+		[ -f "/etc/rc.d/init.d/%1" -o -f "/etc/init/%1.conf" ] && /sbin/service "%1" start \
+	fi
 
 %description
 syslog-ng is a syslogd replacement for Unix and Unix-like systems. It
@@ -93,6 +111,19 @@ Syslog-ng é um substituto para o syslog tradicional, mas com diversas
 melhorias, como, por exemplo, a habilidade de filtrar mensagens de log
 por seu conteúdo (usando expressões regulares) e não apenas pelo par
 facility/prioridade como o syslog original.
+
+%package upstart
+Summary:	Upstart job description for syslog-ng
+Summary(pl.UTF-8):	Opis zadania Upstart dl syslog-ng
+Group:		Daemons
+Requires:	%{name} = %{version}-%{release}
+Requires:	upstart >= 0.6
+
+%description upstart
+Upstart job description for syslog-ng.
+
+%description upstart -l pl.UTF-8
+Opis zadania Upstart dl syslog-ng.
 
 %prep
 %setup -q
@@ -130,7 +161,7 @@ cp -a %{SOURCE5} contrib
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{sysconfig,logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
+install -d $RPM_BUILD_ROOT{/etc/{init,sysconfig,logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
 	$RPM_BUILD_ROOT/var/{log,lib/%{name}}
 
 %{__make} install \
@@ -148,6 +179,8 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 rm $RPM_BUILD_ROOT%{_bindir}/loggen
 
+install %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -160,6 +193,12 @@ if [ "$1" = "0" ]; then
 	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
+
+%post upstart
+%upstart_post %{name}
+
+%postun upstart
+%upstart_postun %{name}
 
 %triggerun -- syslog-ng < 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
@@ -190,3 +229,7 @@ exit 0
 %{_mandir}/man8/syslog-ng.8*
 
 %attr(640,root,root) %ghost /var/log/*
+
+%files upstart
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
