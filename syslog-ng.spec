@@ -66,7 +66,7 @@ Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires:	glib2 >= 1:%{glib2_ver}
 Requires:	psmisc >= 20.1
-Requires:	rc-scripts > 0.4.3.0
+Requires:	rc-scripts >= 0.4.3.0
 Provides:	syslogdaemon
 Conflicts:	klogd
 Conflicts:	msyslog
