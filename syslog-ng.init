@@ -88,7 +88,9 @@ reload() {
 }
 
 flush_logs() {
-	if [ -f /var/lock/subsys/syslog-ng ]; then
+	if use_upstart && [ -f /etc/init/syslog-ng.conf ] ; then
+		/sbin/initctl reload syslog-ng
+	elif [ -f /var/lock/subsys/syslog-ng ]; then
 		configtest
 		msg_reloading "syslog-ng"
 		killproc syslog-ng -HUP
@@ -99,7 +101,7 @@ flush_logs() {
 	fi
 }
 
-upstart_controlled --except configtest
+upstart_controlled --except configtest flush-logs
 
 RETVAL=0
 # See how we were called.
