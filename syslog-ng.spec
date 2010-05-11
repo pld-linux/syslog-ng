@@ -10,7 +10,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.5
-Release:	3
+Release:	3.6
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -81,15 +81,15 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 	if [ -f /var/lock/subsys/"%1" ] ; then \
 		/sbin/service --no-upstart "%1" stop \
 		/sbin/service "%1" start \
-	else \
-		/sbin/service "%1" try-restart \
 	fi
 
 # restart the job after upgrade or migrate to init script on removal
+# cannot be stopped with 'service' as /etc/init/$name.conf may be missing
+# at this point
 %define	upstart_postun() \
 	if [ -x /sbin/initctl ] && /sbin/initctl status "%1" 2>/dev/null | grep -q 'running' ; then \
-		/sbin/initctl stop "%1" 2>/dev/null \
-		[ -f "/etc/rc.d/init.d/%1" -o -f "/etc/init/%1.conf" ] && /sbin/service "%1" start \
+		/sbin/initctl stop "%1" >/dev/null 2>&1 \
+		[ -f "/etc/rc.d/init.d/%1" -o -f "/etc/init/%1.conf" ] && { echo -n "Re-" ; /sbin/service "%1" start ; } ; \
 	fi
 
 %description
