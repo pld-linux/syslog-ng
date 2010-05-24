@@ -32,7 +32,7 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.561
 %if %{with tests}
 BuildRequires:	libdbi-drivers-sqlite3
 BuildRequires:	tzdata
@@ -73,25 +73,6 @@ Conflicts:	msyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-## to be moved to rpm-build-macros
-## TODO: handle RPM_SKIP_AUTO_RESTART
-
-# migrate from init script to upstart job
-%define	upstart_post() \
-	if [ -f /var/lock/subsys/"%1" ] ; then \
-		/sbin/service --no-upstart "%1" stop \
-		/sbin/service "%1" start \
-	fi
-
-# restart the job after upgrade or migrate to init script on removal
-# cannot be stopped with 'service' as /etc/init/$name.conf may be missing
-# at this point
-%define	upstart_postun() \
-	if [ -x /sbin/initctl ] && /sbin/initctl status "%1" 2>/dev/null | grep -q 'running' ; then \
-		/sbin/initctl stop "%1" >/dev/null 2>&1 \
-		[ -f "/etc/rc.d/init.d/%1" -o -f "/etc/init/%1.conf" ] && { echo -n "Re-" ; /sbin/service "%1" start ; } ; \
-	fi
-
 %description
 syslog-ng is a syslogd replacement for Unix and Unix-like systems. It
 has been tested on Solaris, BSDi and Linux, and were found to run
@@ -116,7 +97,7 @@ facility/prioridade como o syslog original.
 
 %package upstart
 Summary:	Upstart job description for syslog-ng
-Summary(pl.UTF-8):	Opis zadania Upstart dl syslog-ng
+Summary(pl.UTF-8):	Opis zadania Upstart dla syslog-ng
 Group:		Daemons
 Requires:	%{name} = %{version}-%{release}
 Requires:	upstart >= 0.6
@@ -125,7 +106,7 @@ Requires:	upstart >= 0.6
 Upstart job description for syslog-ng.
 
 %description upstart -l pl.UTF-8
-Opis zadania Upstart dl syslog-ng.
+Opis zadania Upstart dla syslog-ng.
 
 %prep
 %setup -q
