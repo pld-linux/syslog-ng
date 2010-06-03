@@ -33,17 +33,18 @@ BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.561
+BuildRequires:	which
 %if %{with tests}
 BuildRequires:	libdbi-drivers-sqlite3
+BuildRequires:	python
+BuildRequires:	python-modules
 BuildRequires:	tzdata
 %endif
 %if %{with dynamic}
 BuildRequires:	eventlog-devel >= 0.2
 BuildRequires:	glib2-devel >= 1:%{glib2_ver}
 BuildRequires:	libcap-devel
-%if %{with sql}
-BuildRequires:	libdbi-devel >= 0.8.3-2
-%endif
+%{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libwrap-devel
 BuildRequires:	openssl-devel >= 0.9.8
@@ -53,9 +54,7 @@ BuildRequires:	eventlog-static >= 0.2
 BuildRequires:	glib2-static >= 1:%{glib2_ver}
 BuildRequires:	glibc-static
 BuildRequires:	libcap-static
-%if %{with sql}
-BuildRequires:	libdbi-static >= 0.8.3-2
-%endif
+%{?with_sql:BuildRequires:	libdbi-static >= 0.8.3-2}
 BuildRequires:	libnet-static >= 1:1.1.2.1-3
 BuildRequires:	libwrap-static
 BuildRequires:	openssl-static >= 0.9.8
