@@ -114,7 +114,7 @@ Opis zadania Upstart dla syslog-ng.
 %patch2 -p1
 %patch3 -p1
 cp -a %{SOURCE4} doc
-cp -a %{SOURCE5} contrib
+cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %build
 %{__aclocal}
@@ -198,7 +198,7 @@ exit 0
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/{relogger.pl,syslog-ng.vim}
-%doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,RedHat} contrib/syslog-ng-simple.conf
+%doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,simple,RedHat}
 %doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-v3.0-guide-admin-en.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
