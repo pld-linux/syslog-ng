@@ -1,0 +1,70 @@
+fixes for settings like owner(), group(), perm() and analogous dir_* if create_dirs=yes
+for destination files
+ - CAP_DAC_OVERRIDE force changes if parent dir has 000 perm, ie vservers (is inerhitted for dir_* too)
+ - CAP_CHOWN - needed if dir_owner() or dir_group() are in use
+ - CAP_FOWNER - to force chmod() for dirs with owner != root
+
+diff -upr syslog-ng-3.0.8./src/affile.c syslog-ng-3.0.8/src/affile.c
+--- syslog-ng-3.0.8./src/affile.c	2010-05-05 10:32:49.000000000 +0200
++++ syslog-ng-3.0.8/src/affile.c	2010-10-08 16:23:41.319089286 +0200
+@@ -55,15 +55,21 @@ affile_open_file(gchar *name, gint flags
+       return FALSE;
+     }
+ 
+-  if (create_dirs && !create_containing_directory(name, dir_uid, dir_gid, dir_mode))
+-    return FALSE;
+-
+   saved_caps = g_process_cap_save();
+   if (privileged)
+     {
+       g_process_cap_modify(CAP_DAC_READ_SEARCH, TRUE);
+       g_process_cap_modify(CAP_SYS_ADMIN, TRUE);
+     }
++  else
++      g_process_cap_modify(CAP_DAC_OVERRIDE, TRUE);
++
++  if (create_dirs && !create_containing_directory(name, dir_uid, dir_gid, dir_mode))
++    {
++      g_process_cap_restore(saved_caps);
++      return FALSE;
++    }
++
+   *fd = -1;
+   if (stat(name, &st) >= 0)
+     {
+diff -upr syslog-ng-3.0.8./src/misc.c syslog-ng-3.0.8/src/misc.c
+--- syslog-ng-3.0.8./src/misc.c	2010-05-05 11:26:00.000000000 +0200
++++ syslog-ng-3.0.8/src/misc.c	2010-10-08 16:23:41.319089286 +0200
+@@ -24,6 +24,7 @@
+ #include "misc.h"
+ #include "dnscache.h"
+ #include "messages.h"
++#include "gprocess.h"
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+@@ -352,6 +353,7 @@ create_containing_directory(gchar *name,
+   gchar *dirname;
+   struct stat st;
+   gint rc;
++  cap_t saved_caps;
+   
+   /* check that the directory exists */
+   dirname = g_path_get_dirname(name);
+@@ -385,12 +387,16 @@ create_containing_directory(gchar *name,
+         {
+           if (mkdir(name, (mode_t) dir_mode) == -1)
+             return FALSE;
++	  saved_caps = g_process_cap_save();
++	  g_process_cap_modify(CAP_CHOWN, TRUE);
++	  g_process_cap_modify(CAP_FOWNER, TRUE);
+           if (dir_uid >= 0)
+             chown(name, (uid_t) dir_uid, -1);
+           if (dir_gid >= 0)
+             chown(name, -1, (gid_t) dir_gid);
+           if (dir_mode >= 0)
+             chmod(name, (mode_t) dir_mode);
++	  g_process_cap_restore(saved_caps);
+         }
+       *p = '/';
+       p = strchr(p + 1, '/');
