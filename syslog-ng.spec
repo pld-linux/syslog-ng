@@ -1,10 +1,18 @@
 #
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
+%if "%{pld_release}" == "ac"
+%bcond_with		sql		# build with support for logging to SQL DB
+%else
 %bcond_without	sql		# build without support for logging to SQL DB
+%endif
 %bcond_without	tests
 
+%if "%{pld_release}" == "ac"
+%define		glib2_ver	2.16.0
+%else
 %define		glib2_ver	2.24.0
+%endif
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
@@ -34,10 +42,11 @@ BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig
+BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.561
 BuildRequires:	which
 %if %{with tests}
-BuildRequires:	libdbi-drivers-sqlite3
+%{?with_sql:BuildRequires:	libdbi-drivers-sqlite3}
 BuildRequires:	python
 BuildRequires:	python-modules
 BuildRequires:	tzdata
@@ -49,7 +58,7 @@ BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libwrap-devel
-BuildRequires:	openssl-devel >= 0.9.8
+BuildRequires:	openssl-devel
 BuildRequires:	pcre-devel
 %else
 BuildRequires:	eventlog-static >= 0.2
@@ -59,7 +68,7 @@ BuildRequires:	libcap-static
 %{?with_sql:BuildRequires:	libdbi-static >= 0.8.3-2}
 BuildRequires:	libnet-static >= 1:1.1.2.1-3
 BuildRequires:	libwrap-static
-BuildRequires:	openssl-static >= 0.9.8
+BuildRequires:	openssl-static
 BuildRequires:	pcre-static
 BuildRequires:	zlib-static
 %endif
@@ -153,19 +162,20 @@ install -d $RPM_BUILD_ROOT{/etc/{init,sysconfig,logrotate.d,rc.d/init.d},%{_sysc
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
-install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
+install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
+cp -a %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
+cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
-for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog
-do
+for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog; do
 	> $RPM_BUILD_ROOT/var/log/$n
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 rm $RPM_BUILD_ROOT%{_bindir}/loggen
 
-install %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+%if "%{pld_release}" == "th"
+cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -216,6 +226,8 @@ exit 0
 
 %attr(640,root,root) %ghost /var/log/*
 
+%if "%{pld_release}" == "th"
 %files upstart
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
+%endif
