@@ -181,6 +181,23 @@ cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
 rm -rf $RPM_BUILD_ROOT
 
 %post
+if [ "$1" = "1" ]; then
+	# disable /proc/kmsg from config on first install on vserver
+	{
+		while read f ctx; do
+			[ "$f" = "VxID:" -o "$f" = "s_context:" ] && break
+		done </proc/self/status
+	} 2>/dev/null
+	if [ -z "$ctx" -o "$ctx" = "0" ]; then
+		VSERVER=no
+	else
+		VSERVER=yes
+	fi
+	if [ "$VSERVER" = "yes" ]; then
+		%{__sed} -i -e '/\/proc\/kmsg/ s/^[^#]/#&/' %{_sysconfdir}/%{name}/%{name}.conf
+	fi
+fi
+
 /sbin/chkconfig --add syslog-ng
 %service syslog-ng restart "syslog-ng daemon"
 
