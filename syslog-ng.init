@@ -40,55 +40,59 @@ configtest() {
 
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/syslog-ng ]; then
-		msg_starting "syslog-ng"
-		emit starting JOB=syslog-ng SERVICE=syslog
-		daemon /usr/sbin/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
-		emit --no-wait started JOB=syslog-ng SERVICE=syslog
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
-	else
+	if [ -f /var/lock/subsys/syslog-ng ]; then
 		msg_already_running "syslog-ng"
+		return
 	fi
+
+	msg_starting "syslog-ng"
+	emit starting JOB=syslog-ng SERVICE=syslog
+	daemon /usr/sbin/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
+	emit --no-wait started JOB=syslog-ng SERVICE=syslog
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
 }
 
 stop() {
-	if [ -f /var/lock/subsys/syslog-ng ]; then
-		msg_stopping "syslog-ng"
-		emit stopping JOB=syslog-ng SERVICE=syslog
-		killproc syslog-ng
-		emit --no-wait stopped JOB=syslog-ng SERVICE=syslog
-		rm -f /var/lock/subsys/syslog-ng >/dev/null 2>&1
-	else
+	if [ ! -f /var/lock/subsys/syslog-ng ]; then
 		msg_not_running "syslog-ng"
+		return
 	fi
+
+	msg_stopping "syslog-ng"
+	emit stopping JOB=syslog-ng SERVICE=syslog
+	killproc syslog-ng
+	emit --no-wait stopped JOB=syslog-ng SERVICE=syslog
+	rm -f /var/lock/subsys/syslog-ng >/dev/null 2>&1
 }
 
 condrestart() {
-	if [ -f /var/lock/subsys/syslog-ng ]; then
-		configtest
-		stop
-		start
-	else
+	if [ ! -f /var/lock/subsys/syslog-ng ]; then
 		msg_not_running "syslog-ng"
 		RETVAL=$1
+		return
 	fi
+
+	configtest
+	stop
+	start
 }
 
 reload() {
-	if [ -f /var/lock/subsys/syslog-ng ]; then
-		configtest
-		msg_reloading "syslog-ng"
-		killproc syslog-ng -HUP
-		RETVAL=$?
-	else
+	if [ ! -f /var/lock/subsys/syslog-ng ]; then
 		msg_not_running "syslog-ng"
-		exit 7
+		RETVAL=7
+		return
 	fi
+
+	configtest
+	msg_reloading "syslog-ng"
+	killproc syslog-ng -HUP
+	RETVAL=$?
 }
 
 flush_logs() {
-	if use_upstart && [ -f /etc/init/syslog-ng.conf ] ; then
+	if use_upstart && [ -f /etc/init/syslog-ng.conf ]; then
 		/sbin/initctl reload syslog-ng
 	elif [ -f /var/lock/subsys/syslog-ng ]; then
 		configtest
@@ -97,7 +101,7 @@ flush_logs() {
 		RETVAL=$?
 	else
 		msg_not_running "syslog-ng"
-		exit 7
+		RETVAL=7
 	fi
 }
 
