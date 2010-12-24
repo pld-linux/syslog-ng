@@ -21,20 +21,40 @@ if [ -f /etc/sysconfig/syslog-ng ]; then
 	. /etc/sysconfig/syslog-ng
 fi
 
-checkconfig() {
+# configtest itself
+# must return non-zero if check failed
+# output is discarded if checkconfig is ran without details
+configtest() {
 	syslog-ng $OPTIONS -F -s -p /var/run/syslog-ng-syntaxcheck.pid
-	RETVAL=$?
-	return $RETVAL
+	return $?
 }
 
-configtest() {
-	checkconfig 2>/dev/null
-	RETVAL=$?
-	if [ $RETVAL != 0 ]; then
-		show "Checking syslog-ng config syntax"
-		fail
-		echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
-		exit $RETVAL
+# wrapper for configtest
+checkconfig() {
+	local details=${1:-0}
+
+	if [ $details = 1 ]; then
+		# run config test and display report (status action)
+		show "Checking %s configuration" "syslog-ng"; busy
+		local out
+		out=$(configtest 2>&1)
+		RETVAL=$?
+		if [ $RETVAL = 0 ]; then
+			ok
+		else
+			fail
+		fi
+		[ "$out" ] && echo >&2 "$out"
+	else
+		# run config test and abort with nice message if failed
+		# (for actions checking status before action).
+		configtest >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL != 0 ]; then
+			show "Checking %s configuration" "syslog-ng"; fail
+			nls 'Configuration test failed. See details with %s "checkconfig"' $0
+			exit $RETVAL
+		fi
 	fi
 }
 
@@ -73,7 +93,7 @@ condrestart() {
 		return
 	fi
 
-	configtest
+	checkconfig
 	stop
 	start
 }
@@ -85,7 +105,7 @@ reload() {
 		return
 	fi
 
-	configtest
+	checkconfig
 	msg_reloading "syslog-ng"
 	killproc syslog-ng -HUP
 	RETVAL=$?
@@ -95,7 +115,7 @@ flush_logs() {
 	if use_upstart && [ -f /etc/init/syslog-ng.conf ]; then
 		/sbin/initctl reload syslog-ng
 	elif [ -f /var/lock/subsys/syslog-ng ]; then
-		configtest
+		checkconfig
 		msg_reloading "syslog-ng"
 		killproc syslog-ng -HUP
 		RETVAL=$?
@@ -105,7 +125,7 @@ flush_logs() {
 	fi
 }
 
-upstart_controlled --except configtest flush-logs
+upstart_controlled --except checkconfig configtest flush-logs
 
 RETVAL=0
 # See how we were called.
@@ -131,19 +151,15 @@ case "$1" in
   flush-logs)
   	flush_logs
 	;;
-  configtest)
-	show "Checking syslog-ng config syntax"
-	res=$(checkconfig 2>&1)
-	RETVAL=$?
-	[ $RETVAL = 0 ] && ok || fail
-	echo >&2 "$res"
+  checkconfig|configtest)
+	checkconfig 1
 	;;
   status)
 	status syslog-ng
 	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status|configtest|flush-logs}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status|checkconfig|flush-logs}"
 	exit 3
 esac
 
