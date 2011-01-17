@@ -17,12 +17,12 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.0.9
-Release:	1
+Version:	3.2.2
+Release:	0.1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	481e5dedcf355268bf4c95bddcae9e55
+# Source0-md5:	ed8ebe559d52a63fb61e3e2db566643f
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -33,8 +33,6 @@ Source6:	%{name}.upstart
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
 Patch2:		%{name}-pyssl.patch
-Patch3:		fix-unix-stream-caps.patch
-Patch4:		fix-dac_override.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -122,17 +120,17 @@ Opis zadania Upstart dla syslog-ng.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %build
-%{__aclocal}
+%{__libtoolize}
+%{__aclocal} -I m4
 %{__autoconf}
 %{__automake}
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
+	--with-module-dir=/%{_lib}/syslog-ng \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--with-pidfile-dir=/var/run \
 	--enable-ssl \
@@ -141,6 +139,7 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 	--enable-spoof-source \
 	--enable-linux-caps \
 	--enable-pcre \
+	--enable-pacct \
 %if %{with sql}
 	--enable-sql \
 %endif
@@ -157,7 +156,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{init,sysconfig,logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
 	$RPM_BUILD_ROOT/var/{log,lib/%{name}}
 
-%{__make} install \
+%{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng

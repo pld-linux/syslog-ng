@@ -11,3 +11,14 @@
  
  if test "x$enable_linux_caps" = "xyes" -o "x$enable_linux_caps" = "xauto"; then
  	AC_CHECK_LIB(cap, cap_set_proc, LIBCAP_LIBS="-lcap")
+--- syslog-ng-3.2.2/modules/dbparser/Makefile.am~	2011-01-15 17:14:39.000000000 +0100
++++ syslog-ng-3.2.2/modules/dbparser/Makefile.am	2011-01-17 20:06:00.103986725 +0100
+@@ -17,7 +17,7 @@
+ 	timerwheel.c timerwheel.h \
+ 	patternize.c patternize.h
+ libsyslog_ng_patterndb_la_LDFLAGS = -no-undefined
+-libsyslog_ng_patterndb_la_LIBADD =  @OPENSSL_LIBS@ @DEPS_LIBS@
++libsyslog_ng_patterndb_la_LIBADD =  $(top_builddir)/lib/libsyslog-ng.la @OPENSSL_LIBS@ @DEPS_LIBS@
+ 
+ module_LTLIBRARIES = libdbparser.la
+ libdbparser_la_SOURCES = \
