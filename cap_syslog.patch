@@ -8,7 +8,7 @@ diff -upr syslog-ng-3.0.9./src/affile.c syslog-ng-3.0.9/src/affile.c
 -      g_process_cap_modify(CAP_SYS_ADMIN, TRUE);
 +      if (!kernel_version)
 +        get_kernel_version();
-+      if (kernel_version < LINUX_VERSION(2, 6, 37))
++      if (kernel_version < LINUX_VERSION(2, 6, 38))
 +        g_process_cap_modify(CAP_SYS_ADMIN, TRUE);
 +      else
 +        g_process_cap_modify(CAP_SYSLOG, TRUE);
@@ -78,7 +78,7 @@ diff -upr syslog-ng-3.0.9./src/main.c syslog-ng-3.0.9/src/main.c
 +    g_process_set_caps("cap_net_bind_service,cap_net_broadcast,cap_net_raw,"
                       "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner=p "
                       "cap_sys_admin=ep");
-+  else if (kernel_version < LINUX_VERSION(2, 6, 37))
++  else if (kernel_version < LINUX_VERSION(2, 6, 38))
 +    g_process_set_caps("cap_net_bind_service,cap_net_broadcast,cap_net_raw,"
 +                     "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner,"
 +                     "cap_sys_admin=p");
@@ -89,4 +89,3 @@ diff -upr syslog-ng-3.0.9./src/main.c syslog-ng-3.0.9/src/main.c
    ctx = g_option_context_new("syslog-ng");
    g_process_add_option_group(ctx);
    msg_add_option_group(ctx);
-Only in syslog-ng-3.0.9/src: main.c~
