@@ -27,7 +27,7 @@ Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/dl/guides/%{name}-v3.0-guide-admin-en.pdf
-# Source4-md5:	1a801f138a9a2245009ecb617be4338b
+# Source4-md5:	882f77ad2673e6490099b5393fe26796
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-link.patch
