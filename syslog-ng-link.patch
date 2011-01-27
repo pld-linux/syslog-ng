@@ -11,6 +11,15 @@
  
  if test "x$enable_linux_caps" = "xyes" -o "x$enable_linux_caps" = "xauto"; then
  	AC_CHECK_LIB(cap, cap_set_proc, LIBCAP_LIBS="-lcap")
+@@ -674,7 +674,7 @@
+ 	CORE_DEPS_LIBS="$DEPS_LIBS"
+ 	SYSLOGNG_LINK='$(LINK)'
+ else
+-	DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $LD_START_STATIC -Wl,--whole-archive $GLIB_LIBS $EVTLOG_LIBS $PCRE_LIBS $REGEX_LIBS -Wl,--no-whole-archive $LD_END_STATIC $LIBCAP_LIBS $DL_LIBS "
++	DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $LD_START_STATIC -Wl,--whole-archive $GLIB_LIBS $EVTLOG_LIBS $PCRE_LIBS $REGEX_LIBS -Wl,--no-whole-archive $LD_END_STATIC $LIBCAP_LIBS $DL_LIBS -lrt "
+ 	CORE_DEPS_LIBS=""
+ 	# bypass libtool in case we want to do mixel linking
+ 	SYSLOGNG_LINK='$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@'
 --- syslog-ng-3.2.2/modules/dbparser/Makefile.am~	2011-01-15 17:14:39.000000000 +0100
 +++ syslog-ng-3.2.2/modules/dbparser/Makefile.am	2011-01-17 20:06:00.103986725 +0100
 @@ -17,7 +17,7 @@
