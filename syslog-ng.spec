@@ -136,6 +136,7 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 %{__automake}
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
+	--datadir=%{_datadir}/syslog-ng \
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--with-pidfile-dir=/var/run \
@@ -161,7 +162,8 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{init,sysconfig,logrotate.d,rc.d/init.d},%{_sysconfdir}/syslog-ng} \
+install -d $RPM_BUILD_ROOT/etc/{init,sysconfig,logrotate.d,rc.d/init.d} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/patterndb.d \
 	$RPM_BUILD_ROOT/var/{log,lib/%{name}}
 
 %{__make} -j1 install \
@@ -243,6 +245,7 @@ exit 0
 %doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-v3.0-guide-admin-en.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
+%attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/modules.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/scl.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
@@ -256,7 +259,10 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/lib*.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
+%attr(755,root,root) %{_bindir}/pdbtool
+%attr(755,root,root) %{_bindir}/update-patterndb
 %dir %{_var}/lib/%{name}
+%{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
 %{_mandir}/man8/syslog-ng.8*
