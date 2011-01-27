@@ -2,7 +2,7 @@
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
 %if "%{pld_release}" == "ac"
-%bcond_with		sql		# build with support for logging to SQL DB
+%bcond_with	sql		# build with support for logging to SQL DB
 %else
 %bcond_without	sql		# build without support for logging to SQL DB
 %endif
@@ -169,7 +169,7 @@ install -d $RPM_BUILD_ROOT/etc/{init,sysconfig,logrotate.d,rc.d/init.d} \
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
+%{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 cp -a %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 

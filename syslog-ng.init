@@ -67,7 +67,7 @@ start() {
 
 	msg_starting "syslog-ng"
 	emit starting JOB=syslog-ng SERVICE=syslog
-	daemon /usr/sbin/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
+	daemon @@SBINDIR@@/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
 	emit --no-wait started JOB=syslog-ng SERVICE=syslog
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
