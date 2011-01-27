@@ -80,6 +80,12 @@ Conflicts:	msyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%if %{without dynamic}
+%define		no_install_post_check_so	1
+%define		_sbindir			/sbin
+%define		_libdir				/%{_lib}
+%endif
+
 %description
 syslog-ng is a syslogd replacement for Unix and Unix-like systems. It
 has been tested on Solaris, BSDi and Linux, and were found to run
@@ -130,7 +136,7 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 %{__automake}
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
-	--with-module-dir=/%{_lib}/syslog-ng \
+	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--with-pidfile-dir=/var/run \
 	--enable-ssl \
@@ -145,6 +151,8 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 %endif
 %if %{with dynamic}
 	--enable-dynamic-linking
+%else
+	--enable-mixed-linking
 %endif
 
 %{__make}
@@ -168,7 +176,9 @@ for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
-rm $RPM_BUILD_ROOT%{_bindir}/loggen
+%{__rm} $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}/loggen*
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.{so,la}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/syslog-ng/*.la
 
 %if "%{pld_release}" == "th"
 cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
@@ -178,6 +188,7 @@ cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
 rm -rf $RPM_BUILD_ROOT
 
 %post
+/sbin/ldconfig
 if [ "$1" = "1" ]; then
 	# disable /proc/kmsg from config on first install on vserver
 	{
@@ -203,6 +214,8 @@ if [ "$1" = "0" ]; then
 	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
+
+%postun -p /sbin/ldconfig
 
 %post upstart
 %upstart_post %{name}
@@ -230,11 +243,21 @@ exit 0
 %doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-v3.0-guide-admin-en.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/modules.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/scl.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
+%attr(755,root,root) %{_libdir}/libsyslog-ng.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libsyslog-ng.so.0
+%attr(755,root,root) %{_libdir}/libsyslog-ng-patterndb.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libsyslog-ng-patterndb.so.0
+%dir %{_libdir}/syslog-ng
+%attr(755,root,root) %{_libdir}/syslog-ng/lib*.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
+%attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %dir %{_var}/lib/%{name}
+%{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
 %{_mandir}/man8/syslog-ng.8*
 
