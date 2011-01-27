@@ -15,3 +15,13 @@
  
  #define LOG_PRIORITY_LISTEN 0
  #define LOG_PRIORITY_READER 0
+--- syslog-ng-3.2.2/scripts/update-patterndb.in~	2010-11-20 09:47:33.000000000 +0100
++++ syslog-ng-3.2.2/scripts/update-patterndb.in	2011-01-27 20:43:14.656000204 +0100
+@@ -3,6 +3,6 @@
+ exec_prefix=@exec_prefix@
+ bindir=@bindir@
+ sysconfdir=@sysconfdir@
+-localstatedir=@localstatedir@
++localstatedir=/var/lib/syslog-ng
+ 
+ ${bindir}/pdbtool merge -r --glob *.pdb -D ${sysconfdir}/patterndb.d -p ${localstatedir}/patterndb.xml

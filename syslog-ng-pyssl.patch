@@ -1,8 +1,0 @@
---- syslog-ng-3.0.2/tests/functional/messagegen.py.orig	2009-05-12 16:55:58.000000000 +0200
-+++ syslog-ng-3.0.2/tests/functional/messagegen.py	2009-05-12 16:52:46.000000000 +0200
-@@ -1,4 +1,5 @@
- import struct, stat, re
-+from socket import ssl
- from socket import *
- import os, sys, errno
- 

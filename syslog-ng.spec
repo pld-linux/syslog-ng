@@ -32,7 +32,6 @@ Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-link.patch
 Patch1:		%{name}-datadir.patch
-Patch2:		%{name}-pyssl.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -125,7 +124,6 @@ Opis zadania Upstart dla syslog-ng.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -164,7 +162,7 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{init,sysconfig,logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/patterndb.d \
-	$RPM_BUILD_ROOT/var/{log,lib/%{name}}
+	$RPM_BUILD_ROOT/var/{log,lib/%{name}/xsd}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -278,6 +276,7 @@ exit 0
 %{_datadir}/syslog-ng/xsd/patterndb-*.xsd
 
 %dir %{_var}/lib/%{name}
+%dir %{_var}/lib/%{name}/xsd
 %{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
