@@ -261,6 +261,22 @@ exit 0
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/update-patterndb
+
+%dir %{_datadir}/syslog-ng
+%dir %{_datadir}/syslog-ng/include
+%dir %{_datadir}/syslog-ng/include/scl
+%dir %{_datadir}/syslog-ng/include/scl/pacct
+%{_datadir}/syslog-ng/include/scl/pacct/plugin.conf
+%dir %{_datadir}/syslog-ng/include/scl/syslogconf
+%{_datadir}/syslog-ng/include/scl/syslogconf/README
+%attr(755,root,root) %{_datadir}/syslog-ng/include/scl/syslogconf/convert-syslogconf.awk
+%{_datadir}/syslog-ng/include/scl/syslogconf/plugin.conf
+%dir %{_datadir}/syslog-ng/include/scl/system
+%attr(755,root,root) %{_datadir}/syslog-ng/include/scl/system/generate-system-source.sh
+%{_datadir}/syslog-ng/include/scl/system/plugin.conf
+%dir %{_datadir}/syslog-ng/xsd
+%{_datadir}/syslog-ng/xsd/patterndb-*.xsd
+
 %dir %{_var}/lib/%{name}
 %{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
