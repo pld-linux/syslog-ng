@@ -183,7 +183,7 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/syslog-ng/*.la
 
 %if "%{pld_release}" == "th"
-cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+%{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE6} > $RPM_BUILD_ROOT/etc/init/%{name}.conf
 %endif
 
 %clean

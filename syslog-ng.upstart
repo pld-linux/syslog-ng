@@ -9,7 +9,7 @@ respawn
 
 console output
 
-exec /usr/sbin/syslog-ng --process-mode=background -f /etc/syslog-ng/syslog-ng.conf
+exec @@SBINDIR@@/syslog-ng --process-mode=background -f /etc/syslog-ng/syslog-ng.conf
 expect fork
 
 # vi: ft=upstart
