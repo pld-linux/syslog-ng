@@ -1,4 +1,7 @@
 #
+# TODO:
+#	- move SQL module to a separate package
+#
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
 %if "%{pld_release}" == "ac"
@@ -26,8 +29,8 @@ Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/sou
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/dl/guides/%{name}-v3.0-guide-admin-en.pdf
-# Source4-md5:	882f77ad2673e6490099b5393fe26796
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-v3.2-guide-admin-en_0.pdf
+# Source4-md5:	4fa86dc863ed0206c004b3be7292bcbf
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-link.patch
@@ -67,6 +70,7 @@ BuildRequires:	libwrap-static
 BuildRequires:	openssl-static
 BuildRequires:	pcre-static
 BuildRequires:	zlib-static
+Requires:	libnet >= 1:1.1.2.1-7
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -126,6 +130,8 @@ Opis zadania Upstart dla syslog-ng.
 %patch1 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
+
+%{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 
 %build
 %{__libtoolize}
