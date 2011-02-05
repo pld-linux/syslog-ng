@@ -246,7 +246,7 @@ exit 0
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/relogger.pl
 %doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-v3.0-guide-admin-en.pdf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.2-guide-admin-en_0.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
