@@ -38,7 +38,7 @@
  
  	old_LIBS=$LIBS
 -	LIBS="$LD_START_STATIC $GLIB_LIBS $LD_END_STATIC"
-+	LIBS="$LD_START_STATIC $GLIB_LIBS $LD_END_STATIC -ldl -lrt"
++	LIBS="$LD_START_STATIC $GLIB_LIBS $LD_END_STATIC $BASE_LIBS"
  	AC_CHECK_FUNC(g_hash_table_new, blb_cv_static_glib=yes, blb_cv_static_glib=no)
  	LIBS=$old_LIBS
  fi
