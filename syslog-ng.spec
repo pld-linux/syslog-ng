@@ -18,7 +18,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.0.9
-Release:	9
+Release:	10
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -35,7 +35,6 @@ Patch1:		%{name}-datadir.patch
 Patch2:		%{name}-pyssl.patch
 Patch3:		fix-unix-stream-caps.patch
 Patch4:		fix-dac_override.patch
-Patch5:		cap_syslog.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -126,7 +125,6 @@ Opis zadania Upstart dla syslog-ng.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
