@@ -1,6 +1,7 @@
 #
 # TODO:
 #	- move SQL module to a separate package
+#	- relies on libs in /usr/ which is wrong
 #
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
