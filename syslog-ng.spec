@@ -20,12 +20,12 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.2.2
+Version:	3.2.4
 Release:	0.1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	ed8ebe559d52a63fb61e3e2db566643f
+# Source0-md5:	5995f7dad0053a478b60a63f6f754203
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -51,7 +51,7 @@ BuildRequires:	python-modules
 BuildRequires:	tzdata
 %endif
 %if %{with dynamic}
-BuildRequires:	eventlog-devel >= 0.2
+BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	glib2-devel >= 1:%{glib2_ver}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
@@ -60,7 +60,7 @@ BuildRequires:	libwrap-devel
 BuildRequires:	openssl-devel
 BuildRequires:	pcre-devel
 %else
-BuildRequires:	eventlog-static >= 0.2
+BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= 1:%{glib2_ver}
 BuildRequires:	glibc-static
 BuildRequires:	libcap-static
@@ -257,8 +257,6 @@ exit 0
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %attr(755,root,root) %{_libdir}/libsyslog-ng.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libsyslog-ng.so.0
-%attr(755,root,root) %{_libdir}/libsyslog-ng-patterndb.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libsyslog-ng-patterndb.so.0
 %dir %{_libdir}/syslog-ng
 %attr(755,root,root) %{_libdir}/syslog-ng/lib*.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
