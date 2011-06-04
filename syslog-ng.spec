@@ -34,8 +34,7 @@ Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-v3.2-guide-a
 # Source4-md5:	4fa86dc863ed0206c004b3be7292bcbf
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
-Patch0:		%{name}-link.patch
-Patch1:		%{name}-datadir.patch
+Patch0:		%{name}-datadir.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -84,8 +83,15 @@ Conflicts:	msyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+# syslog-ng has really crazy linking rules (see their bugzilla).
+# Some rules, according to syslog-ng devs, are like this:
+# - libsyslog-ng.so has undefined symbols for third party libraries
+#   and these symbols should go via main syslog-ng binary
+# - same applies for modules
 %if %{without dynamic}
 %define		no_install_post_check_so	1
+# filterout_ld - see comment few lines above
+%define		filterout_ld			-Wl,--as-needed -Wl,--no-copy-dt-needed-entries
 %define		_sbindir			/sbin
 %define		_libdir				/%{_lib}
 %endif
@@ -128,7 +134,6 @@ Opis zadania Upstart dla syslog-ng.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
