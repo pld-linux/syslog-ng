@@ -22,7 +22,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.2.4
-Release:	0.1
+Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -124,6 +124,9 @@ Summary(pl.UTF-8):	Opis zadania Upstart dla syslog-ng
 Group:		Daemons
 Requires:	%{name} = %{version}-%{release}
 Requires:	upstart >= 0.6
+Conflicts:	avahi-upstart < 0.6.30-2
+Conflicts:	openssh-server-upstart < 2:5.8p2-2
+Conflicts:	postgresql-upstart < 9.0.4-2
 
 %description upstart
 Upstart job description for syslog-ng.
@@ -168,7 +171,7 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__make}
 
-%{?with_tests:%{__make} check}
+%{?with_tests:LD_LIBRARY_PATH=$PWD/lib/.libs %{__make} check}
 
 %install
 rm -rf $RPM_BUILD_ROOT

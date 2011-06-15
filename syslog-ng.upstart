@@ -2,8 +2,8 @@
 start on pld.sysinit-done
 stop on pld.shutdown-started
 
-env SERVICE=syslog
-export SERVICE
+env SERVICE_syslog=y
+export SERVICE_syslog
 
 respawn
 

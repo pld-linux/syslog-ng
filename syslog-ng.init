@@ -66,9 +66,9 @@ start() {
 	fi
 
 	msg_starting "syslog-ng"
-	emit starting JOB=syslog-ng SERVICE=syslog
+	emit starting JOB=syslog-ng SERVICE_syslog=y
 	daemon @@SBINDIR@@/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
-	emit --no-wait started JOB=syslog-ng SERVICE=syslog
+	emit --no-wait started JOB=syslog-ng SERVICE_syslog=y
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
 }
@@ -80,9 +80,9 @@ stop() {
 	fi
 
 	msg_stopping "syslog-ng"
-	emit stopping JOB=syslog-ng SERVICE=syslog
+	emit stopping JOB=syslog-ng SERVICE_syslog=y
 	killproc syslog-ng
-	emit --no-wait stopped JOB=syslog-ng SERVICE=syslog
+	emit --no-wait stopped JOB=syslog-ng SERVICE_syslog=y
 	rm -f /var/lock/subsys/syslog-ng >/dev/null 2>&1
 }
 
