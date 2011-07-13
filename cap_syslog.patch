@@ -1,91 +1,145 @@
-diff -upr syslog-ng-3.0.9./src/affile.c syslog-ng-3.0.9/src/affile.c
---- syslog-ng-3.0.9./src/affile.c	2011-01-19 15:14:11.813181829 +0100
-+++ syslog-ng-3.0.9/src/affile.c	2011-01-19 16:10:12.399928759 +0100
-@@ -59,7 +59,12 @@ affile_open_file(gchar *name, gint flags
+diff --git a/lib/gprocess.c b/lib/gprocess.c
+index 38bcb12..e2159fc 100644
+--- a/lib/gprocess.c
++++ b/lib/gprocess.c
+@@ -98,6 +98,7 @@ static gint startup_result_pipe[2] = { -1, -1 };
+ static gint init_result_pipe[2] = { -1, -1 };
+ static GProcessKind process_kind = G_PK_STARTUP;
+ static gboolean stderr_present = TRUE;
++static int have_capsyslog = FALSE;
+ 
+ /* global variables */
+ static struct
+@@ -216,6 +217,13 @@ g_process_cap_modify(int capability, int onoff)
+   if (!process_opts.caps)
+     return TRUE;
+ 
++  /*
++   * if libcap or kernel doesn't support cap_syslog, then resort to
++   * cap_sys_admin
++   */
++  if (capability == CAP_SYSLOG && (!have_capsyslog || CAP_SYSLOG == -1))
++    capability = CAP_SYS_ADMIN;
++
+   caps = cap_get_proc();
+   if (!caps)
+     return FALSE;
+@@ -297,6 +305,25 @@ g_process_cap_restore(cap_t r)
+   return;
+ }
+ 
++gboolean
++g_process_check_cap_syslog(void)
++{
++  int ret;
++
++  if (have_capsyslog)
++    return TRUE;
++
++  if (CAP_SYSLOG == -1)
++    return FALSE;
++
++  ret = prctl(PR_CAPBSET_READ, CAP_SYSLOG);
++  if (ret == -1)
++    return FALSE;
++
++  have_capsyslog = TRUE;
++  return TRUE;
++}
++
+ #endif
+ 
+ /**
+diff --git a/lib/gprocess.h b/lib/gprocess.h
+index a6dd7c4..1bdd719 100644
+--- a/lib/gprocess.h
++++ b/lib/gprocess.h
+@@ -46,6 +46,10 @@ gboolean g_process_cap_modify(int capability, int onoff);
+ cap_t g_process_cap_save(void);
+ void g_process_cap_restore(cap_t r);
+ 
++#ifndef CAP_SYSLOG
++#define CAP_SYSLOG -1
++#endif
++
+ #else
+ 
+ typedef gpointer cap_t;
+@@ -71,6 +75,8 @@ void g_process_set_argv_space(gint argc, gchar **argv);
+ void g_process_set_use_fdlimit(gboolean use);
+ void g_process_set_check(gint check_period, gboolean (*check_fn)(void));
+ 
++gboolean g_process_check_cap_syslog(void);
++
+ void g_process_start(void);
+ void g_process_startup_failed(guint ret_num, gboolean may_exit);
+ void g_process_startup_ok(void);
+diff --git a/modules/affile/affile.c b/modules/affile/affile.c
+index ce343cd..bb8aa75 100644
+--- a/modules/affile/affile.c
++++ b/modules/affile/affile.c
+@@ -59,7 +59,7 @@ affile_open_file(gchar *name, gint flags,
    if (privileged)
      {
        g_process_cap_modify(CAP_DAC_READ_SEARCH, TRUE);
 -      g_process_cap_modify(CAP_SYS_ADMIN, TRUE);
-+      if (!kernel_version)
-+        get_kernel_version();
-+      if (kernel_version < LINUX_VERSION(2, 6, 38))
-+        g_process_cap_modify(CAP_SYS_ADMIN, TRUE);
-+      else
-+        g_process_cap_modify(CAP_SYSLOG, TRUE);
++      g_process_cap_modify(CAP_SYSLOG, TRUE);
      }
    else
-       g_process_cap_modify(CAP_DAC_OVERRIDE, TRUE);
-diff -upr syslog-ng-3.0.9./src/gprocess.h syslog-ng-3.0.9/src/gprocess.h
---- syslog-ng-3.0.9./src/gprocess.h	2009-04-22 13:06:55.000000000 +0200
-+++ syslog-ng-3.0.9/src/gprocess.h	2011-01-19 16:10:12.399928759 +0100
-@@ -27,6 +27,7 @@
- #include "syslog-ng.h"
- 
- #include <sys/types.h>
-+#include <sys/utsname.h>
- 
- #if ENABLE_LINUX_CAPS
- #  include <sys/capability.h>
-@@ -77,5 +78,8 @@ void g_process_finish(void);
- 
- void g_process_add_option_group(GOptionContext *ctx);
- 
-+extern int kernel_version;
-+extern void get_kernel_version(void);
-+#define LINUX_VERSION(x,y,z)    (0x10000*(x) + 0x100*(y) + z)
- 
- #endif
-diff -upr syslog-ng-3.0.9./src/main.c syslog-ng-3.0.9/src/main.c
---- syslog-ng-3.0.9./src/main.c	2010-05-10 17:46:05.000000000 +0200
-+++ syslog-ng-3.0.9/src/main.c	2011-01-19 16:10:25.346593248 +0100
-@@ -64,6 +64,7 @@ static const gchar *persist_file = PATH_
- static gboolean syntax_only = FALSE;
- static gboolean seed_rng = FALSE;
- static gboolean display_version = FALSE;
-+int kernel_version;
- 
- static volatile sig_atomic_t sig_hup_received = FALSE;
- static volatile sig_atomic_t sig_term_received = FALSE;
-@@ -395,6 +396,20 @@ version(void)
-          ON_OFF_STR(ENABLE_PCRE));
+     {
+diff --git a/syslog-ng/main.c b/syslog-ng/main.c
+index 9880c1f..02f17b6 100644
+--- a/syslog-ng/main.c
++++ b/syslog-ng/main.c
+@@ -363,6 +363,33 @@ version(void)
+          ON_OFF_STR(ENABLE_PACCT_MODULE));
  }
  
-+void
-+get_kernel_version(void) {
-+	static struct utsname uts;
-+	int x = 0, y = 0, z = 0;
++#if ENABLE_LINUX_CAPS
++#define BASE_CAPS "cap_net_bind_service,cap_net_broadcast,cap_net_raw," \
++  "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner=p "
 +
-+	if (uname(&uts) == -1) {
-+		fprintf(stderr, "Unable to retrieve kernel version.\n");
-+		exit(1);
-+	}
++static void
++setup_caps (void)
++{
++  static gchar *capsstr_syslog = BASE_CAPS "cap_syslog=ep";
++  static gchar *capsstr_sys_admin = BASE_CAPS "cap_sys_admin=ep";
 +
-+	sscanf(uts.release, "%d.%d.%d", &x, &y, &z);
-+	kernel_version = LINUX_VERSION(x, y, z);
++  /* Set up the minimal privilege we'll need
++   *
++   * NOTE: polling /proc/kmsg requires cap_sys_admin, otherwise it'll always
++   * indicate readability. Enabling/disabling cap_sys_admin on every poll
++   * invocation seems to be too expensive. So I enable it for now.
++   */
++  if (g_process_check_cap_syslog())
++    g_process_set_caps(capsstr_syslog);
++  else
++    g_process_set_caps(capsstr_sys_admin);
 +}
++#else
++
++#define setup_caps()
++
++#endif
 +
  int 
  main(int argc, char *argv[])
  {
-@@ -411,9 +426,20 @@ main(int argc, char *argv[])
-    * indicate readability. Enabling/disabling cap_sys_admin on every poll
-    * invocation seems to be too expensive. So I enable it for now. */
-   
+@@ -374,14 +401,9 @@ main(int argc, char *argv[])
+   z_mem_trace_init("syslog-ng.trace");
+ 
+   g_process_set_argv_space(argc, (gchar **) argv);
+-  
+-  /* NOTE: polling /proc/kmsg requires cap_sys_admin, otherwise it'll always
+-   * indicate readability. Enabling/disabling cap_sys_admin on every poll
+-   * invocation seems to be too expensive. So I enable it for now. */
+-  
 -  g_process_set_caps("cap_net_bind_service,cap_net_broadcast,cap_net_raw,"
-+  if (!kernel_version)
-+    get_kernel_version();
-+  if (kernel_version < LINUX_VERSION(2, 6, 34))
-+    g_process_set_caps("cap_net_bind_service,cap_net_broadcast,cap_net_raw,"
-                      "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner=p "
-                      "cap_sys_admin=ep");
-+  else if (kernel_version < LINUX_VERSION(2, 6, 38))
-+    g_process_set_caps("cap_net_bind_service,cap_net_broadcast,cap_net_raw,"
-+                     "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner,"
-+                     "cap_sys_admin=p");
-+  else 
-+    g_process_set_caps("cap_net_bind_service,cap_net_broadcast,cap_net_raw,"
-+                     "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner,"
-+                     "cap_syslog=p");
+-                     "cap_dac_read_search,cap_dac_override,cap_chown,cap_fowner=p "
+-                     "cap_sys_admin=ep");
++
++  setup_caps();
++
    ctx = g_option_context_new("syslog-ng");
    g_process_add_option_group(ctx);
    msg_add_option_group(ctx);
