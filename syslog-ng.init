@@ -10,12 +10,6 @@
 # Source function library
 . /etc/rc.d/init.d/functions
 
-# Set defaults
-ENABLE_RECEIVE_FROM_NET=no
-HOSTLIST=""
-DOMAINLIST=""
-MARK_TIMESTAMP=""
-
 # Get service config
 if [ -f /etc/sysconfig/syslog-ng ]; then
 	. /etc/sysconfig/syslog-ng
