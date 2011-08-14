@@ -22,7 +22,7 @@ Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.2.4
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
@@ -239,6 +239,10 @@ fi
 
 %postun upstart
 %upstart_postun %{name}
+
+%triggerun upstart -- syslog-ng-upstart < 3.2.4-3
+#  use SERVICE_syslog=y in upstart job environment instead of SERVICE=syslog
+%{__sed} -i -e 's,SERVICE=syslog,SERVICE_syslog=y,' /etc/init/*.conf || :
 
 %triggerun -- syslog-ng < 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
