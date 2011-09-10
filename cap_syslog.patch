@@ -1,3 +1,28 @@
+commit ae0ff59d9a761c2fda8a19b0c05e0e05c59bae57
+Author: Balazs Scheidler <bazsi@balabit.hu>
+Date:   Thu May 12 13:11:58 2011 +0200
+
+    Use CAP_SYSLOG instead of CAP_SYS_ADMIN, if available.
+    
+    If cap_syslog exists, the kernel will complain (once) that we only
+    have cap_sys_admin.  Additionally, using cap_syslog instead of
+    cap_sys_admin significantly lowers the unneeded privs we are
+    using.
+    
+    Upon startup, syslog-ng will detect whether CAP_SYSLOG is available,
+    and use capabilities based on that finding. This detection will also
+    have a side-effect, which will make it so that
+    g_process_cap_modify(CAP_SYSLOG) will fall back to CAP_SYS_ADMIN, if
+    CAP_SYSLOG support was not detected.
+    
+    Thanks to Andrew Morgan for pointing out a nice way to detect whether
+    the kernel has CAP_SYSLOG. Original code by Serge Hallyn, with minor
+    changes based on Balazs Scheidler's review by Gergely Nagy.
+    
+    Signed-off-by: Serge Hallyn <serge.hallyn@ubuntu.com>
+    Signed-off-by: Gergely Nagy <algernon@balabit.hu>
+    Signed-off-by: Balazs Scheidler <bazsi@balabit.hu>
+
 diff --git a/lib/gprocess.c b/lib/gprocess.c
 index 38bcb12..e2159fc 100644
 --- a/lib/gprocess.c
