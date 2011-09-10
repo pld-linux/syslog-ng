@@ -37,7 +37,6 @@ diff -ur syslog-ng-3.2.4.org/lib/gprocess.c syslog-ng-3.2.4/lib/gprocess.c
    have_capsyslog = TRUE;
    return TRUE;
  }
-Tylko w syslog-ng-3.2.4/lib: gprocess.c~
 diff -ur syslog-ng-3.2.4.org/lib/gprocess.h syslog-ng-3.2.4/lib/gprocess.h
 --- syslog-ng-3.2.4.org/lib/gprocess.h	2011-09-10 19:11:42.848926449 +0200
 +++ syslog-ng-3.2.4/lib/gprocess.h	2011-09-10 19:15:44.334619870 +0200
@@ -49,4 +48,3 @@ diff -ur syslog-ng-3.2.4.org/lib/gprocess.h syslog-ng-3.2.4/lib/gprocess.h
  
  #if ENABLE_LINUX_CAPS
  #  include <sys/capability.h>
-Tylko w syslog-ng-3.2.4/lib: gprocess.h~
