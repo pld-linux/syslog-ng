@@ -199,7 +199,7 @@ done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 %{__rm} $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}/loggen*
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.{so,la}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/syslog-ng/*.la
 
 %if "%{pld_release}" == "th"
@@ -265,8 +265,8 @@ exit 0
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/relogger.pl
-%doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.3-guide-admin-en_0.pdf
+%doc contrib/syslog-ng.conf.{doc,simple,RedHat}
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.3-guide-admin-en.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
@@ -275,6 +275,7 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
+%attr(755,root,root) %{_libdir}/libsyslog-ng-%{version}.so
 %dir %{_libdir}/syslog-ng
 %attr(755,root,root) %{_libdir}/syslog-ng/lib*.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
