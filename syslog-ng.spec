@@ -2,6 +2,7 @@
 # TODO:
 #	- move SQL module to a separate package
 #	- relies on libs in /usr/ which is wrong
+#	- use external libivykis.spec
 #
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
@@ -21,22 +22,21 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.2.4
-Release:	4
+Version:	3.3.1
+Release:	1
 License:	GPL v2
 Group:		Daemons
-Source0:	http://www.balabit.com/downloads/files/syslog-ng/sources/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	5995f7dad0053a478b60a63f6f754203
+Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
+# Source0-md5:	a3dfe8a49aa8ce1aeb7e1ed5b11af378
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-v3.2-guide-admin-en_0.pdf
-# Source4-md5:	4fa86dc863ed0206c004b3be7292bcbf
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-v3.3-guide-admin-en.pdf
+# Source4-md5:	bb23e36a8f44956858f2d622f9d1826d
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
-Patch1:		cap_syslog.patch
-Patch2:		cap_syslog-vserver-workaround.patch
+Patch1:		cap_syslog-vserver-workaround.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -140,17 +140,20 @@ Opis zadania Upstart dla syslog-ng.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 
 %build
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__automake}
+for i in . lib/ivykis; do
+cd $i
+	%{__libtoolize}
+	%{__aclocal} -I m4
+	%{__autoconf}
+	%{__automake}
+cd -
+done
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--datadir=%{_datadir}/syslog-ng \
@@ -263,7 +266,7 @@ exit 0
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/relogger.pl
 %doc doc/examples/syslog-ng.conf.sample contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.2-guide-admin-en_0.pdf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.3-guide-admin-en_0.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
@@ -272,8 +275,6 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
-%attr(755,root,root) %{_libdir}/libsyslog-ng.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libsyslog-ng.so.0
 %dir %{_libdir}/syslog-ng
 %attr(755,root,root) %{_libdir}/syslog-ng/lib*.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
