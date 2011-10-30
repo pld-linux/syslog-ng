@@ -61,7 +61,7 @@ start() {
 
 	msg_starting "syslog-ng"
 	emit starting JOB=syslog-ng SERVICE_syslog=y
-	daemon @@SBINDIR@@/syslog-ng -f /etc/syslog-ng/syslog-ng.conf $OPTIONS
+	daemon @@SBINDIR@@/syslog-ng -f /etc/syslog-ng/syslog-ng.conf --worker-threads=1024 $OPTIONS
 	emit --no-wait started JOB=syslog-ng SERVICE_syslog=y
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
