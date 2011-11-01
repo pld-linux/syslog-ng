@@ -1,9 +1,8 @@
 #
 # TODO:
-#	- mongodb?
 #	- move SQL module to a separate package
 #	- relies on libs in /usr/ which is wrong
-#	- use external libivykis [>= 0.18] and libmongo_client [>= 0.1.0]
+#	- use external libivykis [>= 0.18+syslog-ng updates], libmongo_client [>= 0.1.0]
 #
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
@@ -76,13 +75,20 @@ BuildRequires:	libwrap-static
 BuildRequires:	openssl-static >= 0.9.8
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
-Requires:	libnet >= 1:1.1.2.1-7
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires:	glib2 >= 1:%{glib2_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
+%if %{with dynamic}
+Requires:	eventlog >= 0.2.12
+Requires:	json-c >= 0.7
+Requires:	libdbi >= 0.8.3-2
+Requires:	libnet >= 1:1.1.2.1-7
+Requires:	openssl >= 0.9.8
+Requires:	pcre >= 6.1
+%endif
 Provides:	syslogdaemon
 Conflicts:	klogd
 Conflicts:	msyslog
