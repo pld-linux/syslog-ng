@@ -59,8 +59,8 @@ BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libwrap-devel
-BuildRequires:	openssl-devel
-BuildRequires:	pcre-devel
+BuildRequires:	openssl-devel >= 0.9.8
+BuildRequires:	pcre-devel >= 6.1
 %else
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= 1:%{glib2_ver}
@@ -69,8 +69,8 @@ BuildRequires:	libcap-static
 %{?with_sql:BuildRequires:	libdbi-static >= 0.8.3-2}
 BuildRequires:	libnet-static >= 1:1.1.2.1-3
 BuildRequires:	libwrap-static
-BuildRequires:	openssl-static
-BuildRequires:	pcre-static
+BuildRequires:	openssl-static >= 0.9.8
+BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 Requires:	libnet >= 1:1.1.2.1-7
 %endif
@@ -151,6 +151,7 @@ cd $i
 	%{__libtoolize}
 	%{__aclocal} -I m4
 	%{__autoconf}
+	%{__autoheader}
 	%{__automake}
 cd -
 done
