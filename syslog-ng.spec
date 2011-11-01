@@ -1,8 +1,9 @@
 #
 # TODO:
+#	- mongodb?
 #	- move SQL module to a separate package
 #	- relies on libs in /usr/ which is wrong
-#	- use external libivykis.spec
+#	- use external libivykis [>= 0.18] and libmongo_client [>= 0.1.0]
 #
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
@@ -40,8 +41,9 @@ Patch1:		cap_syslog-vserver-workaround.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
-BuildRequires:	bison
+BuildRequires:	bison >= 2.4
 BuildRequires:	flex
+BuildRequires:	libtool >= 2:2.0
 BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.561
@@ -55,6 +57,7 @@ BuildRequires:	tzdata
 %if %{with dynamic}
 BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	glib2-devel >= 1:%{glib2_ver}
+BuildRequires:	json-c-devel >= 0.7
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
@@ -65,6 +68,7 @@ BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= 1:%{glib2_ver}
 BuildRequires:	glibc-static
+BuildRequires:	json-c-static >= 0.7
 BuildRequires:	libcap-static
 %{?with_sql:BuildRequires:	libdbi-static >= 0.8.3-2}
 BuildRequires:	libnet-static >= 1:1.1.2.1-3
@@ -122,7 +126,7 @@ facility/prioridade como o syslog original.
 
 %package upstart
 Summary:	Upstart job description for syslog-ng
-Summary(pl.UTF-8):	Opis zadania Upstart dla syslog-ng
+Summary(pl.UTF-8):	Opis zadania Upstart dla demona syslog-ng
 Group:		Daemons
 Requires:	%{name} = %{version}-%{release}
 Requires:	upstart >= 0.6
@@ -134,7 +138,7 @@ Conflicts:	postgresql-upstart < 9.0.4-2
 Upstart job description for syslog-ng.
 
 %description upstart -l pl.UTF-8
-Opis zadania Upstart dla syslog-ng.
+Opis zadania Upstart dla demona syslog-ng.
 
 %prep
 %setup -q
@@ -159,15 +163,16 @@ done
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--datadir=%{_datadir}/syslog-ng \
 	--with-module-dir=%{_libdir}/syslog-ng \
-	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--with-pidfile-dir=/var/run \
-	--enable-ssl \
+	--with-timezone-dir=%{_datadir}/zoneinfo \
+	--disable-systemd \
 	--enable-ipv6 \
-	--enable-tcp-wrapper \
-	--enable-spoof-source \
 	--enable-linux-caps \
-	--enable-pcre \
 	--enable-pacct \
+	--enable-pcre \
+	--enable-spoof-source \
+	--enable-ssl \
+	--enable-tcp-wrapper \
 %if %{with sql}
 	--enable-sql \
 %endif
