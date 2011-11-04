@@ -40,7 +40,6 @@ BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	linux-libc-headers >= 7:2.6.37-2
 BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.561
@@ -125,8 +124,8 @@ Opis zadania Upstart dla syslog-ng.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-cp -a %{SOURCE4} doc
-cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
+cp -p %{SOURCE4} doc
+cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %build
 %{__aclocal}
@@ -162,8 +161,8 @@ install -d $RPM_BUILD_ROOT{/etc/{init,sysconfig,logrotate.d,rc.d/init.d},%{_sysc
 	DESTDIR=$RPM_BUILD_ROOT
 
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
-cp -a %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
-cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
+cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
+cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
 for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog; do
 	> $RPM_BUILD_ROOT/var/log/$n
@@ -173,7 +172,7 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 rm $RPM_BUILD_ROOT%{_bindir}/loggen
 
 %if "%{pld_release}" == "th"
-cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+cp -p %{SOURCE6} $RPM_BUILD_ROOT/etc/init/%{name}.conf
 %endif
 
 %clean
