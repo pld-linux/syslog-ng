@@ -291,21 +291,16 @@ diff -U5 -rb syslog-ng-3.0.4-orig/src/cfg.c syslog-ng-3.0.4/src/cfg.c
    self->dir_perm = 0700;
  
    self->use_dns_cache = 1;
-diff -U5 -rb syslog-ng-3.0.4-orig/src/cfg.h syslog-ng-3.0.4/src/cfg.h
---- syslog-ng-3.0.4-orig/src/cfg.h	2009-06-03 13:08:27.000000000 +0200
-+++ syslog-ng-3.0.4/src/cfg.h	2009-08-17 10:10:39.000000000 +0200
-@@ -78,10 +78,11 @@
-   gint follow_freq;
-   gboolean create_dirs;
-   uid_t file_uid;
-   gid_t file_gid;
-   mode_t file_perm;
+--- syslog-ng-3.0.9/src/cfg.h~	2010-05-05 11:26:19.000000000 +0300
++++ syslog-ng-3.0.9/src/cfg.h	2011-11-04 12:54:09.546515065 +0200
+@@ -80,6 +80,7 @@
+   gint file_uid;
+   gint file_gid;
+   gint file_perm;
 +  off_t file_size_limit;
    
-   uid_t dir_uid;
-   gid_t dir_gid;
-   mode_t dir_perm;
- 
+   gint dir_uid;
+   gint dir_gid;
 diff -U5 -rb syslog-ng-3.0.4-orig/src/logtransport.c syslog-ng-3.0.4/src/logtransport.c
 --- syslog-ng-3.0.4-orig/src/logtransport.c	2009-04-30 10:53:22.000000000 +0200
 +++ syslog-ng-3.0.4/src/logtransport.c	2009-08-17 11:01:33.000000000 +0200
