@@ -59,6 +59,7 @@ BuildRequires:	glib2-devel >= 1:%{glib2_ver}
 BuildRequires:	json-c-devel >= 0.7
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
+BuildRequires:	libmongo-client-devel >= 0.1.0
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libwrap-devel
 BuildRequires:	openssl-devel >= 0.9.8
@@ -70,6 +71,7 @@ BuildRequires:	glibc-static
 BuildRequires:	json-c-static >= 0.7
 BuildRequires:	libcap-static
 %{?with_sql:BuildRequires:	libdbi-static >= 0.8.3-2}
+BuildRequires:	libmongo-client-static >= 0.1.0
 BuildRequires:	libnet-static >= 1:1.1.2.1-3
 BuildRequires:	libwrap-static
 BuildRequires:	openssl-static >= 0.9.8
@@ -85,6 +87,7 @@ Requires:	rc-scripts >= 0.4.3.0
 Requires:	eventlog >= 0.2.12
 Requires:	json-c >= 0.7
 Requires:	libdbi >= 0.8.3-2
+Requires:	libmongo-client >= 0.1.0
 Requires:	libnet >= 1:1.1.2.1-7
 Requires:	openssl >= 0.9.8
 Requires:	pcre >= 6.1
@@ -168,6 +171,7 @@ done
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--datadir=%{_datadir}/syslog-ng \
+	--with-libmongo-client=system \
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
