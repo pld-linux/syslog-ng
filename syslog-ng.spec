@@ -239,6 +239,7 @@ done
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--datadir=%{_datadir}/syslog-ng \
+	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
 	--with-libmongo-client=system \
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
