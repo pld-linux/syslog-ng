@@ -1,0 +1,6 @@
+- package -devel
+- separated -libs (required by -devel), so no daemon is required for development
+- filterout_ld as-needed options for dynamic linking too (otherwise tests fail)
+- BRs/Rs cleanup wrt. dynamic/mixed linking: only core (libsyslong-ng and syslog-ng daemon)
+  use mixed linking, everything else is always linked dynamically)
+- release 3
