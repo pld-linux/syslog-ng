@@ -38,6 +38,7 @@ Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
+Patch2:		%{name}-nolibs.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -179,6 +180,7 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
