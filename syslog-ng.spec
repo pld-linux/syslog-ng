@@ -78,7 +78,13 @@ Requires:	glib2 >= %{glib2_ver}
 Requires:	pcre >= 6.1
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
+# for afsocket
+Requires:	libnet >= 1:1.1.2.1-7
+# for afsocket and dbparser
+Requires:	openssl >= 0.9.8
 Provides:	syslogdaemon
+Obsoletes:	syslog-ng-module-afsocket
+Obsoletes:	syslog-ng-module-dbparser
 Conflicts:	klogd
 Conflicts:	msyslog
 Conflicts:	syslog
@@ -148,22 +154,6 @@ MongoDB destination support module for syslog-ng.
 %description module-afmongodb -l pl.UTF-8
 Moduł sysloga-ng do obsługi zapisu logów w bazie MongoDB.
 
-%package module-afsocket
-Summary:	Socket based transports support module for syslog-ng
-Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi transportów opartych na gniazdach
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	libnet >= 1:1.1.2.1-7
-Requires:	openssl >= 0.9.8
-
-%description module-afsocket
-Socket based transports (such as udp(), tcp(), syslog() drivers)
-support module for syslog-ng.
-
-%description module-afsocket -l pl.UTF-8
-Moduł sysloga-ng do obsługi transportów opartych na gniazdach (takich
-jak sterowniki udp(), tcp(), syslog()).
-
 %package module-afsql
 Summary:	SQL destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazach SQL
@@ -178,19 +168,6 @@ SQL destination support module for syslog-ng (via libdbi).
 %description module-afsql -l pl.UTF-8
 Moduł sysloga-ng do obsługi zapisu logów w bazach SQL (poprzez
 libdbi).
-
-%package module-dbparser
-Summary:	Sample database based parsing support module for syslog-ng
-Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi analizy opartej na bazie danych
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	openssl >= 0.9.8
-
-%description module-dbparser
-Sample database based parsing support module for syslog-ng.
-
-%description module-dbparser -l pl.UTF-8
-Moduł sysloga-ng do obsługi analizy opartej na bazie danych.
 
 %package module-tfjson
 Summary:	JSON formatting template function for syslog-ng
@@ -388,17 +365,22 @@ exit 0
 %dir %{_libdir}/syslog-ng
 %attr(755,root,root) %{_libdir}/syslog-ng/libaffile.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafprog.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-notls.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-tls.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafuser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libbasicfuncs.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libconfgen.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libconvertfuncs.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libcsvparser.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libdbparser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libdummy.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libpacctformat.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
+%attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/update-patterndb
 
 %dir %{_datadir}/syslog-ng/include
@@ -417,6 +399,7 @@ exit 0
 
 %dir %{_var}/lib/%{name}
 %dir %{_var}/lib/%{name}/xsd
+%{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
 %{_mandir}/man8/syslog-ng.8*
@@ -445,21 +428,9 @@ exit 0
 %doc modules/afmongodb/TODO
 %attr(755,root,root) %{_libdir}/syslog-ng/libafmongodb.so
 
-%files module-afsocket
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-notls.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-tls.so
-
 %files module-afsql
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsql.so
-
-%files module-dbparser
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libdbparser.so
-%attr(755,root,root) %{_bindir}/pdbtool
-%{_mandir}/man1/pdbtool.1*
 
 %files module-tfjson
 %defattr(644,root,root,755)
