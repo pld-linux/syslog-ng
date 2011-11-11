@@ -1,11 +1,12 @@
 #
 # TODO:
-#	- move SQL module to a separate package
-#	- relies on libs in /usr/ which is wrong
-#	- use external libivykis [>= 0.18+syslog-ng updates], libmongo_client [>= 0.1.0]
+# - move SQL module to a separate package
+# - relies on libs in /usr which is wrong
+#   (well, for modules bringing additional functionality it's acceptable IMO --q)
+# - use external libivykis [>= 0.18+syslog-ng updates]
 #
 # Conditional build:
-%bcond_with	dynamic		# link dynamically with glib, eventlog, pcre, openssl
+%bcond_with	dynamic		# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
 %if "%{pld_release}" == "ac"
 %bcond_with	sql		# build with support for logging to SQL DB
 %else
@@ -19,11 +20,11 @@
 %define		glib2_ver	2.24.0
 %endif
 Summary:	Syslog-ng - new generation of the system logger
-Summary(pl.UTF-8):	Syslog-ng - zamiennik syskloga
+Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.3.1
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -41,8 +42,18 @@ URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
+BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	flex
+BuildRequires:	glib2-devel >= 1:%{glib2_ver}
+BuildRequires:	json-c-devel >= 0.7
+BuildRequires:	libcap-devel
+%{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
+BuildRequires:	libmongo-client-devel >= 0.1.0
+BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
+BuildRequires:	libwrap-devel
+BuildRequires:	openssl-devel >= 0.9.8
+BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.561
@@ -53,45 +64,26 @@ BuildRequires:	python
 BuildRequires:	python-modules
 BuildRequires:	tzdata
 %endif
-%if %{with dynamic}
-BuildRequires:	eventlog-devel >= 0.2.12
-BuildRequires:	glib2-devel >= 1:%{glib2_ver}
-BuildRequires:	json-c-devel >= 0.7
-BuildRequires:	libcap-devel
-%{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
-BuildRequires:	libmongo-client-devel >= 0.1.0
-BuildRequires:	libnet-devel >= 1:1.1.2.1-3
-BuildRequires:	libwrap-devel
-BuildRequires:	openssl-devel >= 0.9.8
-BuildRequires:	pcre-devel >= 6.1
-%else
+%if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= 1:%{glib2_ver}
-BuildRequires:	glibc-static
-BuildRequires:	json-c-static >= 0.7
-BuildRequires:	libcap-static
-%{?with_sql:BuildRequires:	libdbi-static >= 0.8.3-2}
-BuildRequires:	libmongo-client-static >= 0.1.0
-BuildRequires:	libnet-static >= 1:1.1.2.1-3
-BuildRequires:	libwrap-static
-BuildRequires:	openssl-static >= 0.9.8
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
+Requires:	%{name}-libs = %{version}-%{release}
+Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= 1:%{glib2_ver}
+Requires:	pcre >= 6.1
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
-%if %{with dynamic}
-Requires:	eventlog >= 0.2.12
+# for modules
 Requires:	json-c >= 0.7
 Requires:	libdbi >= 0.8.3-2
 Requires:	libmongo-client >= 0.1.0
 Requires:	libnet >= 1:1.1.2.1-7
 Requires:	openssl >= 0.9.8
-Requires:	pcre >= 6.1
-%endif
 Provides:	syslogdaemon
 Conflicts:	klogd
 Conflicts:	msyslog
@@ -103,10 +95,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # - libsyslog-ng.so has undefined symbols for third party libraries
 #   and these symbols should go via main syslog-ng binary
 # - same applies for modules
+# In dynamic case tests are forcily linked with dynamic modules, which doesn't work with as-needed.
+%define		filterout_ld			-Wl,--as-needed -Wl,--no-copy-dt-needed-entries
 %if %{without dynamic}
 %define		no_install_post_check_so	1
-# filterout_ld - see comment few lines above
-%define		filterout_ld			-Wl,--as-needed -Wl,--no-copy-dt-needed-entries
 %define		_sbindir			/sbin
 %define		_libdir				/%{_lib}
 %endif
@@ -148,6 +140,40 @@ Upstart job description for syslog-ng.
 
 %description upstart -l pl.UTF-8
 Opis zadania Upstart dla demona syslog-ng.
+
+%package libs
+Summary:	Shared library for syslog-ng
+Summary(pl.UTF-8):	Biblioteka współdzielona sysloga-ng
+Group:		Libraries
+%if %{with dynamic}
+Requires:	eventlog >= 0.2.12
+Requires:	glib2 >= 1:%{glib2_ver}
+Requires:	pcre >= 6.1
+%endif
+Conflicts:	syslog-ng < 3.3.1-3
+
+%description libs
+Shared library for syslog-ng.
+
+%description libs -l pl.UTF-8
+Biblioteka współdzielona sysloga-ng.
+
+%package devel
+Summary:	Header files for syslog-ng modules development
+Summary(pl.UTF-8):	Pliki nagłówkowe do tworzenia modułów dla sysloga-ng
+Group:		Development/Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+%if %{with dynamic}
+Requires:	eventlog-devel >= 0.2.12
+Requires:	glib2-devel >= 1:%{glib2_ver}
+Requires:	pcre-devel >= 6.1
+%endif
+
+%description devel
+Header files for syslog-ng modules development.
+
+%description devel -l pl.UTF-8
+Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 
 %prep
 %setup -q
@@ -194,7 +220,10 @@ done
 
 %{__make}
 
-%{?with_tests:LD_LIBRARY_PATH=$PWD/lib/.libs %{__make} check}
+%if %{with tests}
+LD_LIBRARY_PATH=$PWD/lib/.libs \
+%{__make} check
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -226,7 +255,6 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/ldconfig
 if [ "$1" = "1" ]; then
 	# disable /proc/kmsg from config on first install on vserver
 	{
@@ -253,18 +281,6 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del syslog-ng
 fi
 
-%postun -p /sbin/ldconfig
-
-%post upstart
-%upstart_post %{name}
-
-%postun upstart
-%upstart_postun %{name}
-
-%triggerun upstart -- syslog-ng-upstart < 3.2.4-3
-#  use SERVICE_syslog=y in upstart job environment instead of SERVICE=syslog
-%{__sed} -i -e 's,SERVICE=syslog,SERVICE_syslog=y,' /etc/init/*.conf || :
-
 %triggerun -- syslog-ng < 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#pipe ("/proc/kmsg"#file ("/proc/kmsg"#g' /etc/syslog-ng/syslog-ng.conf
@@ -277,6 +293,19 @@ sed -i -e "1 s#\(.*\)\$#@version: 3.0\n\1#g" /etc/syslog-ng/syslog-ng.conf
 rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %service -q syslog-ng restart
 exit 0
+
+%post upstart
+%upstart_post %{name}
+
+%postun upstart
+%upstart_postun %{name}
+
+%triggerun upstart -- syslog-ng-upstart < 3.2.4-3
+#  use SERVICE_syslog=y in upstart job environment instead of SERVICE=syslog
+%{__sed} -i -e 's,SERVICE=syslog,SERVICE_syslog=y,' /etc/init/*.conf || :
+
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -291,7 +320,6 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
-%attr(755,root,root) %{_libdir}/libsyslog-ng-%{version}.so
 %dir %{_libdir}/syslog-ng
 %attr(755,root,root) %{_libdir}/syslog-ng/lib*.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
@@ -299,7 +327,6 @@ exit 0
 %attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/update-patterndb
 
-%dir %{_datadir}/syslog-ng
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
 %dir %{_datadir}/syslog-ng/include/scl/pacct
@@ -321,10 +348,33 @@ exit 0
 %{_mandir}/man5/syslog-ng.conf.5*
 %{_mandir}/man8/syslog-ng.8*
 
-%attr(640,root,root) %ghost /var/log/*
+%attr(640,root,root) %ghost /var/log/daemon
+%attr(640,root,root) %ghost /var/log/debug
+%attr(640,root,root) %ghost /var/log/iptables
+%attr(640,root,root) %ghost /var/log/kernel
+%attr(640,root,root) %ghost /var/log/lpr
+%attr(640,root,root) %ghost /var/log/maillog
+%attr(640,root,root) %ghost /var/log/messages
+%attr(640,root,root) %ghost /var/log/secure
+%attr(640,root,root) %ghost /var/log/spooler
+%attr(640,root,root) %ghost /var/log/syslog
+%attr(640,root,root) %ghost /var/log/user
+%attr(640,root,root) %ghost /var/log/xferlog
 
 %if "%{pld_release}" == "th"
 %files upstart
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
 %endif
+
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libsyslog-ng-%{version}.so
+%dir %{_datadir}/syslog-ng
+
+%files devel
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libsyslog-ng.so
+%{_includedir}/syslog-ng
+%{_datadir}/syslog-ng/tools
+%{_pkgconfigdir}/syslog-ng.pc
