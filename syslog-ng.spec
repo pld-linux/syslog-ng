@@ -23,7 +23,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.3.1
-Release:	4
+Release:	5
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -38,6 +38,7 @@ Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
+Patch3:		%{name}-systemd.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -216,11 +217,21 @@ Header files for syslog-ng modules development.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 
+%package systemd
+Summary:	systemd units for syslog-ng
+Group:		Daemons
+Requires:	%{name} = %{version}-%{release}
+Requires:	systemd
+
+%description systemd
+systemd units for syslog-ng
+
 %prep
 %setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -244,7 +255,8 @@ done
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
-	--disable-systemd \
+	--enable-systemd \
+	--with-systemdsystemunitdir=/lib/systemd/system \
 	--enable-ipv6 \
 	--enable-linux-caps \
 	--enable-pacct \
@@ -449,3 +461,7 @@ exit 0
 %{_includedir}/syslog-ng
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
+
+%files systemd
+%defattr(644,root,root,755)
+/lib/systemd/system/syslog-ng.service

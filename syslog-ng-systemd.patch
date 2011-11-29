@@ -1,0 +1,14 @@
+--- syslog-ng-3.3.1/contrib/systemd/syslog-ng.service~	2011-09-09 09:14:53.000000000 +0200
++++ syslog-ng-3.3.1/contrib/systemd/syslog-ng.service	2011-11-29 18:24:53.010449488 +0100
+@@ -2,9 +2,10 @@
+ Description=System Logger Daemon
+ 
+ [Service]
++EnvironmentFile=/etc/sysconfig/syslog-ng
+ Sockets=syslog.socket
+ ExecStartPre=/bin/systemctl stop systemd-kmsg-syslogd.service
+-ExecStart=/usr/sbin/syslog-ng -F
++ExecStart=/sbin/syslog-ng -F -f /etc/syslog-ng/syslog-ng.conf --worker-threads=1024
+ ExecReload=/bin/kill -HUP $MAINPID
+ StandardOutput=null
+ 
