@@ -88,6 +88,7 @@ Obsoletes:	syslog-ng-module-afsocket
 Obsoletes:	syslog-ng-module-dbparser
 Conflicts:	klogd
 Conflicts:	msyslog
+Conflicts:	rsyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
