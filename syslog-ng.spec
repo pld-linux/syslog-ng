@@ -143,6 +143,19 @@ Upstart job description for syslog-ng.
 %description upstart -l pl.UTF-8
 Opis zadania Upstart dla demona syslog-ng.
 
+%package systemd
+Summary:	systemd units for syslog-ng
+Summary(pl.UTF-8):	Jednostki systemd dla demona syslog-ng
+Group:		Daemons
+Requires:	%{name} = %{version}-%{release}
+Requires:	systemd
+
+%description systemd
+systemd units for syslog-ng.
+
+%description systemd -l pl.UTF-8
+Jednostki systemd dla demona syslog-ng.
+
 %package module-afmongodb
 Summary:	MongoDB destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie MongoDB
@@ -217,15 +230,6 @@ Header files for syslog-ng modules development.
 
 %description devel -l pl.UTF-8
 Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
-
-%package systemd
-Summary:	systemd units for syslog-ng
-Group:		Daemons
-Requires:	%{name} = %{version}-%{release}
-Requires:	systemd
-
-%description systemd
-systemd units for syslog-ng
 
 %prep
 %setup -q
@@ -438,6 +442,10 @@ exit 0
 %config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
 %endif
 
+%files systemd
+%defattr(644,root,root,755)
+/lib/systemd/system/syslog-ng.service
+
 %files module-afmongodb
 %defattr(644,root,root,755)
 %doc modules/afmongodb/TODO
@@ -462,7 +470,3 @@ exit 0
 %{_includedir}/syslog-ng
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
-
-%files systemd
-%defattr(644,root,root,755)
-/lib/systemd/system/syslog-ng.service
