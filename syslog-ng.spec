@@ -23,7 +23,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.3.2
-Release:	1
+Release:	2
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -364,6 +364,15 @@ exit 0
 %triggerun upstart -- syslog-ng-upstart < 3.2.4-3
 #  use SERVICE_syslog=y in upstart job environment instead of SERVICE=syslog
 %{__sed} -i -e 's,SERVICE=syslog,SERVICE_syslog=y,' /etc/init/*.conf || :
+
+%post systemd
+%systemd_post syslog-ng.service
+
+%preun systemd
+%systemd_preun syslog-ng.service
+
+%postun systemd
+%systemd_reload
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
