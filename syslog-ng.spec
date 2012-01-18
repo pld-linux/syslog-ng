@@ -31,7 +31,7 @@ Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-v3.3-guide-admin-en.pdf
+Source4:	http://www.balabit.com/support/documentation/%{name}-ose-v3.3-guide-admin-en.pdf
 # Source4-md5:	bb23e36a8f44956858f2d622f9d1826d
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
@@ -57,7 +57,7 @@ BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpmbuild(macros) >= 1.561
+BuildRequires:	rpmbuild(macros) >= 1.623
 BuildRequires:	which
 %if %{with tests}
 %{?with_sql:BuildRequires:	libdbi-drivers-sqlite3}
@@ -149,6 +149,7 @@ Summary(pl.UTF-8):	Jednostki systemd dla demona syslog-ng
 Group:		Daemons
 Requires:	%{name} = %{version}-%{release}
 Requires:	systemd
+Requires:	systemd-units
 
 %description systemd
 systemd units for syslog-ng.
@@ -261,7 +262,7 @@ done
 	--with-pidfile-dir=/var/run \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--enable-systemd \
-	--with-systemdsystemunitdir=/lib/systemd/system \
+	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--enable-ipv6 \
 	--enable-linux-caps \
 	--enable-pacct \
@@ -453,7 +454,7 @@ exit 0
 
 %files systemd
 %defattr(644,root,root,755)
-/lib/systemd/system/syslog-ng.service
+%{systemdunitdir}/syslog-ng.service
 
 %files module-afmongodb
 %defattr(644,root,root,755)
