@@ -12,6 +12,8 @@
 %bcond_without	sql		# build without support for logging to SQL DB
 %endif
 %bcond_without	tests
+%bcond_without	json		# build without support for JSON template formatting
+%bcond_without	mongodb		# build without support for mongodb destination
 
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
@@ -46,10 +48,10 @@ BuildRequires:	bison >= 2.4
 BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
-BuildRequires:	json-c-devel >= 0.7
+%{?with_json:BuildRequires:	json-c-devel >= 0.7}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
-BuildRequires:	libmongo-client-devel >= 0.1.0
+%{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.0}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
@@ -257,7 +259,12 @@ done
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--datadir=%{_datadir}/syslog-ng \
 	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
+%if %{with mongodb}
+	--enable-mongodb \
 	--with-libmongo-client=system \
+%else
+	--disable-mongodb \
+%endif
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
@@ -270,6 +277,11 @@ done
 	--enable-spoof-source \
 	--enable-ssl \
 	--enable-tcp-wrapper \
+%if %{with json}
+	--enable-json \
+%else
+	--disable-json \
+%endif
 %if %{with sql}
 	--enable-sql \
 %endif
@@ -456,18 +468,22 @@ exit 0
 %defattr(644,root,root,755)
 %{systemdunitdir}/syslog-ng.service
 
+%if %{with mongodb}
 %files module-afmongodb
 %defattr(644,root,root,755)
 %doc modules/afmongodb/TODO
 %attr(755,root,root) %{_libdir}/syslog-ng/libafmongodb.so
+%endif
 
 %files module-afsql
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsql.so
 
+%if %{with json}
 %files module-tfjson
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libtfjson.so
+%endif
 
 %files libs
 %defattr(644,root,root,755)
