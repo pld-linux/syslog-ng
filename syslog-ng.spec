@@ -152,6 +152,7 @@ Group:		Daemons
 Requires:	%{name} = %{version}-%{release}
 Requires:	systemd
 Requires:	systemd-units
+Provides:	service(klogd)
 Provides:	service(syslog)
 
 %description systemd
