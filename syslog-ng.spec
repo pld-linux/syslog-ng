@@ -25,7 +25,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.3.4
-Release:	2
+Release:	3
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -81,10 +81,13 @@ Requires:	glib2 >= %{glib2_ver}
 Requires:	pcre >= 6.1
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
+Requires:	systemd-units >= 0.38
 # for afsocket
 Requires:	libnet >= 1:1.1.2.1-7
 # for afsocket and dbparser
 Requires:	openssl >= 0.9.8
+Provides:	service(klogd)
+Provides:	service(syslog)
 Provides:	syslogdaemon
 Obsoletes:	syslog-ng-module-afsocket
 Obsoletes:	syslog-ng-module-dbparser
@@ -144,22 +147,6 @@ Upstart job description for syslog-ng.
 
 %description upstart -l pl.UTF-8
 Opis zadania Upstart dla demona syslog-ng.
-
-%package systemd
-Summary:	systemd units for syslog-ng
-Summary(pl.UTF-8):	Jednostki systemd dla demona syslog-ng
-Group:		Daemons
-Requires:	%{name} = %{version}-%{release}
-Requires:	systemd
-Requires:	systemd-units
-Provides:	service(klogd)
-Provides:	service(syslog)
-
-%description systemd
-systemd units for syslog-ng.
-
-%description systemd -l pl.UTF-8
-Jednostki systemd dla demona syslog-ng.
 
 %package module-afmongodb
 Summary:	MongoDB destination support module for syslog-ng
@@ -351,11 +338,20 @@ fi
 /sbin/chkconfig --add syslog-ng
 %service syslog-ng restart "syslog-ng daemon"
 
+%systemd_post syslog-ng.service
+
 %preun
 if [ "$1" = "0" ]; then
 	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
+%systemd_preun syslog-ng.service
+
+%postun
+%systemd_reload
+
+%triggerpostun -- syslog-ng < 3.3.4-3
+%systemd_trigger syslog-ng.service
 
 %triggerun -- syslog-ng < 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
@@ -380,15 +376,6 @@ exit 0
 #  use SERVICE_syslog=y in upstart job environment instead of SERVICE=syslog
 %{__sed} -i -e 's,SERVICE=syslog,SERVICE_syslog=y,' /etc/init/*.conf || :
 
-%post systemd
-%systemd_post syslog-ng.service
-
-%preun systemd
-%systemd_preun syslog-ng.service
-
-%postun systemd
-%systemd_reload
-
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
@@ -405,6 +392,7 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
+%{systemdunitdir}/syslog-ng.service
 %dir %{_libdir}/syslog-ng
 %attr(755,root,root) %{_libdir}/syslog-ng/libaffile.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafprog.so
@@ -465,10 +453,6 @@ exit 0
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
 %endif
-
-%files systemd
-%defattr(644,root,root,755)
-%{systemdunitdir}/syslog-ng.service
 
 %if %{with mongodb}
 %files module-afmongodb
