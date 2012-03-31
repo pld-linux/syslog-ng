@@ -108,7 +108,7 @@ reload() {
 flush_logs() {
 	if use_upstart && [ -f /etc/init/syslog-ng.conf ]; then
 		/sbin/initctl reload syslog-ng
-	elif [ -f /var/lock/subsys/syslog-ng ]; then
+	elif [ -f /var/lock/subsys/syslog-ng ] || service syslog-ng status >/dev/null; then
 		checkconfig
 		msg_reloading "syslog-ng"
 		killproc syslog-ng -HUP
