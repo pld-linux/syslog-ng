@@ -25,7 +25,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.3.5
-Release:	0.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -75,14 +75,14 @@ BuildRequires:	zlib-static
 %endif
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
-Requires(post,preun,postun):	systemd-units >= 0.38
+Requires(post,preun,postun):	systemd-units >= 38
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
 Requires:	pcre >= 6.1
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
-Requires:	systemd-units >= 0.38
+Requires:	systemd-units >= 38
 # for afsocket
 Requires:	libnet >= 1:1.1.2.1-7
 # for afsocket and dbparser
