@@ -463,9 +463,11 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libafmongodb.so
 %endif
 
+%if %{with sql}
 %files module-afsql
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsql.so
+%endif
 
 %if %{with json}
 %files module-tfjson
