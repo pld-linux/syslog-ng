@@ -24,17 +24,17 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.3.5
-Release:	3
+Version:	3.3.6
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	a69e725854301ecda26dbe51f3a10645
+# Source0-md5:	c931d33320bd729e25d338285ac1cef5
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/%{name}-ose-v3.3-guide-admin-en.pdf
-# Source4-md5:	bb23e36a8f44956858f2d622f9d1826d
+# Source4-md5:	b61f2db076ce78cd2030b13bc6680f3d
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
@@ -240,7 +240,7 @@ cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 for i in . lib/ivykis; do
 cd $i
 	%{__libtoolize}
-	%{__aclocal} -I m4
+	%{__aclocal} `[ -d m4 ] && echo '-I m4'`
 	%{__autoconf}
 	%{__autoheader}
 	%{__automake}
