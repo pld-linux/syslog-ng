@@ -34,7 +34,7 @@ Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/%{name}-ose-v3.3-guide-admin-en.pdf
-# Source4-md5:	538ef38b6646073c0d7293c228cef70d
+# Source4-md5:	c5fb4bd364a10dced391dbf63350b115
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
