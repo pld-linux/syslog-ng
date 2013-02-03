@@ -2,7 +2,6 @@
 # TODO:
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
-# - use external libivykis [>= 0.30.1+syslog-ng updates(?)]
 #
 # Conditional build:
 %bcond_with	dynamic		# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
@@ -42,6 +41,7 @@ Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		%{name}-am.patch
+Patch5:		%{name}-ivykis.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -52,6 +52,7 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_json:BuildRequires:	json-c-devel >= 0.7}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
+BuildRequires:	libivykis-devel >= 0.30.1
 %{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.0}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
@@ -71,6 +72,7 @@ BuildRequires:	tzdata
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= %{glib2_ver}
+BuildRequires:	libivykis >= 0.30.1
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
@@ -199,6 +201,7 @@ Group:		Libraries
 %if %{with dynamic}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
+Requires:	libivykis >= 0.30.1
 Requires:	pcre >= 6.1
 %endif
 Conflicts:	syslog-ng < 3.3.1-3
@@ -217,6 +220,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with dynamic}
 Requires:	eventlog-devel >= 0.2.12
 Requires:	glib2-devel >= %{glib2_ver}
+Requires:	libivykis-devel >= 0.30.1
 Requires:	pcre-devel >= 6.1
 %endif
 
@@ -233,6 +237,7 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -258,6 +263,7 @@ done
 %else
 	--disable-mongodb \
 %endif
+	--with-ivykis=system \
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
