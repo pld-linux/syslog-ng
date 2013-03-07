@@ -23,17 +23,17 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.3.6
+Version:	3.3.8
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	c931d33320bd729e25d338285ac1cef5
+# Source0-md5:	df8910af42336988f209cbe61c996e1d
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/%{name}-ose-v3.3-guide-admin-en.pdf
-# Source4-md5:	c5fb4bd364a10dced391dbf63350b115
+# Source4-md5:	6eda9e5b2ff62266fd7bf91721481a40
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
@@ -41,12 +41,12 @@ Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		%{name}-am.patch
-Patch5:		%{name}-ivykis.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
 BuildRequires:	eventlog-devel >= 0.2.12
+%{?with_tests:BuildRequires:	findutils}
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_json:BuildRequires:	json-c-devel >= 0.7}
@@ -72,7 +72,7 @@ BuildRequires:	tzdata
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= %{glib2_ver}
-BuildRequires:	libivykis >= 0.30.1
+BuildRequires:	libivykis-static >= 0.30.1
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
@@ -237,7 +237,6 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -293,7 +292,9 @@ done
 %{__make}
 
 %if %{with tests}
-LD_LIBRARY_PATH=$PWD/lib/.libs \
+LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
+PYTHONPATH=$(pwd)/tests/functional
+export LD_LIBRARY_PATH PYTHONPATH
 %{__make} check
 %endif
 
