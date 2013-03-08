@@ -32,8 +32,8 @@ Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/%{name}-ose-v3.3-guide-admin-en.pdf
-# Source4-md5:	6eda9e5b2ff62266fd7bf91721481a40
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.3-guides/en/syslog-ng-ose-v3.3-guide-admin-en/pdf/syslog-ng-ose-v3.3-guide-admin-en.pdf
+# Source4-md5:	56815d4e7bfda361cb614f3330f4589f
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
