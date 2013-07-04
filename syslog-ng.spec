@@ -55,7 +55,7 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_json:BuildRequires:	json-c-devel >= 0.7}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
-%{?with_sql:BuildRequires:	libesmtp-devel}
+%{?with_smtp:BuildRequires:	libesmtp-devel}
 BuildRequires:	libivykis-devel >= 0.30.1
 %{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.6}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
@@ -179,10 +179,10 @@ Requires:	libdbi >= 0.8.3-2
 Requires:	openssl >= 0.9.8
 
 %description module-afsmtp
-SMTP output support module for syslog-ng
+SMTP output support module for syslog-ng.
 
 %description module-afsmtp -l pl.UTF-8
-Moduł sysloga-ng do obsługi wysyłania logów do serwerów SMTP
+Moduł sysloga-ng do obsługi wysyłania logów do serwerów SMTP.
 
 %package module-afsql
 Summary:	SQL destination support module for syslog-ng
