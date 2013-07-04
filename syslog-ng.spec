@@ -23,17 +23,17 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.3.9
-Release:	1
+Version:	3.4.2
+Release:	0.1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	52ae8f46f16d42fac7232226adb40b7d
+# Source0-md5:	2e32c5fedc067dd83a363c0316b29fb4
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.3-guides/en/syslog-ng-ose-v3.3-guide-admin-en/pdf/syslog-ng-ose-v3.3-guide-admin-en.pdf
-# Source4-md5:	56815d4e7bfda361cb614f3330f4589f
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.4-guides/en/syslog-ng-ose-v3.4-guide-admin/pdf/syslog-ng-ose-v3.4-guide-admin.pdf
+# Source4-md5:	fbc1516a2af9f40d0a7c4929fdf381b1
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
@@ -41,6 +41,7 @@ Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		%{name}-am.patch
+Patch5:		%{name}-pacct.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -52,8 +53,9 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_json:BuildRequires:	json-c-devel >= 0.7}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
+BuildRequires:	libesmtp-devel
 BuildRequires:	libivykis-devel >= 0.30.1
-%{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.0}
+%{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.6}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
@@ -181,17 +183,18 @@ SQL destination support module for syslog-ng (via libdbi).
 Moduł sysloga-ng do obsługi zapisu logów w bazach SQL (poprzez
 libdbi).
 
-%package module-tfjson
+%package module-json
 Summary:	JSON formatting template function for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	json-c >= 0.7
+Requires:	json-c >= 0.9
+Obsoletes:	syslog-ng-module-tfjson
 
-%description module-tfjson
+%description module-json
 JSON formatting template function for syslog-ng.
 
-%description module-tfjson -l pl.UTF-8
+%description module-json -l pl.UTF-8
 Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON.
 
 %package libs
@@ -237,6 +240,7 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -268,10 +272,12 @@ done
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--enable-systemd \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
+	--enable-amqp \
 	--enable-ipv6 \
 	--enable-linux-caps \
 	--enable-pacct \
 	--enable-pcre \
+	--enable-smtp \
 	--enable-spoof-source \
 	--enable-ssl \
 	--enable-tcp-wrapper \
@@ -394,32 +400,33 @@ exit 0
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.3-guide-admin-en.pdf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.4-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/modules.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/scl.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %{systemdunitdir}/syslog-ng.service
 %dir %{_libdir}/syslog-ng
+%attr(755,root,root) %{_libdir}/syslog-ng/libafamqp.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libaffile.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafprog.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libafsmtp.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-notls.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-tls.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafuser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libbasicfuncs.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libconfgen.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libconvertfuncs.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libcryptofuncs.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libcsvparser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libdbparser.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libdummy.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libpacctformat.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/pdbtool
@@ -434,7 +441,6 @@ exit 0
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/syslogconf/convert-syslogconf.awk
 %{_datadir}/syslog-ng/include/scl/syslogconf/plugin.conf
 %dir %{_datadir}/syslog-ng/include/scl/system
-%attr(755,root,root) %{_datadir}/syslog-ng/include/scl/system/generate-system-source.sh
 %{_datadir}/syslog-ng/include/scl/system/plugin.conf
 %dir %{_datadir}/syslog-ng/xsd
 %{_datadir}/syslog-ng/xsd/patterndb-*.xsd
@@ -468,7 +474,6 @@ exit 0
 %if %{with mongodb}
 %files module-afmongodb
 %defattr(644,root,root,755)
-%doc modules/afmongodb/TODO
 %attr(755,root,root) %{_libdir}/syslog-ng/libafmongodb.so
 %endif
 
@@ -479,9 +484,9 @@ exit 0
 %endif
 
 %if %{with json}
-%files module-tfjson
+%files module-json
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libtfjson.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libjson-plugin.so
 %endif
 
 %files libs
