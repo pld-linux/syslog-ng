@@ -162,7 +162,7 @@ Summary:	MongoDB destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie MongoDB
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libmongo-client >= 0.1.0
+Requires:	libmongo-client >= 0.1.6
 
 %description module-afmongodb
 MongoDB destination support module for syslog-ng.
@@ -175,7 +175,6 @@ Summary:	SMTP output support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi wysyłania logów do serwerów SMTP
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libdbi >= 0.8.3-2
 Requires:	openssl >= 0.9.8
 
 %description module-afsmtp
@@ -212,6 +211,21 @@ JSON formatting template function for syslog-ng.
 
 %description module-json-plugin -l pl.UTF-8
 Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON.
+
+%package module-tfgeoip
+Summary:	syslog-ng template function module to get GeoIP info from an IPv4 addresses
+Summary(pl.UTF-8):	Moduł funkcji szablonu sysloga-ng do pobierania informacji GeoIP z adresów IPv4
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	GeoIP-libs >= 1.5.1
+
+%description module-tfgeoip
+syslog-ng template function module to get GeoIP info from an IPv4
+addresses.
+
+%description module-tfgeoip -l pl.UTF-8
+Moduł funkcji szablonu sysloga-ng do pobierania informacji GeoIP z
+adresów IPv4.
 
 %package libs
 Summary:	Shared library for syslog-ng
@@ -291,22 +305,14 @@ done
 	--enable-amqp \
 	--enable-geoip \
 	--enable-ipv6 \
+	--enable-json%{!?with_json:=no} \
 	--enable-linux-caps \
 	--enable-pacct \
 	--enable-pcre \
-%if %{with smtp}
-	--enable-smtp \
-%else
-	--disable-smtp \
-%endif
+	--enable-smtp%{!?with_smtp:=no} \
 	--enable-spoof-source \
 	--enable-ssl \
 	--enable-tcp-wrapper \
-%if %{with json}
-	--enable-json \
-%else
-	--disable-json \
-%endif
 %if %{with sql}
 	--enable-sql \
 %endif
@@ -434,7 +440,6 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libafamqp.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libaffile.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafprog.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsmtp.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-notls.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-tls.so
@@ -448,7 +453,6 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libtfgeoip.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/pdbtool
@@ -516,6 +520,10 @@ exit 0
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libjson-plugin.so
 %endif
+
+%files module-tfgeoip
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/syslog-ng/libtfgeoip.so
 
 %files libs
 %defattr(644,root,root,755)
