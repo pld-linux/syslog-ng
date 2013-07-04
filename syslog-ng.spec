@@ -13,6 +13,7 @@
 %bcond_without	tests
 %bcond_without	json		# build without support for JSON template formatting
 %bcond_without	mongodb		# build without support for mongodb destination
+%bcond_without	smtp		# build without support for logging into SMTP
 
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
@@ -24,7 +25,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.4.2
-Release:	0.1
+Release:	0.2
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -49,11 +50,12 @@ BuildRequires:	bison >= 2.4
 BuildRequires:	eventlog-devel >= 0.2.12
 %{?with_tests:BuildRequires:	findutils}
 BuildRequires:	flex
+BuildRequires:	GeoIP-devel >= 1.5.1
 BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_json:BuildRequires:	json-c-devel >= 0.7}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
-BuildRequires:	libesmtp-devel
+%{?with_sql:BuildRequires:	libesmtp-devel}
 BuildRequires:	libivykis-devel >= 0.30.1
 %{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.6}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
@@ -168,6 +170,20 @@ MongoDB destination support module for syslog-ng.
 %description module-afmongodb -l pl.UTF-8
 Moduł sysloga-ng do obsługi zapisu logów w bazie MongoDB.
 
+%package module-afsmtp
+Summary:	SMTP output support module for syslog-ng
+Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi wysyłania logów do serwerów SMTP
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	libdbi >= 0.8.3-2
+Requires:	openssl >= 0.9.8
+
+%description module-afsmtp
+SMTP output support module for syslog-ng
+
+%description module-afsmtp -l pl.UTF-8
+Moduł sysloga-ng do obsługi wysyłania logów do serwerów SMTP
+
 %package module-afsql
 Summary:	SQL destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazach SQL
@@ -183,7 +199,7 @@ SQL destination support module for syslog-ng (via libdbi).
 Moduł sysloga-ng do obsługi zapisu logów w bazach SQL (poprzez
 libdbi).
 
-%package module-json
+%package module-json-plugin
 Summary:	JSON formatting template function for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON
 Group:		Libraries
@@ -191,10 +207,10 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	json-c >= 0.9
 Obsoletes:	syslog-ng-module-tfjson
 
-%description module-json
+%description module-json-plugin
 JSON formatting template function for syslog-ng.
 
-%description module-json -l pl.UTF-8
+%description module-json-plugin -l pl.UTF-8
 Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON.
 
 %package libs
@@ -273,11 +289,16 @@ done
 	--enable-systemd \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--enable-amqp \
+	--enable-geoip \
 	--enable-ipv6 \
 	--enable-linux-caps \
 	--enable-pacct \
 	--enable-pcre \
+%if %{with smtp}
 	--enable-smtp \
+%else
+	--disable-smtp \
+%endif
 	--enable-spoof-source \
 	--enable-ssl \
 	--enable-tcp-wrapper \
@@ -427,6 +448,7 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libtfgeoip.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/pdbtool
@@ -477,6 +499,12 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libafmongodb.so
 %endif
 
+%if %{with smtp}
+%files module-afsmtp
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/syslog-ng/libafsmtp.so
+%endif
+
 %if %{with sql}
 %files module-afsql
 %defattr(644,root,root,755)
@@ -484,7 +512,7 @@ exit 0
 %endif
 
 %if %{with json}
-%files module-json
+%files module-json-plugin
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libjson-plugin.so
 %endif
