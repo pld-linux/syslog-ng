@@ -10,10 +10,11 @@
 %else
 %bcond_without	sql		# build without support for logging to SQL DB
 %endif
-%bcond_without	tests
+%bcond_without	tests		# do not perform "make check"
 %bcond_without	json		# build without support for JSON template formatting
 %bcond_without	mongodb		# build without support for mongodb destination
 %bcond_without	smtp		# build without support for logging into SMTP
+%bcond_with	system_rabbitmq	# use system librabbitmq [not supported yet]
 
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
@@ -56,7 +57,7 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
-BuildRequires:	libivykis-devel >= 0.30.1
+BuildRequires:	libivykis-devel >= 0.36.1
 %{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.6}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
@@ -64,6 +65,7 @@ BuildRequires:	libwrap-devel
 BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
+%{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.0.1}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.623
 BuildRequires:	which
@@ -76,7 +78,7 @@ BuildRequires:	tzdata
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= %{glib2_ver}
-BuildRequires:	libivykis-static >= 0.30.1
+BuildRequires:	libivykis-static >= 0.36.1
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
@@ -88,6 +90,7 @@ Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
 Requires:	pcre >= 6.1
 Requires:	psmisc >= 20.1
+%{?with_system_rabbitmq:Requires:	rabbitmq-c >= 0.0.1}
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
 # for afsocket
@@ -234,7 +237,7 @@ Group:		Libraries
 %if %{with dynamic}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
-Requires:	libivykis >= 0.30.1
+Requires:	libivykis >= 0.36.1
 Requires:	pcre >= 6.1
 %endif
 Conflicts:	syslog-ng < 3.3.1-3
@@ -253,7 +256,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with dynamic}
 Requires:	eventlog-devel >= 0.2.12
 Requires:	glib2-devel >= %{glib2_ver}
-Requires:	libivykis-devel >= 0.30.1
+Requires:	libivykis-devel >= 0.36.1
 Requires:	pcre-devel >= 6.1
 %endif
 
@@ -297,6 +300,7 @@ done
 	--disable-mongodb \
 %endif
 	--with-ivykis=system \
+	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
