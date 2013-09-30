@@ -67,6 +67,8 @@ BuildRequires:	which
 BuildRequires:	python
 BuildRequires:	python-modules
 BuildRequires:	tzdata
+BuildConflicts:	%{name} < %{version}
+BuildConflicts:	%{name} > %{version}
 %endif
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
