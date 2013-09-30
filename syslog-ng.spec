@@ -25,16 +25,16 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.4.2
+Version:	3.4.3
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	2e32c5fedc067dd83a363c0316b29fb4
+# Source0-md5:	80b873a11b3e02706bc3f2430b9be068
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.4-guides/en/syslog-ng-ose-v3.4-guide-admin/pdf/syslog-ng-ose-v3.4-guide-admin.pdf
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.4-guides/en/syslog-ng-ose-v3.4-guide-admin/pdf/%{name}-ose-v3.4-guide-admin.pdf
 # Source4-md5:	fbc1516a2af9f40d0a7c4929fdf381b1
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
@@ -42,16 +42,14 @@ Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
-Patch4:		%{name}-am.patch
-Patch5:		%{name}-pacct.patch
 URL:		http://www.balabit.com/products/syslog_ng/
+BuildRequires:	GeoIP-devel >= 1.5.1
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
 BuildRequires:	eventlog-devel >= 0.2.12
 %{?with_tests:BuildRequires:	findutils}
 BuildRequires:	flex
-BuildRequires:	GeoIP-devel >= 1.5.1
 BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_json:BuildRequires:	json-c-devel >= 0.7}
 BuildRequires:	libcap-devel
@@ -116,6 +114,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # - same applies for modules
 # In dynamic case tests are forcily linked with dynamic modules, which doesn't work with as-needed.
 %define		filterout_ld			-Wl,--as-needed -Wl,--no-copy-dt-needed-entries
+
 %if %{without dynamic}
 %define		no_install_post_check_so	1
 %define		_sbindir			/sbin
@@ -272,10 +271,8 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
-%patch5 -p1
-cp -a %{SOURCE4} doc
-cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
+cp -p %{SOURCE4} doc
+cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 
@@ -292,6 +289,7 @@ done
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--datadir=%{_datadir}/syslog-ng \
+	--disable-silent-rules \
 	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
 %if %{with mongodb}
 	--enable-mongodb \
@@ -337,7 +335,7 @@ export LD_LIBRARY_PATH PYTHONPATH
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{init,sysconfig,logrotate.d,rc.d/init.d} \
+install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d,init} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/patterndb.d \
 	$RPM_BUILD_ROOT/var/{log,lib/%{name}/xsd}
 
@@ -346,8 +344,8 @@ install -d $RPM_BUILD_ROOT/etc/{init,sysconfig,logrotate.d,rc.d/init.d} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 %{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
-cp -a %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
-cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
+cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
+cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
 for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog; do
 	> $RPM_BUILD_ROOT/var/log/$n
@@ -429,7 +427,7 @@ exit 0
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS debian/syslog-ng.conf* contrib/relogger.pl
+%doc AUTHORS NEWS debian/syslog-ng.conf* contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
 %doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.4-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
