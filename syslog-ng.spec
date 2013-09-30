@@ -23,12 +23,12 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.3.9
+Version:	3.3.11
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	52ae8f46f16d42fac7232226adb40b7d
+# Source0-md5:	763bedd305ea894937a0cbbd8610e094
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -40,7 +40,6 @@ Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
-Patch4:		%{name}-am.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -236,7 +235,6 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 cp -a %{SOURCE4} doc
 cp -a %{SOURCE5} contrib/syslog-ng.conf.simple
 
