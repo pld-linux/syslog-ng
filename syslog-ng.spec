@@ -358,7 +358,6 @@ for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
-%{__rm} $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}/loggen*
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/syslog-ng/*.la
 
@@ -463,6 +462,7 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
+%attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/update-patterndb
 
@@ -481,6 +481,7 @@ exit 0
 
 %dir %{_var}/lib/%{name}
 %dir %{_var}/lib/%{name}/xsd
+%{_mandir}/man1/loggen.1*
 %{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
