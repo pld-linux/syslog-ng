@@ -1,0 +1,67 @@
+--- syslog-ng-3.4.3/doc/man.bak/loggen.1.xml	2013-08-13 12:24:20.000000000 +0300
++++ syslog-ng-3.4.3/doc/man/loggen.1.xml	2013-09-30 21:42:33.729604012 +0300
+@@ -264,7 +264,7 @@
+     <refsect1>
+       <title>Files</title>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/bin/loggen</filename>
++        <filename moreinfo="none">/usr/bin/loggen</filename>
+       </para>
+     </refsect1>
+     <refsect1>
+--- syslog-ng-3.4.3/doc/man.bak/pdbtool.1.xml	2013-08-13 12:24:20.000000000 +0300
++++ syslog-ng-3.4.3/doc/man/pdbtool.1.xml	2013-09-30 21:42:33.729604012 +0300
+@@ -302,10 +302,10 @@
+     <refsect1>
+       <title>Files</title>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/bin/pdbtool</filename>
++        <filename moreinfo="none">/usr/bin/pdbtool</filename>
+       </para>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/etc/syslog-ng/syslog-ng.conf</filename>
++        <filename moreinfo="none">/etc/syslog-ng/syslog-ng.conf</filename>
+       </para>
+     </refsect1>
+     <refsect1>
+--- syslog-ng-3.4.3/doc/man.bak/syslog-ng-ctl.1.xml	2013-08-13 12:24:20.000000000 +0300
++++ syslog-ng-3.4.3/doc/man/syslog-ng-ctl.1.xml	2013-09-30 21:42:33.729604012 +0300
+@@ -120,7 +120,7 @@
+     <refsect1>
+       <title>Files</title>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/sbin/syslog-ng-ctl</filename>
++        <filename moreinfo="none">/sbin/syslog-ng-ctl</filename>
+       </para>
+     </refsect1>
+     <refsect1>
+--- syslog-ng-3.4.3/doc/man.bak/syslog-ng.8.xml	2013-08-13 12:24:20.000000000 +0300
++++ syslog-ng-3.4.3/doc/man/syslog-ng.8.xml	2013-09-30 21:42:33.729604012 +0300
+@@ -236,10 +236,10 @@
+     <refsect1>
+       <title>Files</title>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/</filename>
++        <filename moreinfo="none">/usr/share/syslog-ng</filename>
+       </para>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/etc/syslog-ng.conf</filename>
++        <filename moreinfo="none">/etc/syslog-ng.conf</filename>
+       </para>
+     </refsect1>
+     <refsect1>
+--- syslog-ng-3.4.3/doc/man.bak/syslog-ng.conf.5.xml	2013-08-13 12:24:20.000000000 +0300
++++ syslog-ng-3.4.3/doc/man/syslog-ng.conf.5.xml	2013-09-30 21:42:33.729604012 +0300
+@@ -408,10 +408,10 @@
+     <refsect1>
+       <title>Files</title>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/</filename>
++        <filename moreinfo="none">/usr/share/syslog-ng/</filename>
+       </para>
+       <para>
+-        <filename moreinfo="none">/opt/syslog-ng/etc/syslog-ng.conf</filename>
++        <filename moreinfo="none">/etc/syslog-ng/syslog-ng.conf</filename>
+       </para>
+     </refsect1>
+     <refsect1>

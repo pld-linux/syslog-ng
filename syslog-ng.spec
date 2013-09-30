@@ -42,11 +42,13 @@ Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
+Patch4:		man-paths.patch
 URL:		http://www.balabit.com/products/syslog_ng/
 BuildRequires:	GeoIP-devel >= 1.5.1
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
+BuildRequires:	docbook-style-xsl
 BuildRequires:	eventlog-devel >= 0.2.12
 %{?with_tests:BuildRequires:	findutils}
 BuildRequires:	flex
@@ -106,6 +108,8 @@ Conflicts:	msyslog
 Conflicts:	rsyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define	xsl_stylesheets_dir /usr/share/sgml/docbook/xsl-stylesheets
 
 # syslog-ng has really crazy linking rules (see their bugzilla).
 # Some rules, according to syslog-ng devs, are like this:
@@ -271,6 +275,7 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -324,7 +329,8 @@ done
 	--enable-mixed-linking
 %endif
 
-%{__make}
+%{__make} \
+	XSL_STYLESHEET=%{xsl_stylesheets_dir}/manpages/docbook.xsl
 
 %if %{with tests}
 LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
