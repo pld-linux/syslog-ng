@@ -14,6 +14,7 @@
 %bcond_without	json		# build without support for JSON template formatting
 %bcond_without	mongodb		# build without support for mongodb destination
 %bcond_without	smtp		# build without support for logging into SMTP
+%bcond_without	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq	# use system librabbitmq [not supported yet]
 
 %if "%{pld_release}" == "ac"
@@ -57,7 +58,7 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
-BuildRequires:	libivykis-devel >= 0.36.1
+%{?with_system_libivykis:BuildRequires:	libivykis-devel >= 0.36.1}
 %{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.6}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
@@ -78,7 +79,7 @@ BuildRequires:	tzdata
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= %{glib2_ver}
-BuildRequires:	libivykis-static >= 0.36.1
+%{?with_system_libivykis:BuildRequires:	libivykis-static >= 0.36.1}
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
@@ -240,7 +241,7 @@ Group:		Libraries
 %if %{with dynamic}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
-Requires:	libivykis >= 0.36.1
+%{?with_system_libivykis:Requires:	libivykis >= 0.36.1}
 Requires:	pcre >= 6.1
 %endif
 Conflicts:	syslog-ng < 3.3.1-3
@@ -259,7 +260,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with dynamic}
 Requires:	eventlog-devel >= 0.2.12
 Requires:	glib2-devel >= %{glib2_ver}
-Requires:	libivykis-devel >= 0.36.1
+%{?with_system_libivykis:Requires:	libivykis-devel >= 0.36.1}
 Requires:	pcre-devel >= 6.1
 %endif
 
@@ -302,7 +303,11 @@ done
 %else
 	--disable-mongodb \
 %endif
+%if %{with system_libivykis}
 	--with-ivykis=system \
+%else
+	--with-ivykis=internal \
+%endif
 	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
 	--with-module-dir=%{_libdir}/syslog-ng \
 	--with-pidfile-dir=/var/run \
