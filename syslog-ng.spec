@@ -14,7 +14,7 @@
 %bcond_without	json		# build without support for JSON template formatting
 %bcond_without	mongodb		# build without support for mongodb destination
 %bcond_without	smtp		# build without support for logging into SMTP
-%bcond_without	system_libivykis	# use system libivykis
+%bcond_with	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq	# use system librabbitmq [not supported yet]
 
 %if "%{pld_release}" == "ac"
