@@ -1,5 +1,5 @@
---- syslog-ng-3.3.1/configure.in.orig	2011-09-29 08:35:39.000000000 +0200
-+++ syslog-ng-3.3.1/configure.in	2011-11-11 10:37:51.371629795 +0100
+--- syslog-ng-3.3.1/configure.ac.orig	2011-09-29 08:35:39.000000000 +0200
++++ syslog-ng-3.3.1/configure.ac	2011-11-11 10:37:51.371629795 +0100
 @@ -465,11 +465,10 @@
  dnl ***************************************************************************
  dnl Checks for libraries
@@ -15,3 +15,14 @@
  
  
  if test "x$enable_linux_caps" = "xyes" -o "x$enable_linux_caps" = "xauto"; then
+--- syslog-ng-3.5.2/configure.ac~	2013-12-01 22:52:03.000000000 +0100
++++ syslog-ng-3.5.2/configure.ac	2013-12-01 23:02:32.955209559 +0100
+@@ -1145,7 +1145,7 @@
+ else
+ 	SYSLOGNG_DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $LD_START_STATIC -Wl,--whole-archive $GLIB_LIBS $EVTLOG_LIBS $PCRE_LIBS $REGEX_LIBS -Wl,--no-whole-archive $IVYKIS_NO_LIBTOOL_LIBS $LD_END_STATIC $LIBCAP_LIBS $DL_LIBS "
+ 	TOOL_DEPS_LIBS="$LIBS $BASE_LIBS $GLIB_LIBS $EVTLOG_LIBS $RESOLV_LIBS $LIBCAP_LIBS $PCRE_LIBS $REGEX_LIBS $IVYKIS_LIBS $DL_LIBS"
+-	CORE_DEPS_LIBS=""
++	CORE_DEPS_LIBS="$GLIB_LIBS $EVTLOG_LIBS $LIBCAP_LIBS $IVYKIS_LIBS"
+ 
+ 	# bypass libtool in case we want to do mixed linking because it
+ 	# doesn't support -Wl,-Bstatic -Wl,-Bdynamic on a per-library basis.

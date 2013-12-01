@@ -26,17 +26,17 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.4.3
+Version:	3.5.2
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	80b873a11b3e02706bc3f2430b9be068
+# Source0-md5:	a54cbbe077363f112e5f6ff1ffd34fdb
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.4-guides/en/syslog-ng-ose-v3.4-guide-admin/pdf/%{name}-ose-v3.4-guide-admin.pdf
-# Source4-md5:	fbc1516a2af9f40d0a7c4929fdf381b1
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.5-guides/en/syslog-ng-ose-v3.5-guide-admin/pdf/%{name}-ose-v3.5-guide-admin.pdf
+# Source4-md5:	4c3c7f679e430373375752534e61abee
 Source5:	%{name}-simple.conf
 Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
@@ -439,7 +439,7 @@ exit 0
 %defattr(644,root,root,755)
 %doc AUTHORS NEWS debian/syslog-ng.conf* contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.4-guide-admin.pdf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.5-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
@@ -455,13 +455,16 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-notls.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-tls.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libafstomp.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libafuser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libbasicfuncs.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libconfgen.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libcryptofuncs.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libcsvparser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libdbparser.so
+%attr(755,root,root) %{_libdir}/syslog-ng/liblinux-kmsg-format.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libpacctformat.so
+%attr(755,root,root) %{_libdir}/syslog-ng/libredis.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
@@ -475,6 +478,8 @@ exit 0
 %dir %{_datadir}/syslog-ng/include/scl
 %dir %{_datadir}/syslog-ng/include/scl/pacct
 %{_datadir}/syslog-ng/include/scl/pacct/plugin.conf
+%dir %{_datadir}/syslog-ng/include/scl/rewrite
+%{_datadir}/syslog-ng/include/scl/rewrite/cc-mask.conf
 %dir %{_datadir}/syslog-ng/include/scl/syslogconf
 %{_datadir}/syslog-ng/include/scl/syslogconf/README
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/syslogconf/convert-syslogconf.awk
