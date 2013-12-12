@@ -4,18 +4,19 @@
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
 #
 # Conditional build:
-%bcond_with	dynamic		# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
+%bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
 %if "%{pld_release}" == "ac"
-%bcond_with	sql		# build with support for logging to SQL DB
+%bcond_with	sql			# support for logging to SQL DB
 %else
-%bcond_without	sql		# build without support for logging to SQL DB
+%bcond_without	sql			# support for logging to SQL DB
 %endif
-%bcond_without	tests		# do not perform "make check"
-%bcond_without	json		# build without support for JSON template formatting
-%bcond_without	mongodb		# build without support for mongodb destination
-%bcond_without	smtp		# build without support for logging into SMTP
+%bcond_without	tests			# do not perform "make check"
+%bcond_without	json			# support for JSON template formatting
+%bcond_without	mongodb			# support for mongodb destination
+%bcond_without	redis			# support for Redis destination
+%bcond_without	smtp			# support for logging into SMTP
 %bcond_with	system_libivykis	# use system libivykis
-%bcond_with	system_rabbitmq	# use system librabbitmq [not supported yet]
+%bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
 
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
@@ -54,7 +55,8 @@ BuildRequires:	eventlog-devel >= 0.2.12
 %{?with_tests:BuildRequires:	findutils}
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
-%{?with_json:BuildRequires:	json-c-devel >= 0.7}
+%{?with_hiredis:BuildRequires:	hiredis-devel}
+%{?with_json:BuildRequires:	json-c-devel >= 0.9}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
@@ -219,6 +221,19 @@ JSON formatting template function for syslog-ng.
 %description module-json-plugin -l pl.UTF-8
 Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON.
 
+%package module-redis
+Summary:	Redis destination support module for syslog-ng
+Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie Redis
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description module-redis
+Redis destination support module for syslog-ng (via libhiredis).
+
+%description module-redis -l pl.UTF-8
+Moduł sysloga-ng do obsługi zapisu logów w bazie Redis (poprzez
+libhiredis).
+
 %package module-tfgeoip
 Summary:	syslog-ng template function module to get GeoIP info from an IPv4 addresses
 Summary(pl.UTF-8):	Moduł funkcji szablonu sysloga-ng do pobierania informacji GeoIP z adresów IPv4
@@ -321,6 +336,7 @@ done
 	--enable-linux-caps \
 	--enable-pacct \
 	--enable-pcre \
+	--enable-redis%{!?with_redis:=no} \
 	--enable-smtp%{!?with_smtp:=no} \
 	--enable-spoof-source \
 	--enable-ssl \
@@ -464,7 +480,6 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libdbparser.so
 %attr(755,root,root) %{_libdir}/syslog-ng/liblinux-kmsg-format.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libpacctformat.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libredis.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
 %attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
@@ -538,6 +553,12 @@ exit 0
 %files module-json-plugin
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libjson-plugin.so
+%endif
+
+%if %{with redis}
+%files module-redis
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/syslog-ng/libredis.so
 %endif
 
 %files module-tfgeoip
