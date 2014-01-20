@@ -15,6 +15,7 @@
 %bcond_without	mongodb			# support for mongodb destination
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
+%bcond_without	geoip			# support for GeoIP
 %bcond_with	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
 
@@ -46,7 +47,7 @@ Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 URL:		http://www.balabit.com/products/syslog_ng/
-BuildRequires:	GeoIP-devel >= 1.5.1
+%{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
@@ -330,7 +331,7 @@ done
 	--enable-systemd \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--enable-amqp \
-	--enable-geoip \
+	--enable-geoip%{!?with_geoip:=no} \
 	--enable-ipv6 \
 	--enable-json%{!?with_json:=no} \
 	--enable-linux-caps \
@@ -561,9 +562,11 @@ exit 0
 %attr(755,root,root) %{_libdir}/syslog-ng/libredis.so
 %endif
 
+%if %{with geoip}
 %files module-tfgeoip
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/syslog-ng/libtfgeoip.so
+%endif
 
 %files libs
 %defattr(644,root,root,755)
