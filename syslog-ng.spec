@@ -56,7 +56,7 @@ BuildRequires:	eventlog-devel >= 0.2.12
 %{?with_tests:BuildRequires:	findutils}
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
-%{?with_hiredis:BuildRequires:	hiredis-devel}
+%{?with_redis:BuildRequires:	hiredis-devel}
 %{?with_json:BuildRequires:	json-c-devel >= 0.9}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
