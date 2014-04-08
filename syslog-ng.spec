@@ -28,12 +28,12 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.5.2
-Release:	3
+Version:	3.5.4.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	a54cbbe077363f112e5f6ff1ffd34fdb
+# Source0-md5:	ff3bf223ebafbaa92b69a2d5b729f368
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
