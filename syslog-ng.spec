@@ -30,7 +30,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.5.6
-Release:	3
+Release:	4
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -41,7 +41,6 @@ Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.5-guides/en/syslog-ng-ose-v3.5-guide-admin/pdf/%{name}-ose-v3.5-guide-admin.pdf
 # Source4-md5:	4c3c7f679e430373375752534e61abee
 Source5:	%{name}-simple.conf
-Source6:	%{name}.upstart
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
@@ -148,22 +147,6 @@ Syslog-ng é um substituto para o syslog tradicional, mas com diversas
 melhorias, como, por exemplo, a habilidade de filtrar mensagens de log
 por seu conteúdo (usando expressões regulares) e não apenas pelo par
 facility/prioridade como o syslog original.
-
-%package upstart
-Summary:	Upstart job description for syslog-ng
-Summary(pl.UTF-8):	Opis zadania Upstart dla demona syslog-ng
-Group:		Daemons
-Requires:	%{name} = %{version}-%{release}
-Requires:	upstart >= 0.6
-Conflicts:	avahi-upstart < 0.6.30-2
-Conflicts:	openssh-server-upstart < 2:5.8p2-2
-Conflicts:	postgresql-upstart < 9.0.4-2
-
-%description upstart
-Upstart job description for syslog-ng.
-
-%description upstart -l pl.UTF-8
-Opis zadania Upstart dla demona syslog-ng.
 
 %package module-afmongodb
 Summary:	MongoDB destination support module for syslog-ng
@@ -366,7 +349,7 @@ export LD_LIBRARY_PATH PYTHONPATH
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d,init} \
+install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/patterndb.d \
 	$RPM_BUILD_ROOT/var/{log,lib/%{name}/xsd}
 
@@ -385,10 +368,6 @@ touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/syslog-ng/*.la
-
-%if "%{pld_release}" == "th"
-%{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE6} > $RPM_BUILD_ROOT/etc/init/%{name}.conf
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -441,16 +420,6 @@ sed -i -e "1 s#\(.*\)\$#@version: 3.0\n\1#g" /etc/syslog-ng/syslog-ng.conf
 rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %service -q syslog-ng restart
 exit 0
-
-%post upstart
-%upstart_post %{name}
-
-%postun upstart
-%upstart_postun %{name}
-
-%triggerun upstart -- syslog-ng-upstart < 3.2.4-3
-#  use SERVICE_syslog=y in upstart job environment instead of SERVICE=syslog
-%{__sed} -i -e 's,SERVICE=syslog,SERVICE_syslog=y,' /etc/init/*.conf || :
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -528,12 +497,6 @@ exit 0
 %attr(640,root,root) %ghost /var/log/syslog
 %attr(640,root,root) %ghost /var/log/user
 %attr(640,root,root) %ghost /var/log/xferlog
-
-%if "%{pld_release}" == "th"
-%files upstart
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
-%endif
 
 %if %{with mongodb}
 %files module-afmongodb

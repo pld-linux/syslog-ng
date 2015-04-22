@@ -60,11 +60,9 @@ start() {
 	fi
 
 	msg_starting "syslog-ng"
-	emit starting JOB=syslog-ng SERVICE_syslog=y
 	daemon @@SBINDIR@@/syslog-ng -f /etc/syslog-ng/syslog-ng.conf --worker-threads=1024 $OPTIONS
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/syslog-ng
-	emit --no-wait started JOB=syslog-ng SERVICE_syslog=y
 }
 
 stop() {
@@ -74,9 +72,7 @@ stop() {
 	fi
 
 	msg_stopping "syslog-ng"
-	emit stopping JOB=syslog-ng SERVICE_syslog=y
 	killproc syslog-ng
-	emit --no-wait stopped JOB=syslog-ng SERVICE_syslog=y
 	rm -f /var/lock/subsys/syslog-ng >/dev/null 2>&1
 }
 
@@ -106,10 +102,7 @@ reload() {
 }
 
 flush_logs() {
-	if use_upstart && [ -f /etc/init/syslog-ng.conf ]; then
-		checkconfig
-		/sbin/initctl reload syslog-ng
-	elif [ -x /bin/systemd_booted ] && /bin/systemd_booted; then
+	if [ -x /bin/systemd_booted ] && /bin/systemd_booted; then
 		checkconfig
 		msg_reloading "syslog-ng"
 		/bin/systemctl reload syslog-ng.service
@@ -125,8 +118,6 @@ flush_logs() {
 		RETVAL=7
 	fi
 }
-
-upstart_controlled --except checkconfig configtest flush-logs
 
 RETVAL=0
 # See how we were called.
