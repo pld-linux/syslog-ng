@@ -34,7 +34,7 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	%(echo %{version} | cut -d. -f1,2)
+%define		mver	3.6
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
