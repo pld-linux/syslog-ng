@@ -1,20 +1,17 @@
---- syslog-ng-3.2.2/lib/syslog-ng.h~	2011-01-04 12:57:06.000000000 +0100
-+++ syslog-ng-3.2.2/lib/syslog-ng.h	2011-01-17 19:31:46.933293237 +0100
-@@ -47,10 +47,10 @@
+FIXME: drop this patch and just fix PATH_LOCALSTATEDIR ?
+
+
+--- syslog-ng-3.6.2/lib/syslog-ng.h~	2014-12-15 16:48:45.000000000 +0200
++++ syslog-ng-3.6.2/lib/syslog-ng.h	2015-06-01 08:04:18.542588343 +0300
+@@ -42,7 +42,7 @@
+ #if ENABLE_ENV_WRAPPER
  #define PATH_SYSLOGNG           PATH_LIBEXECDIR "/syslog-ng"
  #endif
- 
 -#define PATH_PERSIST_CONFIG     PATH_LOCALSTATEDIR "/syslog-ng.persist"
--#define PATH_QDISK              PATH_LOCALSTATEDIR
--#define PATH_PATTERNDB_FILE     PATH_LOCALSTATEDIR "/patterndb.xml"
--#define PATH_XSDDIR             PATH_DATADIR "/xsd"
 +#define PATH_PERSIST_CONFIG     "/var/lib/syslog-ng/syslog-ng.persist"
-+#define PATH_QDISK              "/var/lib/syslog-ng"
-+#define PATH_PATTERNDB_FILE     "/var/lib/syslog-ng/patterndb.xml"
-+#define PATH_XSDDIR             "/var/lib/syslog-ng/xsd"
  
- #define LOG_PRIORITY_LISTEN 0
- #define LOG_PRIORITY_READER 0
+ #define SAFE_STRING(x) ((x) ? (x) : "NULL")
+ 
 --- syslog-ng-3.2.2/scripts/update-patterndb.in~	2010-11-20 09:47:33.000000000 +0100
 +++ syslog-ng-3.2.2/scripts/update-patterndb.in	2011-01-27 20:43:14.656000204 +0100
 @@ -3,6 +3,6 @@

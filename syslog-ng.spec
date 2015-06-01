@@ -1,8 +1,17 @@
-#
 # TODO:
-# - switch to LTS version
+# - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
+# - new files:
+#/lib64/syslog-ng/libgraphite.so
+#/lib64/syslog-ng/libpseudofile.so
+#/lib64/syslog-ng/libsdjournal.so
+#/lib64/syslog-ng/libtest/libsyslog-ng-test.a
+#%{_pkgconfigdir}/syslog-ng-test.pc
+#%{_datadir}/syslog-ng/include/scl/graphite/README
+#%{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
+#%{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
+
 #
 # Conditional build:
 %bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
@@ -25,28 +34,29 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
+%define		mver	%(echo %{version} | cut -d. -f1,2)
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.5.6
-Release:	4
+Version:	3.6.2
+Release:	0.1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	eee31ddb012b1fcf2b6a6a99f073a9a6
+# Source0-md5:	6928e9be3499a2e9ae52ea8aa204b165
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-3.5-guides/en/syslog-ng-ose-v3.5-guide-admin/pdf/%{name}-ose-v3.5-guide-admin.pdf
-# Source4-md5:	4c3c7f679e430373375752534e61abee
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{mver}-guides/en/syslog-ng-ose-v%{mver}-guide-admin/pdf/%{name}-ose-v%{mver}-guide-admin.pdf
+# Source4-md5:	bb12c18aef655096987911c4a9fe3ffa
 Source5:	%{name}-simple.conf
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
-URL:		http://www.balabit.com/products/syslog_ng/
+URL:		https://www.balabit.com/network-security/syslog-ng/opensource-logging-system
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.53
 BuildRequires:	automake
@@ -426,9 +436,9 @@ exit 0
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS debian/syslog-ng.conf* contrib/relogger.pl
+%doc AUTHORS NEWS.md debian/syslog-ng.conf* contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v3.5-guide-admin.pdf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v%{mver}-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
@@ -536,7 +546,8 @@ exit 0
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libsyslog-ng-%{version}.so
+%attr(755,root,root) %{_libdir}/libsyslog-ng-%{mver}.so.*.*.*
+%ghost %{_libdir}/libsyslog-ng-%{mver}.so.0
 %dir %{_datadir}/syslog-ng
 
 %files devel

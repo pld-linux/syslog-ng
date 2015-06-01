@@ -1,15 +1,13 @@
---- syslog-ng-3.5.2/contrib/systemd/syslog-ng.service~	2013-09-17 17:43:11.000000000 +0200
-+++ syslog-ng-3.5.2/contrib/systemd/syslog-ng.service	2013-12-01 22:50:06.249492652 +0100
-@@ -3,9 +3,11 @@
- Documentation=man:syslog-ng(8)
+--- syslog-ng-3.6.2/contrib/systemd/syslog-ng.service~	2014-12-15 16:48:45.000000000 +0200
++++ syslog-ng-3.6.2/contrib/systemd/syslog-ng.service	2015-06-01 08:06:32.632888085 +0300
+@@ -4,7 +4,9 @@
  
  [Service]
-+EnvironmentFile=-/etc/sysconfig/syslog-ng
  Type=notify
- Sockets=syslog.socket
 -ExecStart=/usr/sbin/syslog-ng -F
++EnvironmentFile=-/etc/sysconfig/syslog-ng
 +ExecStartPre=-/bin/systemctl stop systemd-kmsg-syslogd.service
-+ExecStart=/sbin/syslog-ng -F -f /etc/syslog-ng/syslog-ng.conf --worker-threads=1024
++ExecStart=/sbin/syslog-ng -F -f /etc/syslog-ng/syslog-ng.conf -p /var/run/syslogd.pid --worker-threads=1024
  ExecReload=/bin/kill -HUP $MAINPID
- StandardOutput=null
- Restart=on-failure
+ StandardOutput=journal
+ StandardError=journal
