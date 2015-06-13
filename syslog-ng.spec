@@ -1,13 +1,12 @@
 # TODO:
+# - --enable-riemann, riemann-client >= 1.0.0
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
 # - new files:
-#/lib64/syslog-ng/libgraphite.so
-#/lib64/syslog-ng/libpseudofile.so
-#/lib64/syslog-ng/libsdjournal.so
-#/lib64/syslog-ng/libtest/libsyslog-ng-test.a
-#%{_pkgconfigdir}/syslog-ng-test.pc
+#%{moduledir}/libgraphite.so
+#%{moduledir}/libpseudofile.so
+#%{moduledir}/libsdjournal.so
 #%{_datadir}/syslog-ng/include/scl/graphite/README
 #%{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
 #%{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
@@ -26,6 +25,7 @@
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
 %bcond_without	geoip			# support for GeoIP
+%bcond_without	systemd			# systemd journal support
 %bcond_with	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
 
@@ -58,7 +58,7 @@ Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 URL:		https://www.balabit.com/network-security/syslog-ng/opensource-logging-system
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
-BuildRequires:	autoconf >= 2.53
+BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
 BuildRequires:	docbook-style-xsl
@@ -72,7 +72,7 @@ BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
 %{?with_system_libivykis:BuildRequires:	libivykis-devel >= 0.36.1}
-%{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.6}
+%{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.8}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
@@ -82,6 +82,7 @@ BuildRequires:	pkgconfig
 %{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.0.1}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.623
+%{?with_systemd:BuildRequires:	systemd-devel >= 1:195}
 BuildRequires:	which
 %if %{with tests}
 %{?with_sql:BuildRequires:	libdbi-drivers-sqlite3}
@@ -122,6 +123,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	xsl_stylesheets_dir /usr/share/sgml/docbook/xsl-stylesheets
 
+%if %{without dynamic}
 # syslog-ng has really crazy linking rules (see their bugzilla).
 # Some rules, according to syslog-ng devs, are like this:
 # - libsyslog-ng.so has undefined symbols for third party libraries
@@ -129,12 +131,14 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # - same applies for modules
 # In dynamic case tests are forcily linked with dynamic modules, which doesn't work with as-needed.
 %define		filterout_ld			-Wl,--as-needed -Wl,--no-copy-dt-needed-entries
-
-%if %{without dynamic}
 %define		no_install_post_check_so	1
 %define		_sbindir			/sbin
-%define		_libdir				/%{_lib}
+%define		slibdir				/%{_lib}
+%else
+%define		slibdir				%{_libdir}
 %endif
+# or just %{_libdir}? modules seem to be always linked dynamically
+%define		moduledir			%{slibdir}/syslog-ng
 
 %description
 syslog-ng is a syslogd replacement for Unix and Unix-like systems. It
@@ -163,7 +167,7 @@ Summary:	MongoDB destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie MongoDB
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libmongo-client >= 0.1.6
+Requires:	libmongo-client >= 0.1.8
 
 %description module-afmongodb
 MongoDB destination support module for syslog-ng.
@@ -321,11 +325,10 @@ done
 	--with-ivykis=internal \
 %endif
 	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
-	--with-module-dir=%{_libdir}/syslog-ng \
+	--with-module-dir=%{moduledir} \
 	--with-pidfile-dir=/var/run \
-	--with-timezone-dir=%{_datadir}/zoneinfo \
-	--enable-systemd \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
+	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--enable-amqp \
 	--enable-geoip%{!?with_geoip:=no} \
 	--enable-ipv6 \
@@ -337,6 +340,7 @@ done
 	--enable-smtp%{!?with_smtp:=no} \
 	--enable-spoof-source \
 	--enable-ssl \
+	--enable-systemd%{!?with_systemd:=no} \
 	--enable-tcp-wrapper \
 %if %{with sql}
 	--enable-sql \
@@ -366,6 +370,12 @@ install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d} \
 %{__make} -j1 install \
 	pkgconfigdir=%{_pkgconfigdir} \
 	DESTDIR=$RPM_BUILD_ROOT
+
+%if "%{slibdir}" != "%{_libdir}"
+install -d $RPM_BUILD_ROOT%{slibdir}
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libsyslog-ng.so.* $RPM_BUILD_ROOT%{slibdir}
+ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsyslog-ng.so.*.*.*) %{_libdir}/libsyslog-ng-%{mver}.so
+%endif
 
 %{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
@@ -447,25 +457,25 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %{systemdunitdir}/syslog-ng.service
-%dir %{_libdir}/syslog-ng
-%attr(755,root,root) %{_libdir}/syslog-ng/libafamqp.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libaffile.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafprog.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-notls.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsocket-tls.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafstomp.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libafuser.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libbasicfuncs.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libconfgen.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libcryptofuncs.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libcsvparser.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libdbparser.so
-%attr(755,root,root) %{_libdir}/syslog-ng/liblinux-kmsg-format.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libpacctformat.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libsyslog-ng-crypto.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libsyslogformat.so
-%attr(755,root,root) %{_libdir}/syslog-ng/libsystem-source.so
+%dir %{moduledir}
+%attr(755,root,root) %{moduledir}/libafamqp.so
+%attr(755,root,root) %{moduledir}/libaffile.so
+%attr(755,root,root) %{moduledir}/libafprog.so
+%attr(755,root,root) %{moduledir}/libafsocket.so
+%attr(755,root,root) %{moduledir}/libafsocket-notls.so
+%attr(755,root,root) %{moduledir}/libafsocket-tls.so
+%attr(755,root,root) %{moduledir}/libafstomp.so
+%attr(755,root,root) %{moduledir}/libafuser.so
+%attr(755,root,root) %{moduledir}/libbasicfuncs.so
+%attr(755,root,root) %{moduledir}/libconfgen.so
+%attr(755,root,root) %{moduledir}/libcryptofuncs.so
+%attr(755,root,root) %{moduledir}/libcsvparser.so
+%attr(755,root,root) %{moduledir}/libdbparser.so
+%attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
+%attr(755,root,root) %{moduledir}/libpacctformat.so
+%attr(755,root,root) %{moduledir}/libsyslog-ng-crypto.so
+%attr(755,root,root) %{moduledir}/libsyslogformat.so
+%attr(755,root,root) %{moduledir}/libsystem-source.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/loggen
@@ -511,48 +521,67 @@ exit 0
 %if %{with mongodb}
 %files module-afmongodb
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libafmongodb.so
+%attr(755,root,root) %{moduledir}/libafmongodb.so
 %endif
 
 %if %{with smtp}
 %files module-afsmtp
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsmtp.so
+%attr(755,root,root) %{moduledir}/libafsmtp.so
 %endif
 
 %if %{with sql}
 %files module-afsql
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libafsql.so
+%attr(755,root,root) %{moduledir}/libafsql.so
 %endif
 
 %if %{with json}
 %files module-json-plugin
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libjson-plugin.so
+%attr(755,root,root) %{moduledir}/libjson-plugin.so
 %endif
 
 %if %{with redis}
 %files module-redis
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libredis.so
+%attr(755,root,root) %{moduledir}/libredis.so
 %endif
 
 %if %{with geoip}
 %files module-tfgeoip
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/syslog-ng/libtfgeoip.so
+%attr(755,root,root) %{moduledir}/libtfgeoip.so
 %endif
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libsyslog-ng-%{mver}.so.*.*.*
-%ghost %{_libdir}/libsyslog-ng-%{mver}.so.0
+%attr(755,root,root) %{slibdir}/libsyslog-ng-%{mver}.so.*.*.*
+%attr(755,root,root) %ghost %{slibdir}/libsyslog-ng-%{mver}.so.0
 %dir %{_datadir}/syslog-ng
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libsyslog-ng.so
-%{_includedir}/syslog-ng
+%dir %{_includedir}/syslog-ng
+%{_includedir}/syslog-ng/*.h
+%{_includedir}/syslog-ng/compat
+%{_includedir}/syslog-ng/control
+%{_includedir}/syslog-ng/filter
+%{_includedir}/syslog-ng/logproto
+%{_includedir}/syslog-ng/parser
+%{_includedir}/syslog-ng/rewrite
+%{_includedir}/syslog-ng/stats
+%{_includedir}/syslog-ng/template
+%{_includedir}/syslog-ng/transport
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
+
+# test-devel ?
+%if "%{_libdir}/syslog-ng" != "{moduledir}"
+%dir %{_libdir}/syslog-ng
+%endif
+%dir %{_libdir}/syslog-ng/libtest
+%{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
+%{_includedir}/syslog-ng/libtest
+%{_pkgconfigdir}/syslog-ng-test.pc
