@@ -1,11 +1,11 @@
 # TODO:
-# - --enable-riemann, riemann-client >= 1.0.0
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
 # - new files:
 #%{moduledir}/libgraphite.so
 #%{moduledir}/libpseudofile.so
+#%{moduledir}/libriemann.so
 #%{moduledir}/libsdjournal.so
 #%{_datadir}/syslog-ng/include/scl/graphite/README
 #%{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
@@ -25,6 +25,7 @@
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
 %bcond_without	geoip			# support for GeoIP
+%bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd journal support
 %bcond_with	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
@@ -39,12 +40,12 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.6.2
+Version:	3.6.3
 Release:	0.1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
-Source0:	http://www.balabit.com/downloads/files/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	6928e9be3499a2e9ae52ea8aa204b165
+Source0:	https://my.balabit.com/downloads/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
+# Source0-md5:	1c45f6ff694a3b1a3d528e45af3a0862
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -80,6 +81,7 @@ BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
 %{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.0.1}
+%{?with_riemann:BuildRequires:	riemann-c-client-devel >= 1.0.0}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.623
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:195}
@@ -313,6 +315,7 @@ done
 	--datadir=%{_datadir}/syslog-ng \
 	--disable-silent-rules \
 	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
+	--with-docbook=%{xsl_stylesheets_dir}/manpages/docbook.xsl \
 %if %{with mongodb}
 	--enable-mongodb \
 	--with-libmongo-client=system \
@@ -334,9 +337,11 @@ done
 	--enable-ipv6 \
 	--enable-json%{!?with_json:=no} \
 	--enable-linux-caps \
+	--enable-manpages \
 	--enable-pacct \
 	--enable-pcre \
 	--enable-redis%{!?with_redis:=no} \
+	--enable-riemann%{!?with_riemann:=no} \
 	--enable-smtp%{!?with_smtp:=no} \
 	--enable-spoof-source \
 	--enable-ssl \
@@ -351,8 +356,8 @@ done
 	--enable-mixed-linking
 %endif
 
-%{__make} \
-	XSL_STYLESHEET=%{xsl_stylesheets_dir}/manpages/docbook.xsl
+%{__make}
+
 
 %if %{with tests}
 LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
@@ -568,6 +573,9 @@ exit 0
 %{_includedir}/syslog-ng/compat
 %{_includedir}/syslog-ng/control
 %{_includedir}/syslog-ng/filter
+%if %{without system_ivykis}
+%{_includedir}/syslog-ng/ivykis
+%endif
 %{_includedir}/syslog-ng/logproto
 %{_includedir}/syslog-ng/parser
 %{_includedir}/syslog-ng/rewrite
