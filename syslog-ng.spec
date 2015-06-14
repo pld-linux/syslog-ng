@@ -2,14 +2,6 @@
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
-# - new files:
-#%{moduledir}/libgraphite.so
-#%{moduledir}/libpseudofile.so
-#%{moduledir}/libriemann.so
-#%{moduledir}/libsdjournal.so
-#%{_datadir}/syslog-ng/include/scl/graphite/README
-#%{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
-#%{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
 
 #
 # Conditional build:
@@ -26,7 +18,7 @@
 %bcond_without	smtp			# support for logging into SMTP
 %bcond_without	geoip			# support for GeoIP
 %bcond_without	riemann			# support for Riemann monitoring system
-%bcond_without	systemd			# systemd journal support
+%bcond_without	systemd			# systemd (daemon and journal) support
 %bcond_with	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
 
@@ -231,6 +223,19 @@ Redis destination support module for syslog-ng (via libhiredis).
 %description module-redis -l pl.UTF-8
 Moduł sysloga-ng do obsługi zapisu logów w bazie Redis (poprzez
 libhiredis).
+
+%package module-riemann
+Summary:	Riemann destination support module for syslog-ng
+Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów do systemu Riemann
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	riemann-c-client >= 1.0.0
+
+%description module-riemann
+Riemann destination support module for syslog-ng.
+
+%description module-riemann -l pl.UTF-8
+Moduł sysloga-ng do obsługi zapisu logów do systemu Riemann.
 
 %package module-tfgeoip
 Summary:	syslog-ng template function module to get GeoIP info from an IPv4 addresses
@@ -476,8 +481,13 @@ exit 0
 %attr(755,root,root) %{moduledir}/libcryptofuncs.so
 %attr(755,root,root) %{moduledir}/libcsvparser.so
 %attr(755,root,root) %{moduledir}/libdbparser.so
+%attr(755,root,root) %{moduledir}/libgraphite.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
+%attr(755,root,root) %{moduledir}/libpseudofile.so
+%if %{with systemd}
+%attr(755,root,root) %{moduledir}/libsdjournal.so
+%endif
 %attr(755,root,root) %{moduledir}/libsyslog-ng-crypto.so
 %attr(755,root,root) %{moduledir}/libsyslogformat.so
 %attr(755,root,root) %{moduledir}/libsystem-source.so
@@ -489,6 +499,11 @@ exit 0
 
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
+%dir %{_datadir}/syslog-ng/include/scl/graphite
+%{_datadir}/syslog-ng/include/scl/graphite/README
+%{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
+%dir %{_datadir}/syslog-ng/include/scl/nodejs
+%{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
 %dir %{_datadir}/syslog-ng/include/scl/pacct
 %{_datadir}/syslog-ng/include/scl/pacct/plugin.conf
 %dir %{_datadir}/syslog-ng/include/scl/rewrite
@@ -551,6 +566,12 @@ exit 0
 %files module-redis
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libredis.so
+%endif
+
+%if %{with riemann}
+%files module-riemann
+%defattr(644,root,root,755)
+%attr(755,root,root) %{moduledir}/libriemann.so
 %endif
 
 %if %{with geoip}
