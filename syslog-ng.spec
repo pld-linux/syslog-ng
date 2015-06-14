@@ -49,6 +49,7 @@ Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
+Patch5:		%{name}-link.patch
 URL:		https://www.balabit.com/network-security/syslog-ng/opensource-logging-system
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.59
@@ -295,6 +296,7 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -383,8 +385,8 @@ install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d} \
 
 %if "%{slibdir}" != "%{_libdir}"
 install -d $RPM_BUILD_ROOT%{slibdir}
-%{__mv} $RPM_BUILD_ROOT%{_libdir}/libsyslog-ng.so.* $RPM_BUILD_ROOT%{slibdir}
-ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsyslog-ng.so.*.*.*) %{_libdir}/libsyslog-ng-%{mver}.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libsyslog-ng-%{mver}.so.* $RPM_BUILD_ROOT%{slibdir}
+ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsyslog-ng-%{mver}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libsyslog-ng.so
 %endif
 
 %{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
@@ -397,7 +399,7 @@ done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/syslog-ng/*.la
+%{__rm} $RPM_BUILD_ROOT%{moduledir}/*.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -594,7 +596,7 @@ exit 0
 %{_includedir}/syslog-ng/compat
 %{_includedir}/syslog-ng/control
 %{_includedir}/syslog-ng/filter
-%if %{without system_ivykis}
+%if %{without system_libivykis}
 %{_includedir}/syslog-ng/ivykis
 %endif
 %{_includedir}/syslog-ng/logproto
