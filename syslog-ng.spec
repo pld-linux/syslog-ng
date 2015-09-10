@@ -70,6 +70,7 @@ BuildRequires:	libcap-devel
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
+BuildRequires:	libxslt-progs
 BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
@@ -80,9 +81,7 @@ BuildRequires:	rpmbuild(macros) >= 1.623
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:195}
 BuildRequires:	which
 %if %{with tests}
-%{?with_sql:BuildRequires:	libdbi-drivers-sqlite3}
 BuildRequires:	python
-BuildRequires:	python-modules
 BuildRequires:	tzdata
 %endif
 %if %{without dynamic}
