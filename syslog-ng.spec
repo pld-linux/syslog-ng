@@ -37,7 +37,7 @@ Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://my.balabit.com/downloads/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	1c45f6ff694a3b1a3d528e45af3a0862
+# Source0-md5:	e9f401615e92e5eb27396c995c1446ba
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
