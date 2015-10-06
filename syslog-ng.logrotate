@@ -1,3 +1,4 @@
+/var/log/cron
 /var/log/daemon
 /var/log/debug
 /var/log/iptables

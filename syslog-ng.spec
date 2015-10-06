@@ -33,7 +33,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.6.4
-Release:	1
+Release:	2
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://my.balabit.com/downloads/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
@@ -392,7 +392,7 @@ ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsyslog-ng-%{mver}.so.
 cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 
-for n in daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog; do
+for n in cron daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog; do
 	> $RPM_BUILD_ROOT/var/log/$n
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
@@ -526,18 +526,19 @@ exit 0
 %{_mandir}/man5/syslog-ng.conf.5*
 %{_mandir}/man8/syslog-ng.8*
 
-%attr(640,root,root) %ghost /var/log/daemon
-%attr(640,root,root) %ghost /var/log/debug
-%attr(640,root,root) %ghost /var/log/iptables
-%attr(640,root,root) %ghost /var/log/kernel
-%attr(640,root,root) %ghost /var/log/lpr
-%attr(640,root,root) %ghost /var/log/maillog
-%attr(640,root,root) %ghost /var/log/messages
-%attr(640,root,root) %ghost /var/log/secure
-%attr(640,root,root) %ghost /var/log/spooler
-%attr(640,root,root) %ghost /var/log/syslog
-%attr(640,root,root) %ghost /var/log/user
-%attr(640,root,root) %ghost /var/log/xferlog
+%attr(640,root,logs) %ghost /var/log/cron
+%attr(640,root,logs) %ghost /var/log/daemon
+%attr(640,root,logs) %ghost /var/log/debug
+%attr(640,root,logs) %ghost /var/log/iptables
+%attr(640,root,logs) %ghost /var/log/kernel
+%attr(640,root,logs) %ghost /var/log/lpr
+%attr(640,root,logs) %ghost /var/log/maillog
+%attr(640,root,logs) %ghost /var/log/messages
+%attr(640,root,logs) %ghost /var/log/secure
+%attr(640,root,logs) %ghost /var/log/spooler
+%attr(640,root,logs) %ghost /var/log/syslog
+%attr(640,root,logs) %ghost /var/log/user
+%attr(640,root,logs) %ghost /var/log/xferlog
 
 %if %{with mongodb}
 %files module-afmongodb
