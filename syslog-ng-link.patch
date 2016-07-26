@@ -11,14 +11,15 @@
 # 	# doesn't support -Wl,-Bstatic -Wl,-Bdynamic on a per-library basis.
 --- syslog-ng-3.6.3/syslog-ng-ctl/Makefile.am.orig	2015-06-08 15:44:04.000000000 +0200
 +++ syslog-ng-3.6.3/syslog-ng-ctl/Makefile.am	2015-06-14 12:14:41.989973064 +0200
-@@ -10,5 +10,6 @@
+@@ -10,5 +10,6 @@ syslog_ng_ctl_syslog_ng_ctl_SOURCES		=
  EXTRA_DIST					+=	\
  	syslog-ng-ctl/control-client-unix.c
  
--syslog_ng_ctl_syslog_ng_ctl_LDADD		= lib/libsyslog-ng.la $(CRYPTO_LIBS) @BASE_LIBS@ @GLIB_LIBS@ @RESOLV_LIBS@
+-syslog_ng_ctl_syslog_ng_ctl_LDADD		= lib/libsyslog-ng.la @BASE_LIBS@ @GLIB_LIBS@ @RESOLV_LIBS@
+-
++syslog_ng_ctl_syslog_ng_ctl_DEPENDENCIES	= lib/libsyslog-ng.la
 +syslog_ng_ctl_syslog_ng_ctl_LDADD		= -L${top_builddir}/lib/.libs -lsyslog-ng @SYSLOGNG_DEPS_LIBS@
 +syslog_ng_ctl_syslog_ng_ctl_LINK		= @SYSLOGNG_LINK@
- syslog_ng_ctl_syslog_ng_ctl_DEPENDENCIES	= lib/libsyslog-ng.la lib/libsyslog-ng-crypto.la
 --- syslog-ng-3.6.3/lib/logproto/tests/Makefile.am.orig	2015-06-08 15:44:04.000000000 +0200
 +++ syslog-ng-3.6.3/lib/logproto/tests/Makefile.am	2015-06-14 12:29:25.672597931 +0200
 @@ -20,7 +20,7 @@

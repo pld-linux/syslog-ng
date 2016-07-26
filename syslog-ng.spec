@@ -2,7 +2,7 @@
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
-
+# - package python module
 #
 # Conditional build:
 %bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
@@ -27,22 +27,22 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.6
+%define		mver	3.7
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.6.4
-Release:	3
+Version:	3.7.3
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
-Source0:	https://my.balabit.com/downloads/syslog-ng/open-source-edition/%{version}/source/%{name}_%{version}.tar.gz
-# Source0-md5:	e9f401615e92e5eb27396c995c1446ba
+Source0:	https://github.com/balabit/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	803d61a713d6d41a973942d417fec999
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{mver}-guides/en/syslog-ng-ose-v%{mver}-guide-admin/pdf/%{name}-ose-v%{mver}-guide-admin.pdf
-# Source4-md5:	bb12c18aef655096987911c4a9fe3ffa
+# Source4-md5:	a236466d3f902d2918edd15b82e42076
 Source5:	%{name}-simple.conf
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
@@ -81,7 +81,9 @@ BuildRequires:	rpmbuild(macros) >= 1.623
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:195}
 BuildRequires:	which
 %if %{with tests}
+BuildRequires:	pylint
 BuildRequires:	python
+BuildRequires:	python-pep8
 BuildRequires:	tzdata
 %endif
 %if %{without dynamic}
@@ -475,8 +477,6 @@ exit 0
 %attr(755,root,root) %{moduledir}/libaffile.so
 %attr(755,root,root) %{moduledir}/libafprog.so
 %attr(755,root,root) %{moduledir}/libafsocket.so
-%attr(755,root,root) %{moduledir}/libafsocket-notls.so
-%attr(755,root,root) %{moduledir}/libafsocket-tls.so
 %attr(755,root,root) %{moduledir}/libafstomp.so
 %attr(755,root,root) %{moduledir}/libafuser.so
 %attr(755,root,root) %{moduledir}/libbasicfuncs.so
@@ -485,13 +485,13 @@ exit 0
 %attr(755,root,root) %{moduledir}/libcsvparser.so
 %attr(755,root,root) %{moduledir}/libdbparser.so
 %attr(755,root,root) %{moduledir}/libgraphite.so
+%attr(755,root,root) %{moduledir}/libkvformat.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
 %if %{with systemd}
 %attr(755,root,root) %{moduledir}/libsdjournal.so
 %endif
-%attr(755,root,root) %{moduledir}/libsyslog-ng-crypto.so
 %attr(755,root,root) %{moduledir}/libsyslogformat.so
 %attr(755,root,root) %{moduledir}/libsystem-source.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
@@ -502,15 +502,21 @@ exit 0
 
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
+%{_datadir}/syslog-ng/include/scl/cim
+%{_datadir}/syslog-ng/include/scl/elasticsearch
+%{_datadir}/syslog-ng/include/scl/hdfs
 %dir %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/graphite/README
 %{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
+%{_datadir}/syslog-ng/include/scl/kafka
+%{_datadir}/syslog-ng/include/scl/mbox
 %dir %{_datadir}/syslog-ng/include/scl/nodejs
 %{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
 %dir %{_datadir}/syslog-ng/include/scl/pacct
 %{_datadir}/syslog-ng/include/scl/pacct/plugin.conf
 %dir %{_datadir}/syslog-ng/include/scl/rewrite
 %{_datadir}/syslog-ng/include/scl/rewrite/cc-mask.conf
+%{_datadir}/syslog-ng/include/scl/solaris
 %dir %{_datadir}/syslog-ng/include/scl/syslogconf
 %{_datadir}/syslog-ng/include/scl/syslogconf/README
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/syslogconf/convert-syslogconf.awk
@@ -581,7 +587,7 @@ exit 0
 %if %{with geoip}
 %files module-tfgeoip
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libtfgeoip.so
+%attr(755,root,root) %{moduledir}/libgeoip-plugin.so
 %endif
 
 %files libs
