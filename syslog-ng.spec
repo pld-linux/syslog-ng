@@ -502,7 +502,6 @@ exit 0
 
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
-%{_datadir}/syslog-ng/include/scl/cim
 %{_datadir}/syslog-ng/include/scl/elasticsearch
 %{_datadir}/syslog-ng/include/scl/hdfs
 %dir %{_datadir}/syslog-ng/include/scl/graphite
@@ -570,6 +569,7 @@ exit 0
 %files module-json-plugin
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libjson-plugin.so
+%{_datadir}/syslog-ng/include/scl/cim
 %endif
 
 %if %{with redis}
