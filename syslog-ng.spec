@@ -20,7 +20,9 @@
 %bcond_without	geoip			# support for GeoIP
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
-%bcond_without	system_libivykis	# use system libivykis
+%bcond_with	python			# python module
+%bcond_with	java			# java modules and support
+%bcond_with	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
 
 %if "%{pld_release}" == "ac"
@@ -84,6 +86,7 @@ BuildRequires:	rpmbuild(macros) >= 1.623
 %{?with_systemd:BuildRequires:	systemd-devel >= 1:195}
 BuildRequires:	which
 %if %{with tests}
+BuildRequires:	GeoIP-db-Country
 BuildRequires:	pylint
 BuildRequires:	python
 BuildRequires:	python-pep8
@@ -262,6 +265,7 @@ Summary:	syslog-ng template function module to get GeoIP info from an IPv4 addre
 Summary(pl.UTF-8):	Moduł funkcji szablonu sysloga-ng do pobierania informacji GeoIP z adresów IPv4
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	GeoIP-db-Country
 Requires:	GeoIP-libs >= 1.5.1
 
 %description module-tfgeoip
@@ -321,11 +325,6 @@ cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 
-# timestamp paring on x32 confuses glib2 testsuite
-%ifarch x32
-%{__sed} -i -e '/tests\/unit\/test_msgparse/d' tests/unit/Makefile.am
-%endif
-
 %build
 for i in . lib/ivykis; do
 cd $i
@@ -341,6 +340,9 @@ done
 	--disable-silent-rules \
 	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
 	--with-docbook=%{xsl_stylesheets_dir}/manpages/docbook.xsl \
+	--enable-java%{!?with_java:=no} \
+	--enable-java-modules%{!?with_java:=no} \
+	--enable-python%{!?with_python:=no} \
 %if %{with mongodb}
 	--enable-mongodb \
 	--with-libmongo-client=system \

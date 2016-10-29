@@ -31,3 +31,16 @@
  	${top_builddir}/libtest/libsyslog-ng-test.a
  lib_logproto_tests_test_findeom_SOURCES = \
  	lib/logproto/tests/test_findeom.c
+--- syslog-ng-3.8.1/modules/diskq/Makefile.am~	2016-10-29 16:04:03.000000000 +0200
++++ syslog-ng-3.8.1/modules/diskq/Makefile.am	2016-10-29 16:04:53.759617687 +0200
+@@ -45,9 +45,9 @@
+ modules_diskq_libdisk_buffer_la_DEPENDENCIES = $(MODULE_DEPS_LIBS) $(LIBSYSLOG_NG_DISK_BUFFER)
+ 
+ modules_diskq_dqtool_SOURCES = modules/diskq/dqtool.c
+ modules_diskq_dqtool_LDADD = \
+-  $(TOOL_DEPS_LIBS) \
+   $(MODULE_DEPS_LIBS) \
++  $(TOOL_DEPS_LIBS) \
+   $(LIBSYSLOG_NG_DISK_BUFFER)
+ 
+ modules/diskq modules/diskq/ mod-diskq: modules/diskq/libdisk-buffer.la \
