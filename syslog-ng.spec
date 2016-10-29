@@ -27,22 +27,22 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.7
+%define		mver	3.8
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.7.3
+Version:	3.8.1
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	803d61a713d6d41a973942d417fec999
+# Source0-md5:	acf14563cf5ce435db8db35486ce66af
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{mver}-guides/en/syslog-ng-ose-v%{mver}-guide-admin/pdf/%{name}-ose-v%{mver}-guide-admin.pdf
-# Source4-md5:	a236466d3f902d2918edd15b82e42076
+# Source4-md5:	ab7f52430e6aca8f377963fcab155a3e
 Source5:	%{name}-simple.conf
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
