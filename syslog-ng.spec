@@ -19,7 +19,7 @@
 %bcond_without	geoip			# support for GeoIP
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
-%bcond_with	system_libivykis	# use system libivykis
+%bcond_without	system_libivykis	# use system libivykis
 %bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
 
 %if "%{pld_release}" == "ac"
@@ -84,6 +84,7 @@ BuildRequires:	which
 BuildRequires:	pylint
 BuildRequires:	python
 BuildRequires:	python-pep8
+BuildRequires:	python-ply
 BuildRequires:	tzdata
 %endif
 %if %{without dynamic}
