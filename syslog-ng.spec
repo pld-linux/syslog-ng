@@ -12,6 +12,7 @@
 %bcond_without	sql			# support for logging to SQL DB
 %endif
 %bcond_without	tests			# do not perform "make check"
+%bcond_without	http			# support for HTTP destination
 %bcond_without	json			# support for JSON template formatting
 %bcond_without	mongodb			# support for mongodb destination
 %bcond_without	redis			# support for Redis destination
@@ -55,6 +56,7 @@ URL:		https://www.balabit.com/network-security/syslog-ng/opensource-logging-syst
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
+%{?with_http:BuildRequires:	curl-devel}
 BuildRequires:	docbook-style-xsl
 BuildRequires:	eventlog-devel >= 0.2.12
 %{?with_tests:BuildRequires:	findutils}
@@ -71,6 +73,7 @@ BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
 BuildRequires:	libxslt-progs
+BuildRequires:	lz4-devel >= r131-5
 BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
@@ -202,6 +205,18 @@ SQL destination support module for syslog-ng (via libdbi).
 Moduł sysloga-ng do obsługi zapisu logów w bazach SQL (poprzez
 libdbi).
 
+%package module-http
+Summary:	HTTP destination support module for syslog-ng
+Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów poprzez HTTP
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description module-http
+HTTP destination support module for syslog-ng (via libcurl).
+
+%description module-http -l pl.UTF-8
+Moduł sysloga-ng do obsługi zapisu logów poprzez HTTP (via libcurl).
+
 %package module-json-plugin
 Summary:	JSON formatting template function for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON
@@ -323,7 +338,6 @@ cd -
 done
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
-	--datadir=%{_datadir}/syslog-ng \
 	--disable-silent-rules \
 	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
 	--with-docbook=%{xsl_stylesheets_dir}/manpages/docbook.xsl \
@@ -345,6 +359,7 @@ done
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	--enable-amqp \
 	--enable-geoip%{!?with_geoip:=no} \
+	--enable-http%{!?with_http:=no} \
 	--enable-ipv6 \
 	--enable-json%{!?with_json:=no} \
 	--enable-linux-caps \
@@ -474,6 +489,7 @@ exit 0
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %{systemdunitdir}/syslog-ng.service
 %dir %{moduledir}
+%attr(755,root,root) %{moduledir}/libadd-contextual-data.so
 %attr(755,root,root) %{moduledir}/libafamqp.so
 %attr(755,root,root) %{moduledir}/libaffile.so
 %attr(755,root,root) %{moduledir}/libafprog.so
@@ -481,10 +497,13 @@ exit 0
 %attr(755,root,root) %{moduledir}/libafstomp.so
 %attr(755,root,root) %{moduledir}/libafuser.so
 %attr(755,root,root) %{moduledir}/libbasicfuncs.so
+%attr(755,root,root) %{moduledir}/libcef.so
 %attr(755,root,root) %{moduledir}/libconfgen.so
 %attr(755,root,root) %{moduledir}/libcryptofuncs.so
 %attr(755,root,root) %{moduledir}/libcsvparser.so
+%attr(755,root,root) %{moduledir}/libdate.so
 %attr(755,root,root) %{moduledir}/libdbparser.so
+%attr(755,root,root) %{moduledir}/libdisk-buffer.so
 %attr(755,root,root) %{moduledir}/libgraphite.so
 %attr(755,root,root) %{moduledir}/libkvformat.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
@@ -497,18 +516,25 @@ exit 0
 %attr(755,root,root) %{moduledir}/libsystem-source.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
+%attr(755,root,root) %{_bindir}/dqtool
 %attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/update-patterndb
 
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
+%dir %{_datadir}/syslog-ng/include/scl/apache
+%{_datadir}/syslog-ng/include/scl/apache/apache.conf
 %{_datadir}/syslog-ng/include/scl/elasticsearch
 %{_datadir}/syslog-ng/include/scl/hdfs
 %dir %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/graphite/README
 %{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
 %{_datadir}/syslog-ng/include/scl/kafka
+%dir %{_datadir}/syslog-ng/include/scl/loggly
+%{_datadir}/syslog-ng/include/scl/loggly/loggly.conf
+%dir %{_datadir}/syslog-ng/include/scl/logmatic
+%{_datadir}/syslog-ng/include/scl/logmatic/logmatic.conf
 %{_datadir}/syslog-ng/include/scl/mbox
 %dir %{_datadir}/syslog-ng/include/scl/nodejs
 %{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
@@ -566,6 +592,12 @@ exit 0
 %attr(755,root,root) %{moduledir}/libafsql.so
 %endif
 
+%if %{with http}
+%files module-http
+%defattr(644,root,root,755)
+%attr(755,root,root) %{moduledir}/libcurl.so
+%endif
+
 %if %{with json}
 %files module-json-plugin
 %defattr(644,root,root,755)
@@ -600,22 +632,28 @@ exit 0
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libsyslog-ng.so
+%{_libdir}/libsyslog-ng-native-connector.a
 %dir %{_includedir}/syslog-ng
 %{_includedir}/syslog-ng/*.h
 %{_includedir}/syslog-ng/compat
 %{_includedir}/syslog-ng/control
+%{_includedir}/syslog-ng/debugger
 %{_includedir}/syslog-ng/filter
 %if %{without system_libivykis}
 %{_includedir}/syslog-ng/ivykis
 %endif
+%{_includedir}/syslog-ng/logmsg
 %{_includedir}/syslog-ng/logproto
 %{_includedir}/syslog-ng/parser
 %{_includedir}/syslog-ng/rewrite
+%{_includedir}/syslog-ng/scanner
 %{_includedir}/syslog-ng/stats
 %{_includedir}/syslog-ng/template
 %{_includedir}/syslog-ng/transport
+%{_includedir}/syslog-ng/value-pairs
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
+%{_pkgconfigdir}/syslog-ng-native-connector.pc
 
 # test-devel ?
 %if "%{_libdir}/syslog-ng" != "{moduledir}"
