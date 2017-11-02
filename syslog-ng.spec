@@ -22,30 +22,30 @@
 %bcond_without	systemd			# systemd (daemon and journal) support
 %bcond_with	python			# python module
 %bcond_with	java			# java modules and support
-%bcond_with	system_libivykis	# use system libivykis
-%bcond_with	system_rabbitmq		# use system librabbitmq [not supported yet]
+%bcond_without	system_libivykis	# use system libivykis
+%bcond_without	system_rabbitmq		# use system librabbitmq
 
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.8
+%define		mver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.8.1
-Release:	1
+Version:	3.12.1
+Release:	0.1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
-Source0:	https://github.com/balabit/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	acf14563cf5ce435db8db35486ce66af
+Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
+# Source0-md5:	91bb7922f67837b8732f974bd482bda0
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{mver}-guides/en/syslog-ng-ose-v%{mver}-guide-admin/pdf/%{name}-ose-v%{mver}-guide-admin.pdf
-# Source4-md5:	ab7f52430e6aca8f377963fcab155a3e
+# Source4-md5:	fce7075b03ba9501911b9812a553e680
 Source5:	%{name}-simple.conf
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
@@ -53,7 +53,7 @@ Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
-URL:		https://www.balabit.com/network-security/syslog-ng/opensource-logging-system
+URL:		https://syslog-ng.org/
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
@@ -69,8 +69,8 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
-%{?with_system_libivykis:BuildRequires:	libivykis-devel >= 0.36.1}
-%{?with_mongodb:BuildRequires:	libmongo-client-devel >= 0.1.8}
+%{?with_system_libivykis:BuildRequires:	libivykis-devel >= 0.42}
+%{?with_mongodb:BuildRequires:	mongo-c-driver-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
@@ -96,7 +96,7 @@ BuildRequires:	tzdata
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= %{glib2_ver}
-%{?with_system_libivykis:BuildRequires:	libivykis-static >= 0.36.1}
+%{?with_system_libivykis:BuildRequires:	libivykis-static >= 0.42}
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
@@ -283,7 +283,7 @@ Group:		Libraries
 %if %{with dynamic}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
-%{?with_system_libivykis:Requires:	libivykis >= 0.36.1}
+%{?with_system_libivykis:Requires:	libivykis >= 0.42}
 Requires:	pcre >= 6.1
 %endif
 Conflicts:	syslog-ng < 3.3.1-3
@@ -302,7 +302,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with dynamic}
 Requires:	eventlog-devel >= 0.2.12
 Requires:	glib2-devel >= %{glib2_ver}
-%{?with_system_libivykis:Requires:	libivykis-devel >= 0.36.1}
+%{?with_system_libivykis:Requires:	libivykis-devel >= 0.42}
 Requires:	pcre-devel >= 6.1
 %endif
 
@@ -313,7 +313,7 @@ Header files for syslog-ng modules development.
 Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{name}-%{version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -326,7 +326,7 @@ cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 
 %build
-for i in . lib/ivykis; do
+for i in . ; do
 cd $i
 	%{__libtoolize}
 	%{__aclocal} `[ -d m4 ] && echo '-I m4'`
@@ -446,20 +446,20 @@ fi
 /sbin/chkconfig --add syslog-ng
 %service syslog-ng restart "syslog-ng daemon"
 
-%systemd_post syslog-ng.service
+%systemd_post syslog-ng@.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
-%systemd_preun syslog-ng.service
+%systemd_preun syslog-ng@.service
 
 %postun
 %systemd_reload
 
 %triggerpostun -- syslog-ng < 3.3.4-3
-%systemd_trigger syslog-ng.service
+%systemd_trigger syslog-ng@.service
 
 %triggerun -- syslog-ng < 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
@@ -479,7 +479,7 @@ exit 0
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS.md debian/syslog-ng.conf* contrib/relogger.pl
+%doc AUTHORS NEWS.md contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
 %doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v%{mver}-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
@@ -489,7 +489,7 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
-%{systemdunitdir}/syslog-ng.service
+%{systemdunitdir}/syslog-ng@.service
 %dir %{moduledir}
 %attr(755,root,root) %{moduledir}/libadd-contextual-data.so
 %attr(755,root,root) %{moduledir}/libafamqp.so
@@ -597,7 +597,7 @@ exit 0
 %if %{with http}
 %files module-http
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libcurl.so
+%attr(755,root,root) %{moduledir}/libhttp.so
 %endif
 
 %if %{with json}

@@ -1,13 +1,13 @@
---- syslog-ng-3.6.2/contrib/systemd/syslog-ng.service~	2014-12-15 16:48:45.000000000 +0200
-+++ syslog-ng-3.6.2/contrib/systemd/syslog-ng.service	2015-06-01 08:06:32.632888085 +0300
-@@ -4,7 +4,9 @@ Documentation=man:syslog-ng(8)
- 
- [Service]
+--- syslog-ng-syslog-ng-3.12.1/contrib/systemd/syslog-ng@.service.org	2017-11-02 15:33:39.811831015 +0100
++++ syslog-ng-syslog-ng-3.12.1/contrib/systemd/syslog-ng@.service	2017-11-02 15:35:08.237545976 +0100
+@@ -7,7 +7,9 @@ Conflicts=emergency.service emergency.ta
  Type=notify
--ExecStart=/usr/sbin/syslog-ng -F $SYSLOGNG_OPTS
+ EnvironmentFile=-/etc/default/syslog-ng@%i
+ EnvironmentFile=-/etc/sysconfig/syslog-ng@%i
+-ExecStart=/usr/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE
 +EnvironmentFile=-/etc/sysconfig/syslog-ng
 +ExecStartPre=-/bin/systemctl stop systemd-kmsg-syslogd.service
-+ExecStart=/sbin/syslog-ng -F -f /etc/syslog-ng/syslog-ng.conf -p /var/run/syslogd.pid --worker-threads=1024 $SYSLOGNG_OPTS
++ExecStart=/usr/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile /etc/syslog-ng/syslog-ng.conf -p /var/run/syslogd.pid --worker-threads=1024 $SYSLOGNG_OPTS
  ExecReload=/bin/kill -HUP $MAINPID
- EnvironmentFile=-/etc/default/syslog-ng
- EnvironmentFile=-/etc/sysconfig/syslog-ng
+ StandardOutput=journal
+ StandardError=journal
