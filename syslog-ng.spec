@@ -30,21 +30,22 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.12
+%define		mver	3.14
+%define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.12.1
+Version:	3.14.1
 Release:	0.1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
-# Source0-md5:	91bb7922f67837b8732f974bd482bda0
+# Source0-md5:	60c58c5e50860c5b81afb6e80abb0a04
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{mver}-guides/en/syslog-ng-ose-v%{mver}-guide-admin/pdf/%{name}-ose-v%{mver}-guide-admin.pdf
+Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{docmver}-guides/en/syslog-ng-ose-v%{docmver}-guide-admin/pdf/%{name}-ose-v%{docmver}-guide-admin.pdf
 # Source4-md5:	fce7075b03ba9501911b9812a553e680
 Source5:	%{name}-simple.conf
 Patch0:		%{name}-datadir.patch
@@ -345,7 +346,7 @@ done
 	--enable-python%{!?with_python:=no} \
 %if %{with mongodb}
 	--enable-mongodb \
-	--with-libmongo-client=system \
+	--with-mongoc=system \
 %else
 	--disable-mongodb \
 %endif
@@ -408,6 +409,12 @@ install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d} \
 install -d $RPM_BUILD_ROOT%{slibdir}
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/libsyslog-ng-%{mver}.so.* $RPM_BUILD_ROOT%{slibdir}
 ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsyslog-ng-%{mver}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libsyslog-ng.so
+
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libevtlog-%{mver}.so.* $RPM_BUILD_ROOT%{slibdir}
+ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libevtlog-%{mver}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libevtlog.so
+
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libsecret-storage.so.* $RPM_BUILD_ROOT%{slibdir}
+ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsecret-storage.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libsecret-storage.so
 %endif
 
 %{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
@@ -419,6 +426,8 @@ for n in cron daemon debug iptables kernel lpr maillog messages secure spooler s
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
+%{__rm} $RPM_BUILD_ROOT%{_sbindir}/syslog-ng-debun
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/syslog-ng-debun.1
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{moduledir}/*.la
 
@@ -481,7 +490,7 @@ exit 0
 %defattr(644,root,root,755)
 %doc AUTHORS NEWS.md contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v%{mver}-guide-admin.pdf
+%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v%{docmver}-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
@@ -498,6 +507,7 @@ exit 0
 %attr(755,root,root) %{moduledir}/libafsocket.so
 %attr(755,root,root) %{moduledir}/libafstomp.so
 %attr(755,root,root) %{moduledir}/libafuser.so
+%attr(755,root,root) %{moduledir}/libappmodel.so
 %attr(755,root,root) %{moduledir}/libbasicfuncs.so
 %attr(755,root,root) %{moduledir}/libcef.so
 %attr(755,root,root) %{moduledir}/libconfgen.so
@@ -506,11 +516,18 @@ exit 0
 %attr(755,root,root) %{moduledir}/libdate.so
 %attr(755,root,root) %{moduledir}/libdbparser.so
 %attr(755,root,root) %{moduledir}/libdisk-buffer.so
+%attr(755,root,root) %{moduledir}/libgeoip2-plugin.so
 %attr(755,root,root) %{moduledir}/libgraphite.so
 %attr(755,root,root) %{moduledir}/libkvformat.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
+%attr(755,root,root) %{moduledir}/libmap-value-pairs.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
+%attr(755,root,root) %{moduledir}/libsnmptrapd-parser.so
+%attr(755,root,root) %{moduledir}/libstardate.so
+%attr(755,root,root) %{moduledir}/libtags-parser.so
+%attr(755,root,root) %{moduledir}/libtfgetent.so
+%attr(755,root,root) %{moduledir}/libxml.so
 %if %{with systemd}
 %attr(755,root,root) %{moduledir}/libsdjournal.so
 %endif
@@ -525,37 +542,37 @@ exit 0
 
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
-%dir %{_datadir}/syslog-ng/include/scl/apache
-%{_datadir}/syslog-ng/include/scl/apache/apache.conf
+%{_datadir}/syslog-ng/include/scl/apache
+%{_datadir}/syslog-ng/include/scl/default-network-drivers
 %{_datadir}/syslog-ng/include/scl/elasticsearch
+%{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
-%dir %{_datadir}/syslog-ng/include/scl/graphite
-%{_datadir}/syslog-ng/include/scl/graphite/README
-%{_datadir}/syslog-ng/include/scl/graphite/plugin.conf
 %{_datadir}/syslog-ng/include/scl/kafka
-%dir %{_datadir}/syslog-ng/include/scl/loggly
-%{_datadir}/syslog-ng/include/scl/loggly/loggly.conf
-%dir %{_datadir}/syslog-ng/include/scl/logmatic
-%{_datadir}/syslog-ng/include/scl/logmatic/logmatic.conf
+#%{_datadir}/syslog-ng/include/scl/iptables
+%dir %{_datadir}/syslog-ng/include/scl/loadbalancer
+%attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
+%{_datadir}/syslog-ng/include/scl/loadbalancer/plugin.conf
+%{_datadir}/syslog-ng/include/scl/loggly
+%{_datadir}/syslog-ng/include/scl/logmatic
 %{_datadir}/syslog-ng/include/scl/mbox
-%dir %{_datadir}/syslog-ng/include/scl/nodejs
-%{_datadir}/syslog-ng/include/scl/nodejs/plugin.conf
-%dir %{_datadir}/syslog-ng/include/scl/pacct
-%{_datadir}/syslog-ng/include/scl/pacct/plugin.conf
-%dir %{_datadir}/syslog-ng/include/scl/rewrite
-%{_datadir}/syslog-ng/include/scl/rewrite/cc-mask.conf
+%{_datadir}/syslog-ng/include/scl/nodejs
+%{_datadir}/syslog-ng/include/scl/osquery
+%{_datadir}/syslog-ng/include/scl/pacct
+%{_datadir}/syslog-ng/include/scl/rewrite
+%{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
+#%{_datadir}/syslog-ng/include/scl/sudo
+%{_datadir}/syslog-ng/include/scl/windowseventlog
 %dir %{_datadir}/syslog-ng/include/scl/syslogconf
 %{_datadir}/syslog-ng/include/scl/syslogconf/README
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/syslogconf/convert-syslogconf.awk
 %{_datadir}/syslog-ng/include/scl/syslogconf/plugin.conf
-%dir %{_datadir}/syslog-ng/include/scl/system
-%{_datadir}/syslog-ng/include/scl/system/plugin.conf
-%dir %{_datadir}/syslog-ng/xsd
-%{_datadir}/syslog-ng/xsd/patterndb-*.xsd
+%{_datadir}/syslog-ng/include/scl/system
+%{_datadir}/syslog-ng/xsd
 
 %dir %{_var}/lib/%{name}
 %dir %{_var}/lib/%{name}/xsd
+%{_mandir}/man1/dqtool.1*
 %{_mandir}/man1/loggen.1*
 %{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
@@ -605,6 +622,9 @@ exit 0
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libjson-plugin.so
 %{_datadir}/syslog-ng/include/scl/cim
+%{_datadir}/syslog-ng/include/scl/cisco
+%{_datadir}/syslog-ng/include/scl/ewmm
+%{_datadir}/syslog-ng/include/scl/graylog2
 %endif
 
 %if %{with redis}
@@ -627,12 +647,18 @@ exit 0
 
 %files libs
 %defattr(644,root,root,755)
+%attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.*.*.*
+%attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.0
+%attr(755,root,root) %{slibdir}/libsecret-storage.so.*.*.*
+%attr(755,root,root) %{slibdir}/libsecret-storage.so.0
 %attr(755,root,root) %{slibdir}/libsyslog-ng-%{mver}.so.*.*.*
 %attr(755,root,root) %ghost %{slibdir}/libsyslog-ng-%{mver}.so.0
 %dir %{_datadir}/syslog-ng
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libevtlog.so
+%attr(755,root,root) %{_libdir}/libsecret-storage.so
 %attr(755,root,root) %{_libdir}/libsyslog-ng.so
 %{_libdir}/libsyslog-ng-native-connector.a
 %dir %{_includedir}/syslog-ng
@@ -646,15 +672,19 @@ exit 0
 %endif
 %{_includedir}/syslog-ng/logmsg
 %{_includedir}/syslog-ng/logproto
+%dir %{_includedir}/syslog-ng/modules
+%{_includedir}/syslog-ng/modules/add-contextual-data
 %{_includedir}/syslog-ng/parser
 %{_includedir}/syslog-ng/rewrite
 %{_includedir}/syslog-ng/scanner
 %{_includedir}/syslog-ng/stats
+%{_includedir}/syslog-ng/str-repr
 %{_includedir}/syslog-ng/template
 %{_includedir}/syslog-ng/transport
 %{_includedir}/syslog-ng/value-pairs
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
+%{_pkgconfigdir}/syslog-ng-add-contextual-data.pc
 %{_pkgconfigdir}/syslog-ng-native-connector.pc
 
 # test-devel ?
