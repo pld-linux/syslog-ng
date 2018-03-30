@@ -65,6 +65,7 @@ Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
+Patch6:		no_shared_ivykis.patch
 URL:		https://syslog-ng.org/
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.59
@@ -333,13 +334,14 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 
 rmdir lib/ivykis
-ln -s ../ivykis-%{libivykis_version} lib/ivykis
+mv ivykis-%{libivykis_version} lib/ivykis
 
 %build
 for i in . ; do

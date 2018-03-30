@@ -1,0 +1,11 @@
+--- syslog-ng-syslog-ng-3.14.1.orig/lib/ivykis/configure.ac	2017-10-18 01:42:59.000000000 +0200
++++ syslog-ng-syslog-ng-3.14.1/lib/ivykis/configure.ac	2018-03-30 15:58:09.000000000 +0200
+@@ -22,7 +22,7 @@
+ esac
+ 
+ # Checks for programs.
+-LT_INIT
++LT_INIT([disable-shared])
+ AC_PROG_CC
+ AC_PROG_LIBTOOL
+ 
