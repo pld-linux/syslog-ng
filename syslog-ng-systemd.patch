@@ -1,6 +1,7 @@
---- syslog-ng-syslog-ng-3.12.1/contrib/systemd/syslog-ng@.service.org	2017-11-02 15:33:39.811831015 +0100
-+++ syslog-ng-syslog-ng-3.12.1/contrib/systemd/syslog-ng@.service	2017-11-02 15:35:08.237545976 +0100
-@@ -7,7 +7,9 @@ Conflicts=emergency.service emergency.ta
+diff -dur -x '*~' syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.service syslog-ng-syslog-ng-3.14.1/contrib/systemd/syslog-ng@.service
+--- syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.service	2018-02-26 15:32:28.000000000 +0100
++++ syslog-ng-syslog-ng-3.14.1/contrib/systemd/syslog-ng@.service	2018-03-30 15:26:03.000000000 +0200
+@@ -7,11 +7,14 @@
  Type=notify
  EnvironmentFile=-/etc/default/syslog-ng@%i
  EnvironmentFile=-/etc/sysconfig/syslog-ng@%i
@@ -11,3 +12,8 @@
  ExecReload=/bin/kill -HUP $MAINPID
  StandardOutput=journal
  StandardError=journal
+ Restart=on-failure
+ 
+ [Install]
++Alias=syslog-ng.service
+ WantedBy=multi-user.target
