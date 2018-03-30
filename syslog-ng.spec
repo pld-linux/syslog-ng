@@ -441,6 +441,7 @@ for n in cron daemon debug iptables kernel lpr maillog messages secure spooler s
 	> $RPM_BUILD_ROOT/var/log/$n
 done
 touch $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+ln -s "%{name}" $RPM_BUILD_ROOT/etc/sysconfig/%{name}@default
 
 %{__rm} $RPM_BUILD_ROOT%{_sbindir}/syslog-ng-debun
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/syslog-ng-debun.1
@@ -508,6 +509,7 @@ exit 0
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
 %doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v%{docmver}-guide-admin.pdf
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}@default
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/scl.conf
