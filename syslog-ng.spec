@@ -20,10 +20,15 @@
 %bcond_without	geoip			# support for GeoIP
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
+%bcond_without	amqp			# AMQP support
 %bcond_with	python			# python module
 %bcond_with	java			# java modules and support
 %bcond_without	system_libivykis	# use system libivykis
 %bcond_without	system_rabbitmq		# use system librabbitmq
+
+%if %{without amqp}
+%undefine with_system_rabbitmq
+%endif
 
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
@@ -360,7 +365,7 @@ done
 	--with-pidfile-dir=/var/run \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
-	--enable-amqp \
+	%{__enable_disable amqp} \
 	--enable-geoip%{!?with_geoip:=no} \
 	--enable-http%{!?with_http:=no} \
 	--enable-ipv6 \
@@ -501,7 +506,9 @@ exit 0
 %{systemdunitdir}/syslog-ng@.service
 %dir %{moduledir}
 %attr(755,root,root) %{moduledir}/libadd-contextual-data.so
+%if %{with amqp}
 %attr(755,root,root) %{moduledir}/libafamqp.so
+%endif
 %attr(755,root,root) %{moduledir}/libaffile.so
 %attr(755,root,root) %{moduledir}/libafprog.so
 %attr(755,root,root) %{moduledir}/libafsocket.so
