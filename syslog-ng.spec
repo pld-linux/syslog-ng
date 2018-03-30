@@ -31,6 +31,9 @@
 %undefine with_system_rabbitmq
 %endif
 
+# as in git submodule
+%define	libivykis_version 0.42.2
+
 %if "%{pld_release}" == "ac"
 %define		glib2_ver	1:2.16.0
 %else
@@ -54,6 +57,8 @@ Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{docmver}-guides/en/syslog-ng-ose-v%{docmver}-guide-admin/pdf/%{name}-ose-v%{docmver}-guide-admin.pdf
 # Source4-md5:	fce7075b03ba9501911b9812a553e680
 Source5:	%{name}-simple.conf
+Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
+# Source6-md5:	aeafef422d8dafb84e1fcd16f9f4822e
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
@@ -76,7 +81,7 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
-%{?with_system_libivykis:BuildRequires:	libivykis-devel >= 0.42}
+%{?with_system_libivykis:BuildRequires:	libivykis-devel >= %{libivykis_version}}
 %{?with_mongodb:BuildRequires:	mongo-c-driver-devel}
 %{?with_geoip2:BuildRequires:	libmaxminddb-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
@@ -104,7 +109,7 @@ BuildRequires:	tzdata
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
 BuildRequires:	glib2-static >= %{glib2_ver}
-%{?with_system_libivykis:BuildRequires:	libivykis-static >= 0.42}
+%{?with_system_libivykis:BuildRequires:	libivykis-static >= %{libivykis_version}}
 BuildRequires:	pcre-static >= 6.1
 BuildRequires:	zlib-static
 %endif
@@ -321,7 +326,7 @@ Header files for syslog-ng modules development.
 Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%setup -q -n %{name}-%{name}-%{version} -a 6
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -332,6 +337,9 @@ cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
+
+rmdir lib/ivykis
+ln -s ../ivykis-%{libivykis_version} lib/ivykis
 
 %build
 for i in . ; do
