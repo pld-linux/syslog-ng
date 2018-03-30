@@ -18,6 +18,7 @@
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
 %bcond_without	geoip			# support for GeoIP
+%bcond_without	geoip2			# support for GeoIP2
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
 %bcond_without	amqp			# AMQP support
@@ -77,6 +78,7 @@ BuildRequires:	libcap-devel
 %{?with_smtp:BuildRequires:	libesmtp-devel}
 %{?with_system_libivykis:BuildRequires:	libivykis-devel >= 0.42}
 %{?with_mongodb:BuildRequires:	mongo-c-driver-devel}
+%{?with_geoip2:BuildRequires:	libmaxminddb-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
@@ -366,7 +368,8 @@ done
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	%{__enable_disable amqp} \
-	--enable-geoip%{!?with_geoip:=no} \
+	%{__enable_disable geoip} \
+	%{__enable_disable geoip2} \
 	--enable-http%{!?with_http:=no} \
 	--enable-ipv6 \
 	--enable-json%{!?with_json:=no} \
@@ -523,7 +526,9 @@ exit 0
 %attr(755,root,root) %{moduledir}/libdate.so
 %attr(755,root,root) %{moduledir}/libdbparser.so
 %attr(755,root,root) %{moduledir}/libdisk-buffer.so
+%if %{with geoip2}
 %attr(755,root,root) %{moduledir}/libgeoip2-plugin.so
+%endif
 %attr(755,root,root) %{moduledir}/libgraphite.so
 %attr(755,root,root) %{moduledir}/libkvformat.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
