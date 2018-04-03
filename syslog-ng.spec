@@ -59,6 +59,7 @@ Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{docmver}-g
 Source5:	%{name}-simple.conf
 Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
 # Source6-md5:	aeafef422d8dafb84e1fcd16f9f4822e
+Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
 Patch1:		cap_syslog-vserver-workaround.patch
 Patch2:		%{name}-nolibs.patch
@@ -439,6 +440,7 @@ ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsecret-storage.so.*.*
 %{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
 cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
+cp -p %{SOURCE7} $RPM_BUILD_ROOT%{systemdunitdir}
 
 for n in cron daemon debug iptables kernel lpr maillog messages secure spooler syslog user xferlog; do
 	> $RPM_BUILD_ROOT/var/log/$n
@@ -475,20 +477,20 @@ fi
 /sbin/chkconfig --add syslog-ng
 %service syslog-ng restart "syslog-ng daemon"
 
-%systemd_post syslog-ng@.service
+%systemd_post syslog-ng@.service syslog-ng.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service syslog-ng stop
 	/sbin/chkconfig --del syslog-ng
 fi
-%systemd_preun syslog-ng@.service
+%systemd_preun syslog-ng@.service syslog-ng.service
 
 %postun
 %systemd_reload
 
 %triggerpostun -- syslog-ng < 3.3.4-3
-%systemd_trigger syslog-ng@.service
+%systemd_trigger syslog-ng@.service syslog-ng.service
 
 %triggerun -- syslog-ng < 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
@@ -520,6 +522,7 @@ exit 0
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
 %{systemdunitdir}/syslog-ng@.service
+%{systemdunitdir}/syslog-ng.service
 %dir %{moduledir}
 %attr(755,root,root) %{moduledir}/libadd-contextual-data.so
 %if %{with amqp}

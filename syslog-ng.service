@@ -1,0 +1,13 @@
+[Unit]
+Description=System Logger Daemon
+BindsTo=syslog-ng@default.service
+PropagatesReloadTo=syslog-ng@default.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/systemctl start syslog-ng@default.service
+ExecStop=/bin/systemctl stop syslog-ng@default.service
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,7 @@
 diff -dur -x '*~' syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.service syslog-ng-syslog-ng-3.14.1/contrib/systemd/syslog-ng@.service
 --- syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.service	2018-02-26 15:32:28.000000000 +0100
 +++ syslog-ng-syslog-ng-3.14.1/contrib/systemd/syslog-ng@.service	2018-03-30 15:38:31.000000000 +0200
-@@ -5,13 +5,20 @@
+@@ -5,13 +5,17 @@
  
  [Service]
  Type=notify
@@ -12,14 +12,12 @@ diff -dur -x '*~' syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.ser
  EnvironmentFile=-/etc/default/syslog-ng@%i
  EnvironmentFile=-/etc/sysconfig/syslog-ng@%i
 -ExecStart=/usr/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE
-+ExecStartPre=-/bin/systemctl stop systemd-kmsg-syslogd.service
-+ExecStart=/usr/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE --worker-threads=1024 $SYSLOGNG_OPTS
++ExecStart=/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE --worker-threads=1024 $SYSLOGNG_OPTS
  ExecReload=/bin/kill -HUP $MAINPID
  StandardOutput=journal
  StandardError=journal
  Restart=on-failure
  
  [Install]
-+Alias=syslog-ng.service
 +DefaultInstance=default
- WantedBy=multi-user.target
+-WantedBy=multi-user.target
