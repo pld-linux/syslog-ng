@@ -328,6 +328,10 @@ Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version} -a 6
+
+rmdir lib/ivykis
+mv ivykis-%{libivykis_version} lib/ivykis
+
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -339,9 +343,6 @@ cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
-
-rmdir lib/ivykis
-mv ivykis-%{libivykis_version} lib/ivykis
 
 %build
 for i in . ; do
