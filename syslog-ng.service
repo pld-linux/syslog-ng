@@ -8,6 +8,7 @@ Type=oneshot
 RemainAfterExit=true
 ExecStart=/bin/systemctl start syslog-ng@default.service
 ExecStop=/bin/systemctl stop syslog-ng@default.service
+ExecReload=/bin/true
 
 [Install]
 WantedBy=multi-user.target
