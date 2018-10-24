@@ -67,6 +67,7 @@ Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
+Patch7:		am_deps.patch
 URL:		https://syslog-ng.org/
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.59
@@ -340,6 +341,7 @@ mv ivykis-%{libivykis_version} lib/ivykis
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
