@@ -1,52 +1,27 @@
 diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/configure.ac syslog-ng-syslog-ng-3.14.1/configure.ac
 --- syslog-ng-syslog-ng-3.14.1.orig/configure.ac	2018-04-03 09:50:19.000000000 +0200
 +++ syslog-ng-syslog-ng-3.14.1/configure.ac	2018-04-03 09:51:38.000000000 +0200
-@@ -1639,9 +1639,9 @@
+@@ -1626,9 +1626,9 @@ if test "x$linking_mode" = "xdynamic"; t
  	# syslog-ng binary is linked with the default link command (e.g. libtool)
  	SYSLOGNG_LINK='$(LINK)'
  else
--	SYSLOGNG_DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $LD_START_STATIC -Wl,${WHOLE_ARCHIVE_OPT} $GLIB_LIBS $EVTLOG_NO_LIBTOOL_LIBS $PCRE_LIBS $REGEX_LIBS  -Wl,${NO_WHOLE_ARCHIVE_OPT} $IVYKIS_NO_LIBTOOL_LIBS $LD_END_STATIC $LIBCAP_LIBS $DL_LIBS "
-+	SYSLOGNG_DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $LD_START_STATIC -Wl,${WHOLE_ARCHIVE_OPT} $GLIB_LIBS $EVTLOG_NO_LIBTOOL_LIBS $PCRE_LIBS $REGEX_LIBS  -Wl,${NO_WHOLE_ARCHIVE_OPT} $LD_END_STATIC $IVYKIS_LIBS $LIBCAP_LIBS $DL_LIBS "
- 	TOOL_DEPS_LIBS="$LIBS $BASE_LIBS $GLIB_LIBS $EVTLOG_LIBS $RESOLV_LIBS $LIBCAP_LIBS $PCRE_LIBS $REGEX_LIBS $IVYKIS_LIBS $DL_LIBS"
+-	SYSLOGNG_DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $EVTLOG_NO_LIBTOOL_LIBS $SECRETSTORAGE_NO_LIBTOOL_LIBS $LD_START_STATIC -Wl,${WHOLE_ARCHIVE_OPT} $GLIB_LIBS $PCRE_LIBS $REGEX_LIBS  -Wl,${NO_WHOLE_ARCHIVE_OPT} $IVYKIS_NO_LIBTOOL_LIBS $LD_END_STATIC $LIBCAP_LIBS $DL_LIBS"
++        SYSLOGNG_DEPS_LIBS="$LIBS $BASE_LIBS $RESOLV_LIBS $EVTLOG_NO_LIBTOOL_LIBS $SECRETSTORAGE_NO_LIBTOOL_LIBS $LD_START_STATIC -Wl,${WHOLE_ARCHIVE_OPT} $GLIB_LIBS $PCRE_LIBS $REGEX_LIBS  -Wl,${NO_WHOLE_ARCHIVE_OPT} $LD_END_STATIC $IVYKIS_LIBS $LIBCAP_LIBS $DL_LIBS"
+ 	TOOL_DEPS_LIBS="$LIBS $BASE_LIBS $GLIB_LIBS $EVTLOG_LIBS $SECRETSTORAGE_LIBS $RESOLV_LIBS $LIBCAP_LIBS $PCRE_LIBS $REGEX_LIBS $IVYKIS_LIBS $DL_LIBS"
 -	CORE_DEPS_LIBS=""
-+	CORE_DEPS_LIBS="$IVYKIS_LIBS"
++        CORE_DEPS_LIBS="$IVYKIS_LIBS"
  
  	# bypass libtool in case we want to do mixed linking because it
  	# doesn't support -Wl,-Bstatic -Wl,-Bdynamic on a per-library basis.
 diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/lib/logproto/tests/Makefile.am syslog-ng-syslog-ng-3.14.1/lib/logproto/tests/Makefile.am
 --- syslog-ng-syslog-ng-3.14.1.orig/lib/logproto/tests/Makefile.am	2018-02-26 15:32:28.000000000 +0100
 +++ syslog-ng-syslog-ng-3.14.1/lib/logproto/tests/Makefile.am	2018-04-03 09:50:43.000000000 +0200
-@@ -22,7 +22,7 @@
+@@ -24,8 +24,7 @@ lib_logproto_tests_test_findeom_CFLAGS	=
  	$(TEST_CFLAGS) \
  	-I${top_srcdir}/libtest
  lib_logproto_tests_test_findeom_LDADD	= \
 -	${top_builddir}/lib/libsyslog-ng.la \
-+	$(TEST_LDADD) \
- 	${top_builddir}/libtest/libsyslog-ng-test.a
+ 	${top_builddir}/libtest/libsyslog-ng-test.a \
+ 	$(TEST_LDADD)
  lib_logproto_tests_test_findeom_SOURCES = \
- 	lib/logproto/tests/test_findeom.c
-diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/modules/diskq/Makefile.am syslog-ng-syslog-ng-3.14.1/modules/diskq/Makefile.am
---- syslog-ng-syslog-ng-3.14.1.orig/modules/diskq/Makefile.am	2018-02-26 15:32:28.000000000 +0100
-+++ syslog-ng-syslog-ng-3.14.1/modules/diskq/Makefile.am	2018-04-03 09:50:43.000000000 +0200
-@@ -46,8 +46,8 @@
- 
- modules_diskq_dqtool_SOURCES = modules/diskq/dqtool.c
- modules_diskq_dqtool_LDADD = \
--  $(TOOL_DEPS_LIBS) \
-   $(MODULE_DEPS_LIBS) \
-+  $(TOOL_DEPS_LIBS) \
-   $(LIBSYSLOG_NG_DISK_BUFFER)
- 
- modules/diskq modules/diskq/ mod-diskq: modules/diskq/libdisk-buffer.la \
-diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/syslog-ng-ctl/Makefile.am syslog-ng-syslog-ng-3.14.1/syslog-ng-ctl/Makefile.am
---- syslog-ng-syslog-ng-3.14.1.orig/syslog-ng-ctl/Makefile.am	2018-02-26 15:32:28.000000000 +0100
-+++ syslog-ng-syslog-ng-3.14.1/syslog-ng-ctl/Makefile.am	2018-04-03 09:50:43.000000000 +0200
-@@ -10,5 +10,6 @@
- EXTRA_DIST					+=	\
- 	syslog-ng-ctl/control-client-unix.c
- 
--syslog_ng_ctl_syslog_ng_ctl_LDADD		= lib/libsyslog-ng.la @BASE_LIBS@ @GLIB_LIBS@ @RESOLV_LIBS@
--
-+syslog_ng_ctl_syslog_ng_ctl_DEPENDENCIES	= lib/libsyslog-ng.la
-+syslog_ng_ctl_syslog_ng_ctl_LDADD		= -L${top_builddir}/lib/.libs -lsyslog-ng @SYSLOGNG_DEPS_LIBS@
-+syslog_ng_ctl_syslog_ng_ctl_LINK		= @SYSLOGNG_LINK@
+

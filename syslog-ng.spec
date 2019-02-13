@@ -39,18 +39,18 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.14
+%define		mver	3.19
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.14.1
-Release:	7
+Version:	3.19.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
-# Source0-md5:	60c58c5e50860c5b81afb6e80abb0a04
+# Source0-md5:	370b066fda02da03b9d4653652519217
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -61,13 +61,12 @@ Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-
 # Source6-md5:	aeafef422d8dafb84e1fcd16f9f4822e
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
-Patch1:		cap_syslog-vserver-workaround.patch
+
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
-Patch7:		am_deps.patch
 URL:		https://syslog-ng.org/
 %{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.59
@@ -76,7 +75,10 @@ BuildRequires:	bison >= 2.4
 %{?with_http:BuildRequires:	curl-devel}
 BuildRequires:	docbook-style-xsl
 BuildRequires:	eventlog-devel >= 0.2.12
-%{?with_tests:BuildRequires:	findutils}
+%if %{with tests}
+BuildRequires:	criterion-devel
+BuildRequires:	findutils
+%endif
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_redis:BuildRequires:	hiredis-devel}
@@ -335,13 +337,12 @@ rmdir lib/ivykis
 mv ivykis-%{libivykis_version} lib/ivykis
 
 %patch0 -p1
-%patch1 -p1
+
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
@@ -419,7 +420,7 @@ export LD_LIBRARY_PATH PYTHONPATH
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{sysconfig,logrotate.d,rc.d/init.d} \
+install -d $RPM_BUILD_ROOT/etc/{syslog-ng.d,sysconfig,logrotate.d,rc.d/init.d} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/patterndb.d \
 	$RPM_BUILD_ROOT/var/{log,lib/%{name}/xsd}
 
@@ -434,6 +435,12 @@ ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsyslog-ng-%{mver}.so.
 
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/libevtlog-%{mver}.so.* $RPM_BUILD_ROOT%{slibdir}
 ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libevtlog-%{mver}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libevtlog.so
+
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libloggen_helper-%{mver}.so.* $RPM_BUILD_ROOT%{slibdir}
+ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libloggen_helper-%{mver}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libloggen_helper.so
+
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libloggen_plugin-%{mver}.so.* $RPM_BUILD_ROOT%{slibdir}
+ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libloggen_plugin-%{mver}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libloggen_plugin.so
 
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/libsecret-storage.so.* $RPM_BUILD_ROOT%{slibdir}
 ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsecret-storage.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libsecret-storage.so
@@ -519,6 +526,7 @@ exit 0
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}@default
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
+%attr(750,root,root) %dir %{_sysconfdir}/syslog-ng.d
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/scl.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
@@ -563,6 +571,9 @@ exit 0
 %endif
 %attr(755,root,root) %{moduledir}/libsyslogformat.so
 %attr(755,root,root) %{moduledir}/libsystem-source.so
+%dir %{moduledir}/loggen
+%attr(755,root,root) %{moduledir}/loggen/libloggen_socket_plugin.so
+%attr(755,root,root) %{moduledir}/loggen/libloggen_ssl_plugin.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/dqtool
@@ -574,7 +585,6 @@ exit 0
 %dir %{_datadir}/syslog-ng/include/scl
 %{_datadir}/syslog-ng/include/scl/apache
 %{_datadir}/syslog-ng/include/scl/default-network-drivers
-%{_datadir}/syslog-ng/include/scl/elasticsearch
 %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
 %{_datadir}/syslog-ng/include/scl/kafka
@@ -582,8 +592,6 @@ exit 0
 %dir %{_datadir}/syslog-ng/include/scl/loadbalancer
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
 %{_datadir}/syslog-ng/include/scl/loadbalancer/plugin.conf
-%{_datadir}/syslog-ng/include/scl/loggly
-%{_datadir}/syslog-ng/include/scl/logmatic
 %{_datadir}/syslog-ng/include/scl/mbox
 %{_datadir}/syslog-ng/include/scl/nodejs
 %{_datadir}/syslog-ng/include/scl/osquery
@@ -653,6 +661,9 @@ exit 0
 %attr(755,root,root) %{moduledir}/libjson-plugin.so
 %{_datadir}/syslog-ng/include/scl/cim
 %{_datadir}/syslog-ng/include/scl/cisco
+%{_datadir}/syslog-ng/include/scl/elasticsearch
+%{_datadir}/syslog-ng/include/scl/loggly
+%{_datadir}/syslog-ng/include/scl/logmatic
 %{_datadir}/syslog-ng/include/scl/ewmm
 %{_datadir}/syslog-ng/include/scl/graylog2
 %endif
@@ -679,6 +690,10 @@ exit 0
 %defattr(644,root,root,755)
 %attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.*.*.*
 %attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.0
+%attr(755,root,root) %{slibdir}/libloggen_helper-%{mver}.so.*.*.*
+%attr(755,root,root) %{slibdir}/libloggen_helper-%{mver}.so.0
+%attr(755,root,root) %{slibdir}/libloggen_plugin-%{mver}.so.*.*.*
+%attr(755,root,root) %{slibdir}/libloggen_plugin-%{mver}.so.0
 %attr(755,root,root) %{slibdir}/libsecret-storage.so.*.*.*
 %attr(755,root,root) %{slibdir}/libsecret-storage.so.0
 %attr(755,root,root) %{slibdir}/libsyslog-ng-%{mver}.so.*.*.*
@@ -714,9 +729,9 @@ exit 0
 %{_includedir}/syslog-ng/value-pairs
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
-%{_pkgconfigdir}/syslog-ng-add-contextual-data.pc
 %{_pkgconfigdir}/syslog-ng-native-connector.pc
 
+%if %{with tests}
 # test-devel ?
 %if "%{_libdir}/syslog-ng" != "{moduledir}"
 %dir %{_libdir}/syslog-ng
@@ -725,3 +740,4 @@ exit 0
 %{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
 %{_includedir}/syslog-ng/libtest
 %{_pkgconfigdir}/syslog-ng-test.pc
+%endif
