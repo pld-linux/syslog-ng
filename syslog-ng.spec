@@ -515,7 +515,7 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 exit 0
 
 %triggerun -- syslog-ng < 3.19.1
-grep -q '/etc/syslog-ng.d/' /etc/syslog-ng/syslog-ng.conf || echo '@include "/etc/syslog-ng.d/"' >> /etc/syslog-ng/syslog-ng.conf
+grep -q '^@include "/etc/syslog-ng\.d/\*\.conf"' /etc/syslog-ng/syslog-ng.conf || echo '@include "/etc/syslog-ng.d/*.conf"' >> /etc/syslog-ng/syslog-ng.conf
 exit 0
 
 %post	libs -p /sbin/ldconfig
