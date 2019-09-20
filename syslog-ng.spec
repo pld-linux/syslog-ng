@@ -39,18 +39,18 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.19
+%define		mver	3.23
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.19.1
-Release:	2
+Version:	3.23.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
-# Source0-md5:	370b066fda02da03b9d4653652519217
+# Source0-md5:	05fbee31597a73148387e943a327fc95
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -560,11 +560,13 @@ exit 0
 %attr(755,root,root) %{moduledir}/libgeoip2-plugin.so
 %endif
 %attr(755,root,root) %{moduledir}/libgraphite.so
+%attr(755,root,root) %{moduledir}/libhook-commands.so
 %attr(755,root,root) %{moduledir}/libkvformat.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
 %attr(755,root,root) %{moduledir}/libmap-value-pairs.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
+%attr(755,root,root) %{moduledir}/libsnmpdest.so
 %attr(755,root,root) %{moduledir}/libsnmptrapd-parser.so
 %attr(755,root,root) %{moduledir}/libstardate.so
 %attr(755,root,root) %{moduledir}/libtags-parser.so
@@ -583,6 +585,7 @@ exit 0
 %attr(755,root,root) %{_bindir}/dqtool
 %attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_bindir}/pdbtool
+%attr(755,root,root) %{_bindir}/persist-tool
 %attr(755,root,root) %{_bindir}/update-patterndb
 
 %dir %{_datadir}/syslog-ng/include
@@ -593,6 +596,7 @@ exit 0
 %{_datadir}/syslog-ng/include/scl/hdfs
 %{_datadir}/syslog-ng/include/scl/kafka
 #%{_datadir}/syslog-ng/include/scl/iptables
+%{_datadir}/syslog-ng/include/scl/linux-audit
 %dir %{_datadir}/syslog-ng/include/scl/loadbalancer
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
 %{_datadir}/syslog-ng/include/scl/loadbalancer/plugin.conf
@@ -707,20 +711,26 @@ exit 0
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libevtlog.so
+%attr(755,root,root) %{_libdir}/libloggen_helper.so
+%attr(755,root,root) %{_libdir}/libloggen_plugin.so
 %attr(755,root,root) %{_libdir}/libsecret-storage.so
 %attr(755,root,root) %{_libdir}/libsyslog-ng.so
 %{_libdir}/libsyslog-ng-native-connector.a
 %dir %{_includedir}/syslog-ng
 %{_includedir}/syslog-ng/*.h
+%{_includedir}/syslog-ng/ack-tracker
 %{_includedir}/syslog-ng/compat
 %{_includedir}/syslog-ng/control
 %{_includedir}/syslog-ng/debugger
 %{_includedir}/syslog-ng/filter
+%{_includedir}/syslog-ng/http-auth
 %if %{without system_libivykis}
 %{_includedir}/syslog-ng/ivykis
 %endif
 %{_includedir}/syslog-ng/logmsg
 %{_includedir}/syslog-ng/logproto
+%{_includedir}/syslog-ng/logthrdest
+%{_includedir}/syslog-ng/logthrsource
 %dir %{_includedir}/syslog-ng/modules
 %{_includedir}/syslog-ng/modules/add-contextual-data
 %{_includedir}/syslog-ng/parser
@@ -729,6 +739,7 @@ exit 0
 %{_includedir}/syslog-ng/stats
 %{_includedir}/syslog-ng/str-repr
 %{_includedir}/syslog-ng/template
+%{_includedir}/syslog-ng/timeutils
 %{_includedir}/syslog-ng/transport
 %{_includedir}/syslog-ng/value-pairs
 %{_datadir}/syslog-ng/tools
