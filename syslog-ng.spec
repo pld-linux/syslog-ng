@@ -17,7 +17,6 @@
 %bcond_without	mongodb			# support for mongodb destination
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
-%bcond_without	geoip			# support for GeoIP
 %bcond_without	geoip2			# support for GeoIP2
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
@@ -39,18 +38,18 @@
 %else
 %define		glib2_ver	1:2.24.0
 %endif
-%define		mver	3.23
+%define		mver	3.24
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.23.1
+Version:	3.24.1
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
-# Source0-md5:	05fbee31597a73148387e943a327fc95
+# Source0-md5:	6fa42cf4ad516f1abc6f73ae8912ceb8
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -68,7 +67,6 @@ Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
 URL:		https://syslog-ng.org/
-%{?with_geoip:BuildRequires:	GeoIP-devel >= 1.5.1}
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
@@ -278,22 +276,6 @@ Riemann destination support module for syslog-ng.
 %description module-riemann -l pl.UTF-8
 Moduł sysloga-ng do obsługi zapisu logów do systemu Riemann.
 
-%package module-tfgeoip
-Summary:	syslog-ng template function module to get GeoIP info from an IPv4 addresses
-Summary(pl.UTF-8):	Moduł funkcji szablonu sysloga-ng do pobierania informacji GeoIP z adresów IPv4
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	GeoIP-db-Country
-Requires:	GeoIP-libs >= 1.5.1
-
-%description module-tfgeoip
-syslog-ng template function module to get GeoIP info from an IPv4
-addresses.
-
-%description module-tfgeoip -l pl.UTF-8
-Moduł funkcji szablonu sysloga-ng do pobierania informacji GeoIP z
-adresów IPv4.
-
 %package libs
 Summary:	Shared library for syslog-ng
 Summary(pl.UTF-8):	Biblioteka współdzielona sysloga-ng
@@ -383,7 +365,6 @@ done
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-timezone-dir=%{_datadir}/zoneinfo \
 	%{__enable_disable amqp} \
-	%{__enable_disable geoip} \
 	%{__enable_disable geoip2} \
 	--enable-http%{!?with_http:=no} \
 	--enable-ipv6 \
@@ -553,7 +534,6 @@ exit 0
 %attr(755,root,root) %{moduledir}/libconfgen.so
 %attr(755,root,root) %{moduledir}/libcryptofuncs.so
 %attr(755,root,root) %{moduledir}/libcsvparser.so
-%attr(755,root,root) %{moduledir}/libdate.so
 %attr(755,root,root) %{moduledir}/libdbparser.so
 %attr(755,root,root) %{moduledir}/libdisk-buffer.so
 %if %{with geoip2}
@@ -571,6 +551,7 @@ exit 0
 %attr(755,root,root) %{moduledir}/libstardate.so
 %attr(755,root,root) %{moduledir}/libtags-parser.so
 %attr(755,root,root) %{moduledir}/libtfgetent.so
+%attr(755,root,root) %{moduledir}/libtimestamp.so
 %attr(755,root,root) %{moduledir}/libxml.so
 %if %{with systemd}
 %attr(755,root,root) %{moduledir}/libsdjournal.so
@@ -688,12 +669,6 @@ exit 0
 %attr(755,root,root) %{moduledir}/libriemann.so
 %endif
 
-%if %{with geoip}
-%files module-tfgeoip
-%defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libgeoip-plugin.so
-%endif
-
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.*.*.*
@@ -731,8 +706,6 @@ exit 0
 %{_includedir}/syslog-ng/logproto
 %{_includedir}/syslog-ng/logthrdest
 %{_includedir}/syslog-ng/logthrsource
-%dir %{_includedir}/syslog-ng/modules
-%{_includedir}/syslog-ng/modules/add-contextual-data
 %{_includedir}/syslog-ng/parser
 %{_includedir}/syslog-ng/rewrite
 %{_includedir}/syslog-ng/scanner
