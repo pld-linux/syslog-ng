@@ -1,5 +1,4 @@
 # TODO:
-# - rdkafka >= 1.0.0
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
@@ -19,6 +18,7 @@
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
 %bcond_without	geoip2			# support for GeoIP2
+%bcond_without	kafka			# support for Apache Kafka protocol
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
 %bcond_without	amqp			# AMQP support
@@ -86,6 +86,7 @@ BuildRequires:	libcap-devel
 %{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
 %{?with_geoip2:BuildRequires:	libmaxminddb-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
+%{?with_kafka:BuildRequires:	librdkafka-devel >= 1.0.0}
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
 BuildRequires:	libxslt-progs
@@ -248,6 +249,20 @@ JSON formatting template function for syslog-ng.
 %description module-json-plugin -l pl.UTF-8
 Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON.
 
+%package module-kafka
+Summary:	Apache Kafka destination support module for syslog-ng
+Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów poprzez protokół Apache Kafka
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	librdkafka >= 1.0.0
+
+%description module-kafka
+Apache Kafka destination support module for syslog-ng.
+
+%description module-kafka -l pl.UTF-8
+Moduł sysloga-ng do obsługi zapisu logów poprzez protokół Apache
+Kafka.
+
 %package module-redis
 Summary:	Redis destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie Redis
@@ -342,9 +357,6 @@ cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 %{__sed} -i -e '1s,/usr/bin/env python$,%{__python},' lib/merge-grammar.py
 
-%{__sed} -E -i -e '1s,#!\s*/usr/bin/env\s+python(\s|$),#!%{__python}\1,' \
-      lib/merge-grammar.py
-
 %build
 for i in . ; do
 cd $i
@@ -358,36 +370,30 @@ done
 %configure \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--disable-silent-rules \
-	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
-	--with-docbook=%{xsl_stylesheets_dir}/manpages/docbook.xsl \
+	%{__enable_disable amqp} \
+%if %{with dynamic}
+	--enable-dynamic-linking \
+%else
+	--enable-mixed-linking \
+%endif
+	%{__enable_disable geoip2} \
+	--enable-http%{!?with_http:=no} \
+	--enable-ipv6 \
 	--enable-java%{!?with_java:=no} \
 	--enable-java-modules%{!?with_java:=no} \
-	--enable-python%{!?with_python:=no} \
+	--enable-json%{!?with_json:=no} \
+	--enable-linux-caps \
+	--enable-kafka%{!?with_kafka:=no} \
+	--enable-manpages \
 %if %{with mongodb}
 	--enable-mongodb \
 	--with-mongoc=system \
 %else
 	--disable-mongodb \
 %endif
-%if %{with system_libivykis}
-	--with-ivykis=system \
-%else
-	--with-ivykis=internal \
-%endif
-	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
-	--with-module-dir=%{moduledir} \
-	--with-pidfile-dir=/var/run \
-	--with-systemdsystemunitdir=%{systemdunitdir} \
-	--with-timezone-dir=%{_datadir}/zoneinfo \
-	%{__enable_disable amqp} \
-	%{__enable_disable geoip2} \
-	--enable-http%{!?with_http:=no} \
-	--enable-ipv6 \
-	--enable-json%{!?with_json:=no} \
-	--enable-linux-caps \
-	--enable-manpages \
 	--enable-pacct \
 	--enable-pcre \
+	--enable-python%{!?with_python:=no} \
 	--enable-redis%{!?with_redis:=no} \
 	--enable-riemann%{!?with_riemann:=no} \
 	--enable-smtp%{!?with_smtp:=no} \
@@ -398,11 +404,18 @@ done
 %if %{with sql}
 	--enable-sql \
 %endif
-%if %{with dynamic}
-	--enable-dynamic-linking
+	--with-default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat \
+	--with-docbook=%{xsl_stylesheets_dir}/manpages/docbook.xsl \
+%if %{with system_libivykis}
+	--with-ivykis=system \
 %else
-	--enable-mixed-linking
+	--with-ivykis=internal \
 %endif
+	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
+	--with-module-dir=%{moduledir} \
+	--with-pidfile-dir=/var/run \
+	--with-systemdsystemunitdir=%{systemdunitdir} \
+	--with-timezone-dir=%{_datadir}/zoneinfo
 
 %{__make}
 
@@ -692,6 +705,13 @@ exit 0
 %{_datadir}/syslog-ng/include/scl/netskope
 # R: basicfuncs http json-plugin
 %{_datadir}/syslog-ng/include/scl/slack
+%endif
+
+%if %{with kafka}
+%files module-kafka
+%defattr(644,root,root,755)
+%doc modules/kafka/README.md
+%attr(755,root,root) %{moduledir}/libkafka.so
 %endif
 
 %if %{with redis}
