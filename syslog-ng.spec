@@ -1,4 +1,5 @@
 # TODO:
+# - rdkafka >= 1.0.0
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
@@ -33,11 +34,7 @@
 # as in git submodule
 %define	libivykis_version 0.42.2
 
-%if "%{pld_release}" == "ac"
-%define		glib2_ver	1:2.16.0
-%else
-%define		glib2_ver	1:2.24.0
-%endif
+%define		glib2_ver	1:2.26.1
 %define		mver	3.24
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
@@ -70,22 +67,23 @@ URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
+%if %{with tests}
+BuildRequires:	criterion-devel >= 2.2.1
+%endif
 %{?with_http:BuildRequires:	curl-devel}
 BuildRequires:	docbook-style-xsl
 BuildRequires:	eventlog-devel >= 0.2.12
-%if %{with tests}
-BuildRequires:	criterion-devel
-BuildRequires:	findutils
-%endif
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
-%{?with_redis:BuildRequires:	hiredis-devel}
+%{?with_java:BuildRequires:	gradle >= 2.2}
+%{?with_redis:BuildRequires:	hiredis-devel >= 0.11.0}
+%{?with_java:BuildRequires:	jdk >= 1.7}
 %{?with_json:BuildRequires:	json-c-devel >= 0.9}
 BuildRequires:	libcap-devel
-%{?with_sql:BuildRequires:	libdbi-devel >= 0.8.3-2}
+%{?with_sql:BuildRequires:	libdbi-devel >= 0.9.0}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
 %{?with_system_libivykis:BuildRequires:	libivykis-devel >= %{libivykis_version}}
-%{?with_mongodb:BuildRequires:	mongo-c-driver-devel}
+%{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
 %{?with_geoip2:BuildRequires:	libmaxminddb-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 BuildRequires:	libtool >= 2:2.0
@@ -95,11 +93,11 @@ BuildRequires:	lz4-devel >= r131-5
 BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
-%{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.0.1}
-%{?with_riemann:BuildRequires:	riemann-c-client-devel >= 1.0.0}
+%{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.5.3}
+%{?with_riemann:BuildRequires:	riemann-c-client-devel >= 1.6.0}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.623
-%{?with_systemd:BuildRequires:	systemd-devel >= 1:195}
+%{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
 BuildRequires:	which
 %if %{with tests}
 BuildRequires:	GeoIP-db-Country
@@ -121,7 +119,7 @@ Requires(post,preun):	/sbin/chkconfig
 Requires(post,preun,postun):	systemd-units >= 38
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	psmisc >= 20.1
-%{?with_system_rabbitmq:Requires:	rabbitmq-c >= 0.0.1}
+%{?with_system_rabbitmq:Requires:	rabbitmq-c >= 0.5.3}
 Requires:	rc-scripts >= 0.4.3.0
 Requires:	systemd-units >= 38
 # for afsocket
@@ -188,7 +186,7 @@ Summary:	MongoDB destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie MongoDB
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libmongo-client >= 0.1.8
+Requires:	mongo-c-driver >= 1.0.0
 
 %description module-afmongodb
 MongoDB destination support module for syslog-ng.
@@ -214,7 +212,7 @@ Summary:	SQL destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazach SQL
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libdbi >= 0.8.3-2
+Requires:	libdbi >= 0.9.0
 Requires:	openssl >= 0.9.8
 
 %description module-afsql
@@ -255,6 +253,7 @@ Summary:	Redis destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie Redis
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	hiredis >= 0.11.0
 
 %description module-redis
 Redis destination support module for syslog-ng (via libhiredis).
@@ -268,7 +267,7 @@ Summary:	Riemann destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów do systemu Riemann
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	riemann-c-client >= 1.0.0
+Requires:	riemann-c-client >= 1.6.0
 
 %description module-riemann
 Riemann destination support module for syslog-ng.
@@ -312,11 +311,23 @@ Header files for syslog-ng modules development.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe do tworzenia modułów dla sysloga-ng.
 
+%package test-devel
+Summary:	syslog-ng test library
+Summary(pl.UTF-8):	Biblioteka testowa sysloga-ng
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+
+%description test-devel
+Test helper package for syslog-ng modules.
+
+%description test-devel -l pl.UTF-8
+Pakiet pomocniczy do testowania modułów sysloga-ng.
+
 %prep
 %setup -q -n %{name}-%{name}-%{version} -a 6
 
 rmdir lib/ivykis
-mv ivykis-%{libivykis_version} lib/ivykis
+%{__mv} ivykis-%{libivykis_version} lib/ivykis
 
 %patch0 -p1
 
@@ -329,6 +340,7 @@ cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
+%{__sed} -i -e '1s,/usr/bin/env python$,%{__python},' lib/merge-grammar.py
 
 %build
 for i in . ; do
@@ -440,8 +452,10 @@ ln -s "%{name}" $RPM_BUILD_ROOT/etc/sysconfig/%{name}@default
 
 %{__rm} $RPM_BUILD_ROOT%{_sbindir}/syslog-ng-debun
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/syslog-ng-debun.1
+%{__rm} $RPM_BUILD_ROOT%{moduledir}/libexamples.so
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{moduledir}/*.la
+%{__rm} $RPM_BUILD_ROOT%{moduledir}/loggen/*.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -572,11 +586,16 @@ exit 0
 %dir %{_datadir}/syslog-ng/include
 %dir %{_datadir}/syslog-ng/include/scl
 %{_datadir}/syslog-ng/include/scl/apache
+%{_datadir}/syslog-ng/include/scl/checkpoint
+%{_datadir}/syslog-ng/include/scl/cisco
+# R: basicfuncs
+%{_datadir}/syslog-ng/include/scl/collectd
 %{_datadir}/syslog-ng/include/scl/default-network-drivers
 %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
 %{_datadir}/syslog-ng/include/scl/kafka
-#%{_datadir}/syslog-ng/include/scl/iptables
+%{_datadir}/syslog-ng/include/scl/iptables
+%{_datadir}/syslog-ng/include/scl/junos
 %{_datadir}/syslog-ng/include/scl/linux-audit
 %dir %{_datadir}/syslog-ng/include/scl/loadbalancer
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
@@ -588,7 +607,8 @@ exit 0
 %{_datadir}/syslog-ng/include/scl/rewrite
 %{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
-#%{_datadir}/syslog-ng/include/scl/sudo
+%{_datadir}/syslog-ng/include/scl/sudo
+%{_datadir}/syslog-ng/include/scl/websense
 %{_datadir}/syslog-ng/include/scl/windowseventlog
 %dir %{_datadir}/syslog-ng/include/scl/syslogconf
 %{_datadir}/syslog-ng/include/scl/syslogconf/README
@@ -642,19 +662,24 @@ exit 0
 %files module-http
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libhttp.so
+%{_datadir}/syslog-ng/include/scl/telegram
 %endif
 
 %if %{with json}
 %files module-json-plugin
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libjson-plugin.so
+# all below configs require json-plugin
 %{_datadir}/syslog-ng/include/scl/cim
-%{_datadir}/syslog-ng/include/scl/cisco
+# R: http json-plugin
 %{_datadir}/syslog-ng/include/scl/elasticsearch
-%{_datadir}/syslog-ng/include/scl/loggly
-%{_datadir}/syslog-ng/include/scl/logmatic
 %{_datadir}/syslog-ng/include/scl/ewmm
 %{_datadir}/syslog-ng/include/scl/graylog2
+%{_datadir}/syslog-ng/include/scl/loggly
+%{_datadir}/syslog-ng/include/scl/logmatic
+%{_datadir}/syslog-ng/include/scl/netskope
+# R: basicfuncs http json-plugin
+%{_datadir}/syslog-ng/include/scl/slack
 %endif
 
 %if %{with redis}
@@ -719,13 +744,11 @@ exit 0
 %{_pkgconfigdir}/syslog-ng.pc
 %{_pkgconfigdir}/syslog-ng-native-connector.pc
 
-%if %{with tests}
-# test-devel ?
+%files test-devel
+%defattr(644,root,root,755)
 %if "%{_libdir}/syslog-ng" != "{moduledir}"
 %dir %{_libdir}/syslog-ng
-%endif
 %dir %{_libdir}/syslog-ng/libtest
 %{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
 %{_includedir}/syslog-ng/libtest
 %{_pkgconfigdir}/syslog-ng-test.pc
-%endif
