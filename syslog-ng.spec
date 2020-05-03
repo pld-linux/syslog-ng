@@ -608,17 +608,14 @@ exit 0
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
 %{_datadir}/syslog-ng/include/scl/loadbalancer/plugin.conf
 %{_datadir}/syslog-ng/include/scl/mbox
-%{_datadir}/syslog-ng/include/scl/netskope
 %{_datadir}/syslog-ng/include/scl/nodejs
 %{_datadir}/syslog-ng/include/scl/osquery
 %{_datadir}/syslog-ng/include/scl/pacct
 %{_datadir}/syslog-ng/include/scl/rewrite
-%{_datadir}/syslog-ng/include/scl/slack
 %{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
 %{_datadir}/syslog-ng/include/scl/sudo
 %{_datadir}/syslog-ng/include/scl/sumologic
-%{_datadir}/syslog-ng/include/scl/telegram
 %{_datadir}/syslog-ng/include/scl/websense
 %{_datadir}/syslog-ng/include/scl/windowseventlog
 %dir %{_datadir}/syslog-ng/include/scl/syslogconf
