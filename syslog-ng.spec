@@ -35,18 +35,18 @@
 %define	libivykis_version 0.42.2
 
 %define		glib2_ver	1:2.26.1
-%define		mver	3.24
+%define		mver	3.27
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.24.1
+Version:	3.27.1
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
-# Source0-md5:	6fa42cf4ad516f1abc6f73ae8912ceb8
+# Source0-md5:	8d836a470d9c43c5b51181bad238540b
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -342,6 +342,9 @@ cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 %{__sed} -i -e '1s,/usr/bin/env python$,%{__python},' lib/merge-grammar.py
 
+%{__sed} -E -i -e '1s,#!\s*/usr/bin/env\s+python(\s|$),#!%{__python}\1,' \
+      lib/merge-grammar.py
+
 %build
 for i in . ; do
 cd $i
@@ -539,10 +542,12 @@ exit 0
 %endif
 %attr(755,root,root) %{moduledir}/libaffile.so
 %attr(755,root,root) %{moduledir}/libafprog.so
+%attr(755,root,root) %{moduledir}/libafsnmp.so
 %attr(755,root,root) %{moduledir}/libafsocket.so
 %attr(755,root,root) %{moduledir}/libafstomp.so
 %attr(755,root,root) %{moduledir}/libafuser.so
 %attr(755,root,root) %{moduledir}/libappmodel.so
+%attr(755,root,root) %{moduledir}/libazure-auth-header.so
 %attr(755,root,root) %{moduledir}/libbasicfuncs.so
 %attr(755,root,root) %{moduledir}/libcef.so
 %attr(755,root,root) %{moduledir}/libconfgen.so
@@ -560,8 +565,7 @@ exit 0
 %attr(755,root,root) %{moduledir}/libmap-value-pairs.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
-%attr(755,root,root) %{moduledir}/libsnmpdest.so
-%attr(755,root,root) %{moduledir}/libsnmptrapd-parser.so
+%attr(755,root,root) %{moduledir}/libsecure-logging.so
 %attr(755,root,root) %{moduledir}/libstardate.so
 %attr(755,root,root) %{moduledir}/libtags-parser.so
 %attr(755,root,root) %{moduledir}/libtfgetent.so
@@ -581,6 +585,9 @@ exit 0
 %attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/persist-tool
+%attr(755,root,root) %{_bindir}/slogimport
+%attr(755,root,root) %{_bindir}/slogkey
+%attr(755,root,root) %{_bindir}/slogverify
 %attr(755,root,root) %{_bindir}/update-patterndb
 
 %dir %{_datadir}/syslog-ng/include
@@ -601,13 +608,17 @@ exit 0
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
 %{_datadir}/syslog-ng/include/scl/loadbalancer/plugin.conf
 %{_datadir}/syslog-ng/include/scl/mbox
+%{_datadir}/syslog-ng/include/scl/netskope
 %{_datadir}/syslog-ng/include/scl/nodejs
 %{_datadir}/syslog-ng/include/scl/osquery
 %{_datadir}/syslog-ng/include/scl/pacct
 %{_datadir}/syslog-ng/include/scl/rewrite
+%{_datadir}/syslog-ng/include/scl/slack
 %{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
 %{_datadir}/syslog-ng/include/scl/sudo
+%{_datadir}/syslog-ng/include/scl/sumologic
+%{_datadir}/syslog-ng/include/scl/telegram
 %{_datadir}/syslog-ng/include/scl/websense
 %{_datadir}/syslog-ng/include/scl/windowseventlog
 %dir %{_datadir}/syslog-ng/include/scl/syslogconf
@@ -622,6 +633,10 @@ exit 0
 %{_mandir}/man1/dqtool.1*
 %{_mandir}/man1/loggen.1*
 %{_mandir}/man1/pdbtool.1*
+%{_mandir}/man1/persist-tool.1*
+%{_mandir}/man1/slogimport.1*
+%{_mandir}/man1/slogkey.1*
+%{_mandir}/man1/slogverify.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
 %{_mandir}/man8/syslog-ng.8*
@@ -731,9 +746,11 @@ exit 0
 %{_includedir}/syslog-ng/logproto
 %{_includedir}/syslog-ng/logthrdest
 %{_includedir}/syslog-ng/logthrsource
+%{_includedir}/syslog-ng/modules
 %{_includedir}/syslog-ng/parser
 %{_includedir}/syslog-ng/rewrite
 %{_includedir}/syslog-ng/scanner
+%{_includedir}/syslog-ng/signal-slot-connector
 %{_includedir}/syslog-ng/stats
 %{_includedir}/syslog-ng/str-repr
 %{_includedir}/syslog-ng/template
