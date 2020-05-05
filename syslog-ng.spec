@@ -2,7 +2,6 @@
 # - switch to LTS version??? where???
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
-# - package python module
 #
 # Conditional build:
 %bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
@@ -22,7 +21,7 @@
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
 %bcond_without	amqp			# AMQP support
-%bcond_with	python			# python module
+%bcond_without	python			# python module
 %bcond_with	java			# java modules and support
 %bcond_without	system_libivykis	# use system libivykis
 %bcond_without	system_rabbitmq		# use system librabbitmq
@@ -71,7 +70,7 @@ BuildRequires:	bison >= 2.4
 BuildRequires:	criterion-devel >= 2.2.1
 %endif
 %{?with_http:BuildRequires:	curl-devel}
-BuildRequires:	docbook-style-xsl
+BuildRequires:	docbook-style-xsl-nons
 BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
@@ -103,9 +102,10 @@ BuildRequires:	which
 %if %{with tests}
 BuildRequires:	GeoIP-db-Country
 BuildRequires:	pylint
-BuildRequires:	python
-BuildRequires:	python-pep8
-BuildRequires:	python-ply
+BuildRequires:	python3
+%{?with_python:BuildRequires:	python3-devel >= 1:3.2}
+BuildRequires:	python3-pep8
+BuildRequires:	python3-ply
 BuildRequires:	tzdata
 %endif
 %if %{without dynamic}
@@ -263,6 +263,18 @@ Apache Kafka destination support module for syslog-ng.
 Moduł sysloga-ng do obsługi zapisu logów poprzez protokół Apache
 Kafka.
 
+%package module-python
+Summary:	Python support module for syslog-ng
+Summary(pl.UTF-8):	Moduł obsługi Pythona dla sysloga-ng
+Group:		Librares
+Requires:	%{name} = %{version}-%{release}
+
+%description module-python
+Python support module for syslog-ng.
+
+%description module-python -l pl.UTF-8
+Moduł obsługi Pythona dla sysloga-ng.
+
 %package module-redis
 Summary:	Redis destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów w bazie Redis
@@ -355,7 +367,7 @@ cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
-%{__sed} -i -e '1s,/usr/bin/env python$,%{__python},' lib/merge-grammar.py
+%{__sed} -i -e '1s,/usr/bin/env python$,%{__python3},' lib/merge-grammar.py
 
 %build
 for i in . ; do
@@ -368,6 +380,7 @@ cd $i
 cd -
 done
 %configure \
+	PYTHON="%{__python3}" \
 	--sysconfdir=%{_sysconfdir}/syslog-ng \
 	--disable-silent-rules \
 	%{__enable_disable amqp} \
@@ -714,6 +727,13 @@ exit 0
 %attr(755,root,root) %{moduledir}/libkafka.so
 %endif
 
+%if %{with python}
+%files module-python
+%defattr(644,root,root,755)
+%attr(755,root,root) %{moduledir}/libmod-python.so
+%{moduledir}/python
+%endif
+
 %if %{with redis}
 %files module-redis
 %defattr(644,root,root,755)
@@ -782,6 +802,7 @@ exit 0
 %defattr(644,root,root,755)
 %if "%{_libdir}/syslog-ng" != "{moduledir}"
 %dir %{_libdir}/syslog-ng
+%endif
 %dir %{_libdir}/syslog-ng/libtest
 %{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
 %{_includedir}/syslog-ng/libtest
