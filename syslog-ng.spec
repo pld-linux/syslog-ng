@@ -67,7 +67,7 @@ BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
 BuildRequires:	bison >= 2.4
 %if %{with tests}
-BuildRequires:	criterion-devel >= 2.2.1
+BuildRequires:	criterion-devel >= 2.3.3-5
 %endif
 %{?with_http:BuildRequires:	curl-devel}
 BuildRequires:	docbook-style-xsl-nons
