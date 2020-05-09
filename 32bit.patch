@@ -1,0 +1,26 @@
+diff -ur syslog-ng-syslog-ng-3.27.1/lib/logsource.c syslog-ng-syslog-ng-3.27.1.32bit/lib/logsource.c
+--- syslog-ng-syslog-ng-3.27.1/lib/logsource.c	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1.32bit/lib/logsource.c	2020-05-09 11:36:21.539723717 +0200
+@@ -57,7 +58,7 @@
+       return window_size_increment;
+     }
+ 
+-  guint32 remaining_window_size_increment = MAX(window_size_increment - old, 0);
++  guint32 remaining_window_size_increment = MAX((gssize)window_size_increment - old, 0);
+   guint32 reclaimed = window_size_increment - remaining_window_size_increment;
+   atomic_gssize_add(&self->pending_reclaimed, reclaimed);
+ 
+diff -ur syslog-ng-syslog-ng-3.27.1/lib/tests/test_window_size_counter.c syslog-ng-syslog-ng-3.27.1.32bit/lib/tests/test_window_size_counter.c
+--- syslog-ng-syslog-ng-3.27.1/lib/tests/test_window_size_counter.c	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1.32bit/lib/tests/test_window_size_counter.c	2020-05-09 11:43:12.103043082 +0200
+@@ -59,8 +59,8 @@
+   WindowSizeCounter c;
+   gboolean suspended = FALSE;
+   window_size_counter_set(&c, -1);
+-  gint v = (gint)window_size_counter_get(&c, &suspended);
+-  cr_assert_eq(v, -1);
++  gssize v = (gssize)window_size_counter_get(&c, &suspended);
++  cr_assert_eq(v, G_MAXLONG);
+ }
+ 
+ Test(test_window_size_counter, suspend_resume_multiple_times)

@@ -62,6 +62,7 @@ Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
+Patch7:		32bit.patch
 URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
@@ -363,6 +364,7 @@ rmdir lib/ivykis
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
