@@ -1,5 +1,5 @@
 # TODO:
-# - switch to LTS version??? where???
+# - modules/secure-logging tests fail in ix86, seems like a parsing problem
 # - relies on libs in /usr which is wrong
 #   (well, for modules bringing additional functionality it's acceptable IMO --q)
 #
