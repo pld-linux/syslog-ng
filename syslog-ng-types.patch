@@ -1,0 +1,245 @@
+Fix gsize vs guint64 confusion in secure-logging module.
+--- syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slogkey/slogkey.c.orig	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slogkey/slogkey.c	2020-05-10 17:43:50.686930970 +0200
+@@ -76,7 +76,7 @@
+       // Display key counter
+       char key[KEY_LENGTH];
+       char *keyfile = argv[2];
+-      size_t counter;
++      guint64 counter;
+       ret = readKey(key, &counter, keyfile);
+       if(!ret)
+         {
+--- syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slog.h.orig	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slog.h	2020-05-10 18:14:12.007892114 +0200
+@@ -110,11 +110,11 @@
+                 unsigned char *iv,
+                 unsigned char *plaintext);
+ 
+-void cmac(unsigned char *key, const void *input, guint64 length, unsigned char *out, guint64 *outlen);
++void cmac(unsigned char *key, const void *input, gsize length, unsigned char *out, gsize *outlen);
+ 
+ 
+-gchar *convertToBase64(unsigned char *input, guint64 len);
+-guchar *convertToBin(char *input, guint64 *outLen);
++gchar *convertToBase64(unsigned char *input, gsize len);
++guchar *convertToBin(char *input, gsize *outLen);
+ 
+ /*
+  * Derive key = evolve key multiple times
+--- syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slog.c.orig	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slog.c	2020-05-10 18:24:58.711228981 +0200
+@@ -365,12 +365,12 @@
+         {
+           memcpy(bigBuf, inputBigMac, AES_BLOCKSIZE);
+ 
+-          guint64 outlen;
++          gsize outlen;
+           cmac(MACKey, bigBuf, AES_BLOCKSIZE+IV_LENGTH+AES_BLOCKSIZE+ct_length, outputBigMac, &outlen );
+         }
+       else   //First aggregated MAC
+         {
+-          guint64 outlen = 0;
++          gsize outlen = 0;
+ 
+           cmac(MACKey, &bigBuf[AES_BLOCKSIZE], IV_LENGTH+AES_BLOCKSIZE+ct_length, outputBigMac, &outlen);
+         }
+@@ -406,14 +406,14 @@
+     }
+ }
+ 
+-guchar *convertToBin(char *input, guint64 *outLen)
++guchar *convertToBin(char *input, gsize *outLen)
+ {
+   return g_base64_decode ((const gchar *) input, outLen);
+ }
+ 
+-gchar *convertToBase64(unsigned char *input, guint64 len)
++gchar *convertToBase64(unsigned char *input, gsize len)
+ {
+-  return  g_base64_encode ((const guchar *) input, (gsize) len);
++  return  g_base64_encode ((const guchar *) input, len);
+ }
+ 
+ /*
+@@ -430,14 +430,16 @@
+  * If Parameter 5 == 0, there was an error.
+  *
+  */
+-void cmac(unsigned char *key, const void *input, guint64 length, unsigned char *out, guint64 *outlen)
++void cmac(unsigned char *key, const void *input, gsize length, unsigned char *out, gsize *outlen)
+ {
+   CMAC_CTX *ctx = CMAC_CTX_new();
+ 
+   CMAC_Init(ctx, key, KEY_LENGTH, EVP_aes_256_cbc(), NULL);
+   CMAC_Update(ctx, input, length);
+ 
+-  CMAC_Final(ctx, out, outlen);
++  size_t outsize;
++  CMAC_Final(ctx, out, &outsize);
++  *outlen = outsize;
+   CMAC_CTX_free(ctx);
+ }
+ 
+@@ -481,7 +483,7 @@
+   // Prepare plaintext
+   for (int i=0; i<outputLength/AES_BLOCKSIZE; i++)
+     {
+-      guint64 outlen;
++      gsize outlen;
+       cmac(key, input, AES_BLOCKSIZE, &buf[i*AES_BLOCKSIZE], &outlen);
+       input[inputLength-1]++;
+     }
+@@ -489,7 +491,7 @@
+   if (outputLength % AES_BLOCKSIZE!=0)
+     {
+       int index = outputLength/AES_BLOCKSIZE;
+-      guint64 outlen;
++      gsize outlen;
+       cmac(key, input, AES_BLOCKSIZE, &buf[(index)*AES_BLOCKSIZE], &outlen);
+     }
+ 
+@@ -603,7 +605,7 @@
+       return 0;
+     }
+ 
+-  guint64 outlen = 0;
++  gsize outlen = 0;
+   status = g_io_channel_write_chars(macfile, outputBuffer, CMAC_LENGTH, &outlen, &error);
+   if(status != G_IO_STATUS_NORMAL)
+     {
+@@ -732,7 +734,7 @@
+       return 0;
+     }
+ 
+-  guint64 outlen = 0;
++  gsize outlen = 0;
+   unsigned char keyBuffer[KEY_LENGTH];
+   bzero(keyBuffer, KEY_LENGTH);
+   unsigned char zeroBuffer[CMAC_LENGTH];
+@@ -861,7 +863,7 @@
+       return 0;
+     }
+ 
+-  guint64 outlen=0;
++  gsize outlen=0;
+   unsigned char testOutput[CMAC_LENGTH];
+ 
+   cmac((guchar *)keydata, &(littleEndianCounter), sizeof(littleEndianCounter), testOutput, &outlen);
+@@ -916,7 +918,7 @@
+       return 0;
+     }
+ 
+-  guint64 outlen = 0;
++  gsize outlen = 0;
+   // Write key
+   status = g_io_channel_write_chars(keyfile, key, KEY_LENGTH, &outlen, &error);
+   if(status != G_IO_STATUS_NORMAL)
+@@ -1029,7 +1031,7 @@
+               if (tab != NULL)
+                 {
+                   char key[CTR_LEN_SIMPLE+1];
+-                  snprintf(key, CTR_LEN_SIMPLE+1, "%lu", logEntryOnDisk);
++                  snprintf(key, CTR_LEN_SIMPLE+1, "%"G_GUINT64_FORMAT, logEntryOnDisk);
+                   if(g_hash_table_contains(tab, key) == TRUE)
+                     {
+                       msg_error("[SLOG] ERROR: Duplicate entry detected", evt_tag_long("entry", logEntryOnDisk));
+@@ -1068,7 +1070,7 @@
+           GString *line = input[i];
+ 
+           char *ct = &(line->str)[COUNTER_LENGTH+1];
+-          guint64 outputLength;
++          gsize outputLength;
+ 
+           // binBuf = IV + TAG + CT
+           guchar *binBuf = convertToBin(ct, &outputLength);
+@@ -1088,12 +1090,12 @@
+               if (pt_length>0)
+                 {
+                   // Include colon, whitespace, and \0
+-                  g_string_append_printf(output[i], "%0*lx: %.*s", CTR_LEN_SIMPLE, logEntryOnDisk, pt_length, pt);
++                  g_string_append_printf(output[i], "%0*"G_GINT64_MODIFIER"x: %.*s", CTR_LEN_SIMPLE, logEntryOnDisk, pt_length, pt);
+ 
+                   if (tab != NULL)
+                     {
+                       char *key = malloc(CTR_LEN_SIMPLE+1);
+-                      snprintf(key, CTR_LEN_SIMPLE+1, "%lu", logEntryOnDisk);
++                      snprintf(key, CTR_LEN_SIMPLE+1, "%"G_GUINT64_FORMAT, logEntryOnDisk);
+ 
+                       if (g_hash_table_insert(tab, key, (gpointer)logEntryOnDisk) == FALSE)
+                         {
+@@ -1106,7 +1108,7 @@
+                   // Update BigHMAC
+                   if ((*numberOfLogEntries) == 0UL)   //First aggregated MAC
+                     {
+-                      guint64 outlen = 0;
++                      gsize outlen = 0;
+ 
+                       unsigned char MACKey[KEY_LENGTH];
+                       deriveMACSubKey(mainKey, MACKey);
+@@ -1116,7 +1118,7 @@
+                   else
+                     {
+                       // numberOfEntries > 0
+-                      guint64 outlen;
++                      gsize outlen;
+                       unsigned char bigBuf[AES_BLOCKSIZE+IV_LENGTH+AES_BLOCKSIZE+pt_length];
+                       memcpy(bigBuf, cmac_tag, AES_BLOCKSIZE);
+                       memcpy(&bigBuf[AES_BLOCKSIZE], binBuf, IV_LENGTH+AES_BLOCKSIZE+pt_length);
+@@ -1169,7 +1171,7 @@
+         {
+           // Hashtable key
+           char key[CTR_LEN_SIMPLE+1];
+-          snprintf(key, CTR_LEN_SIMPLE+1, "%lu", i);
++          snprintf(key, CTR_LEN_SIMPLE+1, "%"G_GUINT64_FORMAT, i);
+ 
+           if(g_hash_table_contains(tab, key) == FALSE)
+             {
+--- syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slogimport/slogimport.c.orig	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1/modules/secure-logging/slogimport/slogimport.c	2020-05-10 18:29:54.983177242 +0200
+@@ -49,7 +49,7 @@
+   char mac[CMAC_LENGTH];
+ 
+   // Read key and counter
+-  size_t counter;
++  guint64 counter;
+   int ret = readKey(key, &counter, argv[1]);
+   if (ret!=1)
+     {
+@@ -59,7 +59,7 @@
+ 
+   if (argc==8)
+     {
+-      sscanf(argv[7], "%zu", &counter);
++      sscanf(argv[7], "%"G_GUINT64_FORMAT, &counter);
+     }
+ 
+   // Open input file
+--- syslog-ng-syslog-ng-3.27.1/modules/secure-logging/tests/test_secure_logging.c.orig	2020-04-30 16:18:56.000000000 +0200
++++ syslog-ng-syslog-ng-3.27.1/modules/secure-logging/tests/test_secure_logging.c	2020-05-10 18:37:11.932385333 +0200
+@@ -179,9 +179,9 @@
+ 
+   GHashTable *tab = NULL;
+ 
+-  size_t next = 0;
+-  size_t start = 0;
+-  size_t numberOfLogEntries = 0UL;
++  guint64 next = 0;
++  guint64 start = 0;
++  guint64 numberOfLogEntries = 0;
+ 
+   GString **outputBuffer = (GString **) malloc(sizeof(GString *) * totalNumberOfMessages);
+ 
+@@ -216,9 +216,9 @@
+ 
+   GHashTable *tab = NULL;
+ 
+-  size_t next = 0;
+-  size_t start = 0;
+-  size_t numberOfLogEntries = 0UL;
++  guint64 next = 0;
++  guint64 start = 0;
++  guint64 numberOfLogEntries = 0;
+ 
+   GString **outputBuffer = (GString **) malloc(sizeof(GString *) * totalNumberOfMessages);
+ 

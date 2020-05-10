@@ -41,7 +41,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.27.1
-Release:	1
+Release:	2
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
@@ -56,7 +56,7 @@ Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-
 # Source6-md5:	aeafef422d8dafb84e1fcd16f9f4822e
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
-
+Patch1:		%{name}-types.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
@@ -358,7 +358,7 @@ rmdir lib/ivykis
 %{__mv} ivykis-%{libivykis_version} lib/ivykis
 
 %patch0 -p1
-
+%patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
