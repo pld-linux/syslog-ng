@@ -1,7 +1,5 @@
-# TODO:
-# - modules/secure-logging tests fail in ix86, seems like a parsing problem
-# - relies on libs in /usr which is wrong
-#   (well, for modules bringing additional functionality it's acceptable IMO --q)
+# NOTE: only core functionality is available without /usr;
+#       some non-trivial extension modules rely in libraries/daemons existing in /usr.
 #
 # Conditional build:
 %bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
