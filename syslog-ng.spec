@@ -39,7 +39,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	3.27.1
-Release:	3
+Release:	4
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
@@ -469,7 +469,7 @@ ln -snf %{slibdir}/$(basename $RPM_BUILD_ROOT%{slibdir}/libsecret-storage.so.*.*
 %endif
 
 %{__sed} -e 's|@@SBINDIR@@|%{_sbindir}|g' %{SOURCE1} > $RPM_BUILD_ROOT/etc/rc.d/init.d/syslog-ng
-cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
+sed -e 's,#VERSION#,%{mver},' < %{SOURCE2} > $RPM_BUILD_ROOT%{_sysconfdir}/syslog-ng/syslog-ng.conf
 cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/logrotate.d/syslog-ng
 cp -p %{SOURCE7} $RPM_BUILD_ROOT%{systemdunitdir}
 
