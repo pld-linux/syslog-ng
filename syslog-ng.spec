@@ -29,34 +29,36 @@
 %endif
 
 # as in git submodule
-%define	libivykis_version 0.42.2
+%define	libivykis_version 0.42.4
 
-%define		glib2_ver	1:2.26.1
-%define		mver	3.27
+%define		glib2_ver	1:2.28
+%define		mver	3.29
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.27.1
-Release:	6
+Version:	3.29.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
-Source0:	https://github.com/balabit/syslog-ng/archive/%{name}-%{version}.tar.gz
-# Source0-md5:	8d836a470d9c43c5b51181bad238540b
+Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	5bc0c28d37310a3487efe0a6d79db8ab
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
 Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{docmver}-guides/en/syslog-ng-ose-v%{docmver}-guide-admin/pdf/%{name}-ose-v%{docmver}-guide-admin.pdf
 # Source4-md5:	fce7075b03ba9501911b9812a553e680
 Source5:	%{name}-simple.conf
+%if 0
+# for git archives (release tarballs include ivykis)
 #Source6Download: https://github.com/buytenh/ivykis/releases
 Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
-# Source6-md5:	aeafef422d8dafb84e1fcd16f9f4822e
+# Source6-md5:	e09caeb95a01a541ec40d3b757dada12
+%endif
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
-Patch1:		%{name}-types.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
@@ -310,7 +312,7 @@ Group:		Libraries
 %if %{with dynamic}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
-%{?with_system_libivykis:Requires:	libivykis >= 0.42}
+%{?with_system_libivykis:Requires:	libivykis >= %{libivykis_version}}
 Requires:	pcre >= 6.1
 %endif
 Conflicts:	syslog-ng < 3.3.1-3
@@ -329,7 +331,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with dynamic}
 Requires:	eventlog-devel >= 0.2.12
 Requires:	glib2-devel >= %{glib2_ver}
-%{?with_system_libivykis:Requires:	libivykis-devel >= 0.42}
+%{?with_system_libivykis:Requires:	libivykis-devel >= %{libivykis_version}}
 Requires:	pcre-devel >= 6.1
 %endif
 
@@ -352,13 +354,18 @@ Test helper package for syslog-ng modules.
 Pakiet pomocniczy do testowania modułów sysloga-ng.
 
 %prep
+%if 1
+# release tarball
+%setup -q
+%else
+# git archive
 %setup -q -n %{name}-%{name}-%{version} -a 6
 
 rmdir lib/ivykis
 %{__mv} ivykis-%{libivykis_version} lib/ivykis
+%endif
 
 %patch0 -p1
-%patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
@@ -433,7 +440,6 @@ done
 	--with-timezone-dir=%{_datadir}/zoneinfo
 
 %{__make}
-
 
 %if %{with tests}
 LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
@@ -613,7 +619,7 @@ exit 0
 %attr(755,root,root) %{_bindir}/loggen
 %attr(755,root,root) %{_bindir}/pdbtool
 %attr(755,root,root) %{_bindir}/persist-tool
-%attr(755,root,root) %{_bindir}/slogimport
+%attr(755,root,root) %{_bindir}/slogencrypt
 %attr(755,root,root) %{_bindir}/slogkey
 %attr(755,root,root) %{_bindir}/slogverify
 %attr(755,root,root) %{_bindir}/update-patterndb
@@ -639,6 +645,7 @@ exit 0
 %{_datadir}/syslog-ng/include/scl/nodejs
 %{_datadir}/syslog-ng/include/scl/osquery
 %{_datadir}/syslog-ng/include/scl/pacct
+%{_datadir}/syslog-ng/include/scl/paloalto
 %{_datadir}/syslog-ng/include/scl/rewrite
 %{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
@@ -659,11 +666,12 @@ exit 0
 %{_mandir}/man1/loggen.1*
 %{_mandir}/man1/pdbtool.1*
 %{_mandir}/man1/persist-tool.1*
-%{_mandir}/man1/slogimport.1*
+%{_mandir}/man1/slogencrypt.1*
 %{_mandir}/man1/slogkey.1*
 %{_mandir}/man1/slogverify.1*
 %{_mandir}/man1/syslog-ng-ctl.1*
 %{_mandir}/man5/syslog-ng.conf.5*
+%{_mandir}/man7/secure-logging.7*
 %{_mandir}/man8/syslog-ng.8*
 
 %attr(640,root,logs) %ghost /var/log/cron
@@ -725,7 +733,6 @@ exit 0
 %if %{with kafka}
 %files module-kafka
 %defattr(644,root,root,755)
-%doc modules/kafka/README.md
 %attr(755,root,root) %{moduledir}/libkafka.so
 %endif
 
@@ -777,7 +784,6 @@ exit 0
 %{_includedir}/syslog-ng/control
 %{_includedir}/syslog-ng/debugger
 %{_includedir}/syslog-ng/filter
-%{_includedir}/syslog-ng/http-auth
 %if %{without system_libivykis}
 %{_includedir}/syslog-ng/ivykis
 %endif
