@@ -59,6 +59,9 @@ Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-
 %endif
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
+# https://github.com/syslog-ng/syslog-ng/commit/1d90d844a39eb25ac3423f663b0409f61a064330.patch
+# https://github.com/syslog-ng/syslog-ng/commit/46fa90bdd3adee5bcbb2687cf00c08925c504c07.patch
+Patch1:		%{name}-tests-fixes.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
 Patch4:		man-paths.patch
@@ -366,6 +369,7 @@ rmdir lib/ivykis
 %endif
 
 %patch0 -p1
+%patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
