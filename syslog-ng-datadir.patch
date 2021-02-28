@@ -1,8 +1,9 @@
-FIXME: drop this patch and just fix PATH_LOCALSTATEDIR ?
 
+ -FIXME: drop this patch and just fix PATH_LOCALSTATEDIR ?
 
---- syslog-ng-3.6.2/lib/syslog-ng.h~	2014-12-15 16:48:45.000000000 +0200
-+++ syslog-ng-3.6.2/lib/syslog-ng.h	2015-06-01 08:04:18.542588343 +0300
+diff -urNp -x '*.orig' syslog-ng-3.29.1.org/lib/syslog-ng.h syslog-ng-3.29.1/lib/syslog-ng.h
+--- syslog-ng-3.29.1.org/lib/syslog-ng.h	2020-08-28 14:08:43.000000000 +0200
++++ syslog-ng-3.29.1/lib/syslog-ng.h	2021-02-28 14:25:45.374311232 +0100
 @@ -42,7 +42,7 @@
  #if SYSLOG_NG_ENABLE_ENV_WRAPPER
  #define PATH_SYSLOGNG           SYSLOG_NG_PATH_LIBEXECDIR "/syslog-ng"
@@ -12,13 +13,14 @@ FIXME: drop this patch and just fix PATH_LOCALSTATEDIR ?
  
  typedef struct _LogPipe LogPipe;
  typedef struct _LogMessage LogMessage;
---- syslog-ng-3.2.2/scripts/update-patterndb.in~	2010-11-20 09:47:33.000000000 +0100
-+++ syslog-ng-3.2.2/scripts/update-patterndb.in	2011-01-27 20:43:14.656000204 +0100
-@@ -3,6 +3,6 @@
+diff -urNp -x '*.orig' syslog-ng-3.29.1.org/scripts/update-patterndb.in syslog-ng-3.29.1/scripts/update-patterndb.in
+--- syslog-ng-3.29.1.org/scripts/update-patterndb.in	2020-08-10 20:04:39.000000000 +0200
++++ syslog-ng-3.29.1/scripts/update-patterndb.in	2021-02-28 14:25:45.374311232 +0100
+@@ -3,6 +3,6 @@ prefix=@prefix@
  exec_prefix=@exec_prefix@
  bindir=@bindir@
  sysconfdir=@sysconfdir@
 -localstatedir=@localstatedir@
 +localstatedir=/var/lib/syslog-ng
  
- ${bindir}/pdbtool merge -r --glob *.pdb -D ${sysconfdir}/patterndb.d -p ${localstatedir}/patterndb.xml
+ ${bindir}/pdbtool merge -r --glob \*.pdb -D ${sysconfdir}/patterndb.d -p ${localstatedir}/patterndb.xml

@@ -1,6 +1,7 @@
---- syslog-ng-3.3.1/configure.ac.orig	2011-09-29 08:35:39.000000000 +0200
-+++ syslog-ng-3.3.1/configure.ac	2011-11-11 10:37:51.371629795 +0100
-@@ -465,11 +465,10 @@
+diff -urNp -x '*.orig' syslog-ng-3.29.1.org/configure.ac syslog-ng-3.29.1/configure.ac
+--- syslog-ng-3.29.1.org/configure.ac	2020-08-28 14:08:43.000000000 +0200
++++ syslog-ng-3.29.1/configure.ac	2021-02-28 14:26:43.099448649 +0100
+@@ -765,11 +765,10 @@ fi
  dnl ***************************************************************************
  dnl Checks for libraries
  AC_CHECK_LIB(door, door_create, BASE_LIBS="$BASE_LIBS -ldoor")
@@ -13,5 +14,5 @@
 +AC_CHECK_FUNC([gethostbyname], [:], [AC_CHECK_LIB(nsl, gethostbyname, BASE_LIBS="$BASE_LIBS -lnsl")])
 +AC_CHECK_FUNC([regexec], [:], [AC_CHECK_LIB(regex, regexec, REGEX_LIBS="-lregex")])
  
- 
- if test "x$enable_linux_caps" = "xyes" -o "x$enable_linux_caps" = "xauto"; then
+ AC_CHECK_FUNCS(strdup		\
+ 	strtol			\

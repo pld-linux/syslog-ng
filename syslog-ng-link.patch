@@ -1,7 +1,7 @@
-diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/configure.ac syslog-ng-syslog-ng-3.14.1/configure.ac
---- syslog-ng-syslog-ng-3.14.1.orig/configure.ac	2018-04-03 09:50:19.000000000 +0200
-+++ syslog-ng-syslog-ng-3.14.1/configure.ac	2018-04-03 09:51:38.000000000 +0200
-@@ -1626,9 +1626,9 @@ if test "x$linking_mode" = "xdynamic"; t
+diff -urNp -x '*.orig' syslog-ng-3.29.1.org/configure.ac syslog-ng-3.29.1/configure.ac
+--- syslog-ng-3.29.1.org/configure.ac	2021-02-28 14:27:09.946954361 +0100
++++ syslog-ng-3.29.1/configure.ac	2021-02-28 14:27:10.230296549 +0100
+@@ -1775,9 +1775,9 @@ if test "x$linking_mode" = "xdynamic"; t
  	# syslog-ng binary is linked with the default link command (e.g. libtool)
  	SYSLOGNG_LINK='$(LINK)'
  else
@@ -13,10 +13,10 @@ diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/configure.ac syslog-ng-sys
  
  	# bypass libtool in case we want to do mixed linking because it
  	# doesn't support -Wl,-Bstatic -Wl,-Bdynamic on a per-library basis.
-diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/lib/logproto/tests/Makefile.am syslog-ng-syslog-ng-3.14.1/lib/logproto/tests/Makefile.am
---- syslog-ng-syslog-ng-3.14.1.orig/lib/logproto/tests/Makefile.am	2018-02-26 15:32:28.000000000 +0100
-+++ syslog-ng-syslog-ng-3.14.1/lib/logproto/tests/Makefile.am	2018-04-03 09:50:43.000000000 +0200
-@@ -24,8 +24,7 @@ lib_logproto_tests_test_findeom_CFLAGS	=
+diff -urNp -x '*.orig' syslog-ng-3.29.1.org/lib/logproto/tests/Makefile.am syslog-ng-3.29.1/lib/logproto/tests/Makefile.am
+--- syslog-ng-3.29.1.org/lib/logproto/tests/Makefile.am	2020-08-10 20:04:39.000000000 +0200
++++ syslog-ng-3.29.1/lib/logproto/tests/Makefile.am	2021-02-28 14:27:10.230296549 +0100
+@@ -23,7 +23,6 @@ lib_logproto_tests_test_findeom_CFLAGS	=
  	$(TEST_CFLAGS) \
  	-I${top_srcdir}/libtest
  lib_logproto_tests_test_findeom_LDADD	= \
@@ -24,4 +24,3 @@ diff -dur -x '*.orig' syslog-ng-syslog-ng-3.14.1.orig/lib/logproto/tests/Makefil
  	${top_builddir}/libtest/libsyslog-ng-test.a \
  	$(TEST_LDADD)
  lib_logproto_tests_test_findeom_SOURCES = \
-
