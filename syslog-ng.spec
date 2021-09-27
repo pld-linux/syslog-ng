@@ -133,9 +133,9 @@ Requires:	openssl >= 0.9.8
 Provides:	service(klogd)
 Provides:	service(syslog)
 Provides:	syslogdaemon
-Obsoletes:	syslog-ng-module-afsocket
-Obsoletes:	syslog-ng-module-dbparser
-Obsoletes:	syslog-ng-systemd
+Obsoletes:	syslog-ng-module-afsocket < 3.3.1-4
+Obsoletes:	syslog-ng-module-dbparser < 3.3.1-4
+Obsoletes:	syslog-ng-systemd < 3.3.4-3
 Conflicts:	klogd
 Conflicts:	msyslog
 Conflicts:	rsyslog
@@ -244,7 +244,7 @@ Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	json-c >= 0.9
-Obsoletes:	syslog-ng-module-tfjson
+Obsoletes:	syslog-ng-module-tfjson < 3.4.2
 
 %description module-json-plugin
 JSON formatting template function for syslog-ng.
