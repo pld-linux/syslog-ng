@@ -32,7 +32,7 @@
 %define	libivykis_version 0.42.4
 
 %define		glib2_ver	1:2.28
-%define		mver	3.29
+%define		mver	3.34
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
@@ -88,7 +88,7 @@ BuildRequires:	libcap-devel
 %{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
 %{?with_geoip2:BuildRequires:	libmaxminddb-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
-%{?with_kafka:BuildRequires:	librdkafka-devel >= 1.0.0}
+%{?with_kafka:BuildRequires:	librdkafka-devel >= 1.1.0}
 BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
 BuildRequires:	libxslt-progs
@@ -100,7 +100,7 @@ BuildRequires:	pkgconfig
 %{?with_riemann:BuildRequires:	riemann-c-client-devel >= 1.6.0}
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.623
-%{?with_systemd:BuildRequires:	systemd-devel >= 1:209}
+%{?with_systemd:BuildRequires:	systemd-devel >= 1:245}
 BuildRequires:	which
 %if %{with tests}
 BuildRequires:	GeoIP-db-Country
@@ -257,7 +257,7 @@ Summary:	Apache Kafka destination support module for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi zapisu logów poprzez protokół Apache Kafka
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	librdkafka >= 1.0.0
+Requires:	librdkafka >= 1.1.0
 
 %description module-kafka
 Apache Kafka destination support module for syslog-ng.
@@ -315,6 +315,7 @@ Requires:	glib2 >= %{glib2_ver}
 %{?with_system_libivykis:Requires:	libivykis >= %{libivykis_version}}
 Requires:	pcre >= 6.1
 %endif
+%{?with_systemd:Requires:	systemd-libs >= 1:245}
 Conflicts:	syslog-ng < 3.3.1-3
 
 %description libs
@@ -376,7 +377,7 @@ cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
-%{__sed} -i -e '1s,/usr/bin/env python$,%{__python3},' lib/merge-grammar.py
+%{__sed} -i -e '1s,/usr/bin/env python3$,%{__python3},' lib/merge-grammar.py
 
 %build
 for i in . ; do
@@ -599,6 +600,7 @@ exit 0
 %attr(755,root,root) %{moduledir}/libmap-value-pairs.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
+%attr(755,root,root) %{moduledir}/libregexp-parser.so
 %attr(755,root,root) %{moduledir}/libsecure-logging.so
 %attr(755,root,root) %{moduledir}/libstardate.so
 %attr(755,root,root) %{moduledir}/libtags-parser.so
@@ -632,6 +634,7 @@ exit 0
 # R: basicfuncs
 %{_datadir}/syslog-ng/include/scl/collectd
 %{_datadir}/syslog-ng/include/scl/default-network-drivers
+%{_datadir}/syslog-ng/include/scl/fortigate
 %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
 %{_datadir}/syslog-ng/include/scl/kafka
@@ -718,6 +721,9 @@ exit 0
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libjson-plugin.so
 # all below configs require json-plugin
+%{_datadir}/syslog-ng/include/scl/cee
+# R: basicfuncs http json-plugin
+%{_datadir}/syslog-ng/include/scl/discord
 %{_datadir}/syslog-ng/include/scl/cim
 # R: http json-plugin
 %{_datadir}/syslog-ng/include/scl/elasticsearch
