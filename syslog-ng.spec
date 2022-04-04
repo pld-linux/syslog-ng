@@ -32,19 +32,19 @@
 %define	libivykis_version 0.42.4
 
 %define		glib2_ver	1:2.28
-%define		mver	3.34
+%define		mver	3.36
 %define		docmver	3.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.34.1
-Release:	2
+Version:	3.36.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
 Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	c92dacafc90c878de3719a0dc3d82de5
+# Source0-md5:	a3a39aa2c65c4d291f96ab560ea7a4f9
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -536,7 +536,9 @@ fi
 %triggerpostun -- syslog-ng < 3.3.4-3
 %systemd_trigger syslog-ng@.service syslog-ng.service
 
-%triggerun -- syslog-ng < 3.0
+%triggerun -- syslog-ng < 3.19.1
+grep -q '^@include "/etc/syslog-ng\.d/\*\.conf"' /etc/syslog-ng/syslog-ng.conf || echo '@include "/etc/syslog-ng.d/*.conf"' >> /etc/syslog-ng/syslog-ng.conf
+# 3.0
 sed -i -e 's#sync(\(.*\))#flush_lines(\1)#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#pipe ("/proc/kmsg"#file ("/proc/kmsg"#g' /etc/syslog-ng/syslog-ng.conf
 sed -i -e 's#log_prefix#program_override#g' /etc/syslog-ng/syslog-ng.conf
@@ -547,11 +549,6 @@ sed -i -e 's#match("IN\=\[A-Za-z0-9\]\* OUT=\[A-Za-z0-9\]\*");#match("IN=[A-Za-z
 sed -i -e "1 s#\(.*\)\$#@version: 3.0\n\1#g" /etc/syslog-ng/syslog-ng.conf
 rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %service -q syslog-ng restart
-exit 0
-
-%triggerun -- syslog-ng < 3.19.1
-grep -q '^@include "/etc/syslog-ng\.d/\*\.conf"' /etc/syslog-ng/syslog-ng.conf || echo '@include "/etc/syslog-ng.d/*.conf"' >> /etc/syslog-ng/syslog-ng.conf
-exit 0
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -602,6 +599,7 @@ exit 0
 %attr(755,root,root) %{moduledir}/libmap-value-pairs.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
+%attr(755,root,root) %{moduledir}/librate-limit-filter.so
 %attr(755,root,root) %{moduledir}/libregexp-parser.so
 %attr(755,root,root) %{moduledir}/libsecure-logging.so
 %attr(755,root,root) %{moduledir}/libstardate.so
