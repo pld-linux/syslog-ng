@@ -1,0 +1,23 @@
+--- syslog-ng-3.36.1/configure.ac.orig	2022-11-19 19:54:27.666859016 +0100
++++ syslog-ng-3.36.1/configure.ac	2022-11-19 19:55:44.214304211 +0100
+@@ -919,16 +919,18 @@
+ dnl ***************************************************************************
+ 
+ GLIB_ADDONS="gmodule-2.0 gthread-2.0"
+-PKG_CHECK_MODULES(GLIB, glib-2.0 >= $GLIB_MIN_VERSION $GLIB_ADDONS,,)
+ 
+ if test "$linking_mode" != "dynamic"; then
++	PKG_CHECK_MODULES_STATIC(GLIB, glib-2.0 >= $GLIB_MIN_VERSION $GLIB_ADDONS,,)
+ 	# strip out -ldl & -lrt as it cannot be linked statically
+-	GLIB_LIBS=`echo $GLIB_LIBS | tr ' ' '\n' | egrep -v "^(-ldld?)|(-lrt)$" | tr '\n' ' '`
++	GLIB_LIBS=`echo $GLIB_LIBS | tr ' ' '\n' | egrep -v "^(-ldld?)|(-lrt)|(-lm)$" | tr '\n' ' '`
+ 
+ 	old_LIBS=$LIBS
+ 	LIBS="$LD_START_STATIC $GLIB_LIBS $LD_END_STATIC $BASE_LIBS"
+ 	AC_CHECK_FUNC(g_hash_table_new, blb_cv_static_glib=yes, blb_cv_static_glib=no)
+ 	LIBS=$old_LIBS
++else
++	PKG_CHECK_MODULES(GLIB, glib-2.0 >= $GLIB_MIN_VERSION $GLIB_ADDONS,,)
+ fi
+ 
+ GLIB_CFLAGS="${GLIB_CFLAGS} -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_32"

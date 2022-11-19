@@ -66,6 +66,7 @@ Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
 Patch7:		32bit.patch
 Patch8:		openssl3.patch
+Patch9:		glib-static.patch
 URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
@@ -375,6 +376,7 @@ rmdir lib/ivykis
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 cp -p %{SOURCE4} doc
 cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
 
