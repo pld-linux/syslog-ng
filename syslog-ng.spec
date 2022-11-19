@@ -815,6 +815,7 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{_pkgconfigdir}/syslog-ng.pc
 %{_pkgconfigdir}/syslog-ng-native-connector.pc
 
+%if %{with tests}
 %files test-devel
 %defattr(644,root,root,755)
 %if "%{_libdir}/syslog-ng" != "{moduledir}"
@@ -824,3 +825,4 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{_libdir}/syslog-ng/libtest/libsyslog-ng-test.a
 %{_includedir}/syslog-ng/libtest
 %{_pkgconfigdir}/syslog-ng-test.pc
+%endif
