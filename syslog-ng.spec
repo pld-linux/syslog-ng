@@ -95,6 +95,7 @@ BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
 BuildRequires:	libxslt-progs
 BuildRequires:	lz4-devel >= r131-5
+BuildRequires:	net-snmp-devel
 BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre-devel >= 6.1
 BuildRequires:	pkgconfig
