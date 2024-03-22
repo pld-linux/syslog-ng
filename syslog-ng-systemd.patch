@@ -12,7 +12,7 @@ diff -dur -x '*~' syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.ser
  EnvironmentFile=-/etc/default/syslog-ng@%i
  EnvironmentFile=-/etc/sysconfig/syslog-ng@%i
 -ExecStart=/usr/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE
-+ExecStart=/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE --worker-threads=1024 $SYSLOGNG_OPTS
++ExecStart=/sbin/syslog-ng -F $OTHER_OPTIONS --cfgfile $CONFIG_FILE --control $CONTROL_FILE --persist-file $PERSIST_FILE --pidfile $PID_FILE $SYSLOGNG_OPTS
  ExecReload=/bin/kill -HUP $MAINPID
  StandardOutput=journal
  StandardError=journal
