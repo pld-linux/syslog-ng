@@ -38,7 +38,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	4.8.0
-Release:	1
+Release:	2
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
@@ -424,6 +424,7 @@ done
 	--enable-spoof-source \
 	--enable-ssl \
 	--enable-systemd%{!?with_systemd:=no} \
+	--with-systemd-journal=auto \
 	--enable-tcp-wrapper \
 %if %{with sql}
 	--enable-sql \
@@ -447,7 +448,10 @@ done
 LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
 PYTHONPATH=$(pwd)/tests/functional
 export LD_LIBRARY_PATH PYTHONPATH
-%{__make} check
+if ! %{__make} check; then
+	cat test-suite.log
+	exit 1
+fi
 %endif
 
 %install
