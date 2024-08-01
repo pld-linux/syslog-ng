@@ -52,7 +52,7 @@ Source4:	%{name}-simple.conf
 # for git archives (release tarballs include ivykis)
 #Source6Download: https://github.com/buytenh/ivykis/releases
 Source5:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
-# Source6-md5:	e09caeb95a01a541ec40d3b757dada12
+# Source5-md5:	e09caeb95a01a541ec40d3b757dada12
 %endif
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
