@@ -38,7 +38,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	4.8.0
-Release:	2
+Release:	3
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
@@ -109,7 +109,11 @@ BuildRequires:	python3
 %{?with_python:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	python3-pep8
 BuildRequires:	python3-ply
+BuildRequires:	python3-pytest-mock
 BuildRequires:	tzdata
+%endif
+%if %{with python}
+BuildRequires:	python3-kubernetes
 %endif
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
