@@ -439,6 +439,7 @@ done
 	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
 	--with-module-dir=%{moduledir} \
 	--with-pidfile-dir=/var/run \
+	--with-python-packages=system \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-timezone-dir=%{_datadir}/zoneinfo
 
