@@ -29,32 +29,29 @@
 %endif
 
 # as in git submodule
-%define	libivykis_version 0.42.4
+%define	libivykis_version 0.43.2
 
 %define		glib2_ver	1:2.28
-%define		mver	3.36
-%define		docmver	3.12
+%define		mver	4.8
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	3.36.1
-Release:	6
+Version:	4.8.0
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
 Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	a3a39aa2c65c4d291f96ab560ea7a4f9
+# Source0-md5:	581018ae30bc52f49e8489f0c28a43f8
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
-Source4:	http://www.balabit.com/support/documentation/syslog-ng-ose-%{docmver}-guides/en/syslog-ng-ose-v%{docmver}-guide-admin/pdf/%{name}-ose-v%{docmver}-guide-admin.pdf
-# Source4-md5:	fce7075b03ba9501911b9812a553e680
-Source5:	%{name}-simple.conf
+Source4:	%{name}-simple.conf
 %if 0
 # for git archives (release tarballs include ivykis)
 #Source6Download: https://github.com/buytenh/ivykis/releases
-Source6:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
+Source5:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
 # Source6-md5:	e09caeb95a01a541ec40d3b757dada12
 %endif
 Source7:	syslog-ng.service
@@ -65,7 +62,7 @@ Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
 Patch7:		32bit.patch
-Patch8:		openssl3.patch
+
 Patch9:		glib-static.patch
 URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
@@ -363,7 +360,7 @@ Pakiet pomocniczy do testowania modułów sysloga-ng.
 %setup -q
 %else
 # git archive
-%setup -q -n %{name}-%{name}-%{version} -a 6
+%setup -q -n %{name}-%{name}-%{version} -a 5
 
 rmdir lib/ivykis
 %{__mv} ivykis-%{libivykis_version} lib/ivykis
@@ -376,10 +373,9 @@ rmdir lib/ivykis
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p1
+
 %patch9 -p1
-cp -p %{SOURCE4} doc
-cp -p %{SOURCE5} contrib/syslog-ng.conf.simple
+cp -p %{SOURCE4} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
 %{__sed} -i -e '1s,/usr/bin/env python3$,%{__python3},' lib/merge-grammar.py
@@ -560,13 +556,12 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %defattr(644,root,root,755)
 %doc AUTHORS NEWS.md contrib/relogger.pl
 %doc contrib/syslog-ng.conf.{doc,simple,RedHat}
-%doc contrib/{apparmor,selinux,syslog2ng} doc/syslog-ng-ose-v%{docmver}-guide-admin.pdf
+%doc contrib/{apparmor,selinux,syslog2ng}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}@default
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng/patterndb.d
 %attr(750,root,root) %dir %{_sysconfdir}/syslog-ng.d
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/scl.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/syslog-ng/syslog-ng.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/syslog-ng
 %attr(754,root,root) /etc/rc.d/init.d/syslog-ng
@@ -587,10 +582,12 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %attr(755,root,root) %{moduledir}/libazure-auth-header.so
 %attr(755,root,root) %{moduledir}/libbasicfuncs.so
 %attr(755,root,root) %{moduledir}/libcef.so
+%attr(755,root,root) %{moduledir}/libcloud_auth.so
 %attr(755,root,root) %{moduledir}/libconfgen.so
+%attr(755,root,root) %{moduledir}/libcorrelation.so
 %attr(755,root,root) %{moduledir}/libcryptofuncs.so
 %attr(755,root,root) %{moduledir}/libcsvparser.so
-%attr(755,root,root) %{moduledir}/libdbparser.so
+#%attr(755,root,root) %{moduledir}/libdbparser.so
 %attr(755,root,root) %{moduledir}/libdisk-buffer.so
 %if %{with geoip2}
 %attr(755,root,root) %{moduledir}/libgeoip2-plugin.so
@@ -600,6 +597,7 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %attr(755,root,root) %{moduledir}/libkvformat.so
 %attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
 %attr(755,root,root) %{moduledir}/libmap-value-pairs.so
+%attr(755,root,root) %{moduledir}/libmetrics-probe.so
 %attr(755,root,root) %{moduledir}/libpacctformat.so
 %attr(755,root,root) %{moduledir}/libpseudofile.so
 %attr(755,root,root) %{moduledir}/librate-limit-filter.so
@@ -627,34 +625,50 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %attr(755,root,root) %{_bindir}/slogencrypt
 %attr(755,root,root) %{_bindir}/slogkey
 %attr(755,root,root) %{_bindir}/slogverify
+%attr(755,root,root) %{_bindir}/syslog-ng-update-virtualenv
 %attr(755,root,root) %{_bindir}/update-patterndb
 
+%{_datadir}/syslog-ng/smart-multi-line.fsm
 %dir %{_datadir}/syslog-ng/include
+%{_datadir}/syslog-ng/include/scl.conf
 %dir %{_datadir}/syslog-ng/include/scl
 %{_datadir}/syslog-ng/include/scl/apache
+%{_datadir}/syslog-ng/include/scl/arr
 %{_datadir}/syslog-ng/include/scl/checkpoint
 %{_datadir}/syslog-ng/include/scl/cisco
 # R: basicfuncs
 %{_datadir}/syslog-ng/include/scl/collectd
+%{_datadir}/syslog-ng/include/scl/darwinosl
 %{_datadir}/syslog-ng/include/scl/default-network-drivers
 %{_datadir}/syslog-ng/include/scl/fortigate
+%{_datadir}/syslog-ng/include/scl/google
 %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
 %{_datadir}/syslog-ng/include/scl/kafka
 %{_datadir}/syslog-ng/include/scl/iptables
+%{_datadir}/syslog-ng/include/scl/jellyfin
 %{_datadir}/syslog-ng/include/scl/junos
 %{_datadir}/syslog-ng/include/scl/linux-audit
 %dir %{_datadir}/syslog-ng/include/scl/loadbalancer
 %attr(755,root,root) %{_datadir}/syslog-ng/include/scl/loadbalancer/gen-loadbalancer.sh
 %{_datadir}/syslog-ng/include/scl/loadbalancer/plugin.conf
+%{_datadir}/syslog-ng/include/scl/logscale
+%{_datadir}/syslog-ng/include/scl/mariadb
 %{_datadir}/syslog-ng/include/scl/mbox
 %{_datadir}/syslog-ng/include/scl/nodejs
+%{_datadir}/syslog-ng/include/scl/openobserve
+%{_datadir}/syslog-ng/include/scl/opensearch
 %{_datadir}/syslog-ng/include/scl/osquery
 %{_datadir}/syslog-ng/include/scl/pacct
 %{_datadir}/syslog-ng/include/scl/paloalto
+%{_datadir}/syslog-ng/include/scl/pgsql
+%{_datadir}/syslog-ng/include/scl/pihole
+%{_datadir}/syslog-ng/include/scl/python
+%{_datadir}/syslog-ng/include/scl/qbittorrent
 %{_datadir}/syslog-ng/include/scl/rewrite
 %{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
+%{_datadir}/syslog-ng/include/scl/splunk
 %{_datadir}/syslog-ng/include/scl/sudo
 %{_datadir}/syslog-ng/include/scl/sumologic
 %{_datadir}/syslog-ng/include/scl/websense
@@ -786,31 +800,8 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %attr(755,root,root) %{_libdir}/libsecret-storage.so
 %attr(755,root,root) %{_libdir}/libsyslog-ng.so
 %{_libdir}/libsyslog-ng-native-connector.a
-%dir %{_includedir}/syslog-ng
-%{_includedir}/syslog-ng/*.h
-%{_includedir}/syslog-ng/ack-tracker
-%{_includedir}/syslog-ng/compat
-%{_includedir}/syslog-ng/control
-%{_includedir}/syslog-ng/debugger
-%{_includedir}/syslog-ng/filter
-%if %{without system_libivykis}
-%{_includedir}/syslog-ng/ivykis
-%endif
-%{_includedir}/syslog-ng/logmsg
-%{_includedir}/syslog-ng/logproto
-%{_includedir}/syslog-ng/logthrdest
-%{_includedir}/syslog-ng/logthrsource
-%{_includedir}/syslog-ng/modules
-%{_includedir}/syslog-ng/parser
-%{_includedir}/syslog-ng/rewrite
-%{_includedir}/syslog-ng/scanner
-%{_includedir}/syslog-ng/signal-slot-connector
-%{_includedir}/syslog-ng/stats
-%{_includedir}/syslog-ng/str-repr
-%{_includedir}/syslog-ng/template
-%{_includedir}/syslog-ng/timeutils
-%{_includedir}/syslog-ng/transport
-%{_includedir}/syslog-ng/value-pairs
+%{_includedir}/syslog-ng
+%exclude %{_includedir}/syslog-ng/libtest
 %{_datadir}/syslog-ng/tools
 %{_pkgconfigdir}/syslog-ng.pc
 %{_pkgconfigdir}/syslog-ng-native-connector.pc

@@ -1,7 +1,6 @@
-diff -dur -x '*~' syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.service syslog-ng-syslog-ng-3.14.1/contrib/systemd/syslog-ng@.service
---- syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.service	2018-02-26 15:32:28.000000000 +0100
-+++ syslog-ng-syslog-ng-3.14.1/contrib/systemd/syslog-ng@.service	2018-03-30 15:38:31.000000000 +0200
-@@ -5,13 +5,17 @@
+--- syslog-ng-4.8.0/contrib/systemd/syslog-ng@.service.orig	2024-08-01 19:21:06.909970083 +0200
++++ syslog-ng-4.8.0/contrib/systemd/syslog-ng@.service	2024-08-01 19:23:37.569970075 +0200
+@@ -7,9 +7,13 @@ After=network.target network-online.targ
  
  [Service]
  Type=notify
@@ -16,8 +15,3 @@ diff -dur -x '*~' syslog-ng-syslog-ng-3.14.1.orig/contrib/systemd/syslog-ng@.ser
  ExecReload=/bin/kill -HUP $MAINPID
  StandardOutput=journal
  StandardError=journal
- Restart=on-failure
- 
- [Install]
-+DefaultInstance=default
--WantedBy=multi-user.target

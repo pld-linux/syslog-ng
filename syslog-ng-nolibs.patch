@@ -1,9 +1,8 @@
-diff -urNp -x '*.orig' syslog-ng-3.29.1.org/configure.ac syslog-ng-3.29.1/configure.ac
---- syslog-ng-3.29.1.org/configure.ac	2020-08-28 14:08:43.000000000 +0200
-+++ syslog-ng-3.29.1/configure.ac	2021-02-28 14:26:43.099448649 +0100
-@@ -765,11 +765,10 @@ fi
- dnl ***************************************************************************
+--- syslog-ng-4.8.0/configure.ac~	2024-07-23 13:42:10.000000000 +0200
++++ syslog-ng-4.8.0/configure.ac	2024-08-01 19:20:42.196636751 +0200
+@@ -900,11 +900,10 @@ dnl ************************************
  dnl Checks for libraries
+ AC_CHECK_LIB(m, round, BASE_LIBS="$BASE_LIBS -lm")
  AC_CHECK_LIB(door, door_create, BASE_LIBS="$BASE_LIBS -ldoor")
 -AC_CHECK_LIB(socket, socket, BASE_LIBS="$BASE_LIBS -lsocket")
 +AC_CHECK_FUNC([socket], [:], [AC_CHECK_LIB(socket, socket, BASE_LIBS="$BASE_LIBS -lsocket")])
