@@ -38,7 +38,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	4.8.0
-Release:	3
+Release:	4
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
@@ -316,9 +316,9 @@ Group:		Libraries
 %if %{with dynamic}
 Requires:	eventlog >= 0.2.12
 Requires:	glib2 >= %{glib2_ver}
-%{?with_system_libivykis:Requires:	libivykis >= %{libivykis_version}}
 Requires:	pcre >= 6.1
 %endif
+%{?with_system_libivykis:Requires:  libivykis >= %{libivykis_version}}
 %{?with_systemd:Requires:	systemd-libs >= 1:245}
 Conflicts:	syslog-ng < 3.3.1-3
 
@@ -336,9 +336,9 @@ Requires:	%{name}-libs = %{version}-%{release}
 %if %{with dynamic}
 Requires:	eventlog-devel >= 0.2.12
 Requires:	glib2-devel >= %{glib2_ver}
-%{?with_system_libivykis:Requires:	libivykis-devel >= %{libivykis_version}}
 Requires:	pcre-devel >= 6.1
 %endif
+%{?with_system_libivykis:Requires:  libivykis-devel >= %{libivykis_version}}
 
 %description devel
 Header files for syslog-ng modules development.
