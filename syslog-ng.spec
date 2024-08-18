@@ -31,7 +31,7 @@
 # as in git submodule
 %define	libivykis_version 0.43.2
 
-%define		glib2_ver	1:2.28
+%define		glib2_ver	1:2.32.0
 %define		mver	4.8
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
@@ -67,7 +67,7 @@ Patch9:		glib-static.patch
 URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
-BuildRequires:	bison >= 2.4
+BuildRequires:	bison >= 3.7.6
 %if %{with tests}
 BuildRequires:	criterion-devel >= 2.3.3-5
 %endif
@@ -76,10 +76,10 @@ BuildRequires:	docbook-style-xsl-nons
 BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
-%{?with_java:BuildRequires:	gradle >= 2.2}
+%{?with_java:BuildRequires:	gradle >= 3.4}
 %{?with_redis:BuildRequires:	hiredis-devel >= 0.11.0}
-%{?with_java:BuildRequires:	jdk >= 1.7}
-%{?with_json:BuildRequires:	json-c-devel >= 0.9}
+%{?with_java:BuildRequires:	jdk >= 1.8}
+%{?with_json:BuildRequires:	json-c-devel >= 0.13}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.9.0}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
@@ -94,7 +94,7 @@ BuildRequires:	libxslt-progs
 BuildRequires:	lz4-devel >= r131-5
 BuildRequires:	net-snmp-devel
 BuildRequires:	openssl-devel >= 0.9.8
-BuildRequires:	pcre-devel >= 6.1
+BuildRequires:	pcre2-8-devel >= 10.0
 BuildRequires:	pkgconfig
 %{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.5.3}
 %{?with_riemann:BuildRequires:	riemann-c-client-devel >= 1.6.0}
