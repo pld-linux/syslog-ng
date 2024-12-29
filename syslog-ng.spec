@@ -242,6 +242,19 @@ HTTP destination support module for syslog-ng (via libcurl).
 %description module-http -l pl.UTF-8
 Moduł sysloga-ng do obsługi zapisu logów poprzez HTTP (via libcurl).
 
+%package module-cloudauth
+Summary:	Cloud Authentication support for syslog-ng: pubsub
+Summary(pl.UTF-8):	Moduł sysloga-ng do chmurowej autentykacji na potrzeby pubsub
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description module-cloudauth
+Cloud Authentication support for syslog-ng,
+currently used for Google PubSub
+
+%description module-cloudauth -l pl.UTF-8
+Moduł sysloga-ng do obsługi autentykacji w chmurze, używany przez Google PubSub
+
 %package module-json-plugin
 Summary:	JSON formatting template function for syslog-ng
 Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi szablonów z formatowaniem JSON
@@ -591,7 +604,6 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %attr(755,root,root) %{moduledir}/libazure-auth-header.so
 %attr(755,root,root) %{moduledir}/libbasicfuncs.so
 %attr(755,root,root) %{moduledir}/libcef.so
-%attr(755,root,root) %{moduledir}/libcloud_auth.so
 %attr(755,root,root) %{moduledir}/libconfgen.so
 %attr(755,root,root) %{moduledir}/libcorrelation.so
 %attr(755,root,root) %{moduledir}/libcryptofuncs.so
@@ -650,7 +662,6 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{_datadir}/syslog-ng/include/scl/darwinosl
 %{_datadir}/syslog-ng/include/scl/default-network-drivers
 %{_datadir}/syslog-ng/include/scl/fortigate
-%{_datadir}/syslog-ng/include/scl/google
 %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
 %{_datadir}/syslog-ng/include/scl/kafka
@@ -741,6 +752,11 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %attr(755,root,root) %{moduledir}/libhttp.so
 %{_datadir}/syslog-ng/include/scl/telegram
 %endif
+
+%files module-cloudauth
+%defattr(644,root,root,755)
+%attr(755,root,root) %{moduledir}/libcloud_auth.so
+%{_datadir}/syslog-ng/include/scl/google/google-pubsub.conf
 
 %if %{with json}
 %files module-json-plugin
