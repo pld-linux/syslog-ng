@@ -50,9 +50,10 @@ Source3:	%{name}.logrotate
 Source4:	%{name}-simple.conf
 %if 0
 # for git archives (release tarballs include ivykis)
-#Source6Download: https://github.com/buytenh/ivykis/releases
-Source5:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
-# Source5-md5:	e09caeb95a01a541ec40d3b757dada12
+#Source5Download: https://github.com/buytenh/ivykis/releases
+#Source5:	https://github.com/buytenh/ivykis/archive/v%{libivykis_version}/ivykis-%{libivykis_version}.tar.gz
+Source5:	https://downloads.sourceforge.net/libivykis/ivykis-%{libivykis_version}.tar.gz
+# Source5-md5:	df51c6d5c52bef1c82ea33eddc997792
 %endif
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
