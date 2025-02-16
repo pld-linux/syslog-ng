@@ -383,15 +383,15 @@ rmdir lib/ivykis
 %{__mv} ivykis-%{libivykis_version} lib/ivykis
 %endif
 
-%patch0 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
+%patch -P0 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
+%patch -P6 -p1
+%patch -P7 -p1
 
-%patch9 -p1
+%patch -P9 -p1
 cp -p %{SOURCE4} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
