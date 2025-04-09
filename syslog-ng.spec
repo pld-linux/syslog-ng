@@ -1,5 +1,6 @@
 # NOTE: only core functionality is available without /usr;
 #       some non-trivial extension modules rely in libraries/daemons existing in /usr.
+# TODO: mqtt, libpaho-mqtt?
 #
 # Conditional build:
 %bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
@@ -9,6 +10,8 @@
 %bcond_without	sql			# support for logging to SQL DB
 %endif
 %bcond_without	tests			# do not perform "make check"
+%bcond_with	bpf			# loading eBPF programs support
+%bcond_without	grpc			# support for GRPC protocols
 %bcond_without	http			# support for HTTP destination
 %bcond_without	json			# support for JSON template formatting
 %bcond_without	mongodb			# support for mongodb destination
@@ -37,13 +40,13 @@ Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	4.8.0
-Release:	4
+Version:	4.8.1
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
 Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	581018ae30bc52f49e8489f0c28a43f8
+# Source0-md5:	6a5852343f9a34449c3812b474728aa7
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -78,14 +81,15 @@ BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_java:BuildRequires:	gradle >= 3.4}
+%{?with_grpc:BuildRequires:	grpc-devel >= 1.16.1}
 %{?with_redis:BuildRequires:	hiredis-devel >= 0.11.0}
 %{?with_java:BuildRequires:	jdk >= 1.8}
 %{?with_json:BuildRequires:	json-c-devel >= 0.13}
+%{?with_bpf:BuildRequires:	libbpf-devel >= 1.0.1}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.9.0}
 %{?with_smtp:BuildRequires:	libesmtp-devel}
 %{?with_system_libivykis:BuildRequires:	libivykis-devel >= %{libivykis_version}}
-%{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
 %{?with_geoip2:BuildRequires:	libmaxminddb-devel}
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 %{?with_kafka:BuildRequires:	librdkafka-devel >= 1.1.0}
@@ -93,10 +97,12 @@ BuildRequires:	libtool >= 2:2.0
 BuildRequires:	libwrap-devel
 BuildRequires:	libxslt-progs
 BuildRequires:	lz4-devel >= r131-5
+%{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
 BuildRequires:	net-snmp-devel
 BuildRequires:	openssl-devel >= 0.9.8
 BuildRequires:	pcre2-8-devel >= 10.0
 BuildRequires:	pkgconfig
+%{?with_grpc:BuildRequires:	protobuf-devel >= 3.12.0}
 %{?with_system_rabbitmq:BuildRequires:	rabbitmq-c-devel >= 0.5.3}
 %{?with_riemann:BuildRequires:	riemann-c-client-devel >= 1.6.0}
 BuildRequires:	rpm >= 4.4.9-56
@@ -112,9 +118,6 @@ BuildRequires:	python3-pep8
 BuildRequires:	python3-ply
 BuildRequires:	python3-pytest-mock
 BuildRequires:	tzdata
-%endif
-%if %{with python}
-BuildRequires:	python3-kubernetes
 %endif
 %if %{without dynamic}
 BuildRequires:	eventlog-static >= 0.2.12
@@ -245,16 +248,31 @@ Moduł sysloga-ng do obsługi zapisu logów poprzez HTTP (via libcurl).
 
 %package module-cloudauth
 Summary:	Cloud Authentication support for syslog-ng: pubsub
-Summary(pl.UTF-8):	Moduł sysloga-ng do chmurowej autentykacji na potrzeby pubsub
+Summary(pl.UTF-8):	Moduł sysloga-ng do uwierzytelniania chmurowego na potrzeby pubsub
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description module-cloudauth
-Cloud Authentication support for syslog-ng,
-currently used for Google PubSub
+Cloud Authentication support for syslog-ng, currently used for Google
+PubSub.
 
 %description module-cloudauth -l pl.UTF-8
-Moduł sysloga-ng do obsługi autentykacji w chmurze, używany przez Google PubSub
+Moduł sysloga-ng do obsługi uwierzytelniania w chmurze, używany przez
+Google PubSub.
+
+%package module-grpc
+Summary:	GRPC modules for syslog-ng: bigquery, loki, otel
+Summary(pl.UTF-8):	Moduły GRPC dla sysloga-ng: bigquery, loki, otel
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description module-grpc
+GRPC protocols support for syslog-ng, currently: bigquery, loki and
+otel.
+
+%description module-grpc -l pl.UTF-8
+Obsługa protokołów GRPC dla sysloga-ng, obecnie: bigquery, loki i
+otel.
 
 %package module-json-plugin
 Summary:	JSON formatting template function for syslog-ng
@@ -418,7 +436,9 @@ done
 %else
 	--enable-mixed-linking \
 %endif
+	--enable-ebpf%{!?with_bpf:=no} \
 	%{__enable_disable geoip2} \
+	--enable-grpc%{!?with_grpc:=no} \
 	--enable-http%{!?with_http:=no} \
 	--enable-ipv6 \
 	--enable-java%{!?with_java:=no} \
@@ -457,7 +477,7 @@ done
 	%{?with_system_rabbitmq:--with-librabbitmq-client=system} \
 	--with-module-dir=%{moduledir} \
 	--with-pidfile-dir=/var/run \
-	--with-python-packages=system \
+	--with-python-packages=none \
 	--with-systemdsystemunitdir=%{systemdunitdir} \
 	--with-timezone-dir=%{_datadir}/zoneinfo
 
@@ -574,6 +594,9 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
+
+%post	module-grpc -p /sbin/ldconfig
+%postun	module-grpc -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -758,6 +781,15 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libcloud_auth.so
 %{_datadir}/syslog-ng/include/scl/google/google-pubsub.conf
+
+%files module-grpc
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libgrpc-protos.so.*.*.*
+%ghost %{_libdir}/libgrpc-protos.so.0
+%{_libdir}/libgrpc-protos.so
+%attr(755,root,root) %{moduledir}/libbigquery.so
+%attr(755,root,root) %{moduledir}/libloki.so
+%attr(755,root,root) %{moduledir}/libotel.so
 
 %if %{with json}
 %files module-json-plugin
