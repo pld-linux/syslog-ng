@@ -1,6 +1,5 @@
 # NOTE: only core functionality is available without /usr;
 #       some non-trivial extension modules rely in libraries/daemons existing in /usr.
-# TODO: mqtt, libpaho-mqtt?
 #
 # Conditional build:
 %bcond_with	dynamic			# link dynamically with glib, eventlog, pcre (modules are always linked dynamically)
@@ -10,11 +9,12 @@
 %bcond_without	sql			# support for logging to SQL DB
 %endif
 %bcond_without	tests			# do not perform "make check"
-%bcond_with	bpf			# loading eBPF programs support
+%bcond_with	bpf			# loading eBPF programs support (generates some data from current kernel)
 %bcond_without	grpc			# support for GRPC protocols
 %bcond_without	http			# support for HTTP destination
 %bcond_without	json			# support for JSON template formatting
 %bcond_without	mongodb			# support for mongodb destination
+%bcond_without	mqtt			# support for MQTT protocol
 %bcond_without	redis			# support for Redis destination
 %bcond_without	smtp			# support for logging into SMTP
 %bcond_without	geoip2			# support for GeoIP2
@@ -85,6 +85,8 @@ BuildRequires:	glib2-devel >= %{glib2_ver}
 %{?with_redis:BuildRequires:	hiredis-devel >= 0.11.0}
 %{?with_java:BuildRequires:	jdk >= 1.8}
 %{?with_json:BuildRequires:	json-c-devel >= 0.13}
+# bpftool
+%{?with_bpf:BuildRequires:	kernel-tools >= 4.15}
 %{?with_bpf:BuildRequires:	libbpf-devel >= 1.0.1}
 BuildRequires:	libcap-devel
 %{?with_sql:BuildRequires:	libdbi-devel >= 0.9.0}
@@ -100,6 +102,7 @@ BuildRequires:	lz4-devel >= r131-5
 %{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
 BuildRequires:	net-snmp-devel
 BuildRequires:	openssl-devel >= 0.9.8
+%{?with_mqtt:BuildRequires:	paho-mqtt-devel}
 BuildRequires:	pcre2-8-devel >= 10.0
 BuildRequires:	pkgconfig
 %{?with_grpc:BuildRequires:	protobuf-devel >= 3.12.0}
@@ -302,6 +305,18 @@ Apache Kafka destination support module for syslog-ng.
 Moduł sysloga-ng do obsługi zapisu logów poprzez protokół Apache
 Kafka.
 
+%package module-mqtt
+Summary:	MQTT protocol support module for syslog-ng
+Summary(pl.UTF-8):	Moduł sysloga-ng do obsługi protokołu MQTT
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description module-mqtt
+MQTT protocol support module for syslog-ng.
+
+%description module-mqtt -l pl.UTF-8
+Moduł sysloga-ng do obsługi protokołu MQTT.
+
 %package module-python
 Summary:	Python support module for syslog-ng
 Summary(pl.UTF-8):	Moduł obsługi Pythona dla sysloga-ng
@@ -453,6 +468,7 @@ done
 %else
 	--disable-mongodb \
 %endif
+	--enable-mqtt%{!?with_mqtt:=no} \
 	--enable-pacct \
 	--enable-pcre \
 	--enable-python%{!?with_python:=no} \
@@ -815,6 +831,12 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %files module-kafka
 %defattr(644,root,root,755)
 %attr(755,root,root) %{moduledir}/libkafka.so
+%endif
+
+%if %{with mqtt}
+%files module-mqtt
+%defattr(644,root,root,755)
+%attr(755,root,root) %{moduledir}/libmqtt.so
 %endif
 
 %if %{with python}
