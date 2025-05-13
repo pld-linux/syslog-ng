@@ -76,7 +76,7 @@ BuildRequires:	bison >= 3.7.6
 BuildRequires:	criterion-devel >= 2.3.3-5
 %endif
 %{?with_http:BuildRequires:	curl-devel}
-BuildRequires:	docbook-style-xsl-nons
+BuildRequires:	docbook-style-xsl
 BuildRequires:	eventlog-devel >= 0.2.12
 BuildRequires:	flex
 BuildRequires:	glib2-devel >= %{glib2_ver}
