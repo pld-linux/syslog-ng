@@ -13,5 +13,5 @@
 +AC_CHECK_FUNC([gethostbyname], [:], [AC_CHECK_LIB(nsl, gethostbyname, BASE_LIBS="$BASE_LIBS -lnsl")])
 +AC_CHECK_FUNC([regexec], [:], [AC_CHECK_LIB(regex, regexec, REGEX_LIBS="-lregex")])
  
- AC_CHECK_FUNCS(strdup		\
- 	strtol			\
+ CHECK_FUNCS_AND_DEFINE([
+     fmemopen

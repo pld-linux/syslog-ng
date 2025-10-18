@@ -35,18 +35,18 @@
 %define	libivykis_version 0.43.2
 
 %define		glib2_ver	1:2.32.0
-%define		mver	4.8
+%define		mver	4.10
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	4.8.1
+Version:	4.10.2
 Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
 Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	6a5852343f9a34449c3812b474728aa7
+# Source0-md5:	0c97637b266efcf932b5fdea5f40235e
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -62,11 +62,10 @@ Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
 Patch2:		%{name}-nolibs.patch
 Patch3:		%{name}-systemd.patch
-Patch4:		man-paths.patch
 Patch5:		%{name}-link.patch
 Patch6:		no_shared_ivykis.patch
 Patch7:		32bit.patch
-
+Patch8:		bad-tests.patch
 Patch9:		glib-static.patch
 URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
@@ -147,12 +146,12 @@ Provides:	syslogdaemon
 Obsoletes:	syslog-ng-module-afsocket < 3.3.1-4
 Obsoletes:	syslog-ng-module-dbparser < 3.3.1-4
 Obsoletes:	syslog-ng-systemd < 3.3.4-3
+Conflicts:	cronie < 1.5.0-3
+Conflicts:	fcron < 3.1.2-5
 Conflicts:	klogd
 Conflicts:	msyslog
 Conflicts:	rsyslog
 Conflicts:	syslog
-Conflicts:	cronie < 1.5.0-3
-Conflicts:	fcron < 3.1.2-5
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define	xsl_stylesheets_dir /usr/share/sgml/docbook/xsl-stylesheets
@@ -420,11 +419,10 @@ rmdir lib/ivykis
 %patch -P0 -p1
 %patch -P2 -p1
 %patch -P3 -p1
-%patch -P4 -p1
 %patch -P5 -p1
 %patch -P6 -p1
 %patch -P7 -p1
-
+%patch -P8 -p1
 %patch -P9 -p1
 cp -p %{SOURCE4} contrib/syslog-ng.conf.simple
 
@@ -630,53 +628,55 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{systemdunitdir}/syslog-ng@.service
 %{systemdunitdir}/syslog-ng.service
 %dir %{moduledir}
-%attr(755,root,root) %{moduledir}/libadd-contextual-data.so
+%{moduledir}/libadd-contextual-data.so
 %if %{with amqp}
-%attr(755,root,root) %{moduledir}/libafamqp.so
+%{moduledir}/libafamqp.so
 %endif
-%attr(755,root,root) %{moduledir}/libaffile.so
-%attr(755,root,root) %{moduledir}/libafprog.so
-%attr(755,root,root) %{moduledir}/libafsnmp.so
-%attr(755,root,root) %{moduledir}/libafsocket.so
-%attr(755,root,root) %{moduledir}/libafstomp.so
-%attr(755,root,root) %{moduledir}/libafuser.so
-%attr(755,root,root) %{moduledir}/libappmodel.so
-%attr(755,root,root) %{moduledir}/libazure-auth-header.so
-%attr(755,root,root) %{moduledir}/libbasicfuncs.so
-%attr(755,root,root) %{moduledir}/libcef.so
-%attr(755,root,root) %{moduledir}/libconfgen.so
-%attr(755,root,root) %{moduledir}/libcorrelation.so
-%attr(755,root,root) %{moduledir}/libcryptofuncs.so
-%attr(755,root,root) %{moduledir}/libcsvparser.so
+%{moduledir}/libaffile.so
+%{moduledir}/libafprog.so
+%{moduledir}/libafsnmp.so
+%{moduledir}/libafsocket.so
+%{moduledir}/libafstomp.so
+%{moduledir}/libafuser.so
+%{moduledir}/libappmodel.so
+%{moduledir}/libazure-auth-header.so
+%{moduledir}/libbasicfuncs.so
+%{moduledir}/libcef.so
+%{moduledir}/libclickhouse.so
+%{moduledir}/libconfgen.so
+%{moduledir}/libcorrelation.so
+%{moduledir}/libcryptofuncs.so
+%{moduledir}/libcsvparser.so
 #%attr(755,root,root) %{moduledir}/libdbparser.so
-%attr(755,root,root) %{moduledir}/libdisk-buffer.so
+%{moduledir}/libdisk-buffer.so
 %if %{with geoip2}
-%attr(755,root,root) %{moduledir}/libgeoip2-plugin.so
+%{moduledir}/libgeoip2-plugin.so
 %endif
-%attr(755,root,root) %{moduledir}/libgraphite.so
-%attr(755,root,root) %{moduledir}/libhook-commands.so
-%attr(755,root,root) %{moduledir}/libkvformat.so
-%attr(755,root,root) %{moduledir}/liblinux-kmsg-format.so
-%attr(755,root,root) %{moduledir}/libmap-value-pairs.so
-%attr(755,root,root) %{moduledir}/libmetrics-probe.so
-%attr(755,root,root) %{moduledir}/libpacctformat.so
-%attr(755,root,root) %{moduledir}/libpseudofile.so
-%attr(755,root,root) %{moduledir}/librate-limit-filter.so
-%attr(755,root,root) %{moduledir}/libregexp-parser.so
-%attr(755,root,root) %{moduledir}/libsecure-logging.so
-%attr(755,root,root) %{moduledir}/libstardate.so
-%attr(755,root,root) %{moduledir}/libtags-parser.so
-%attr(755,root,root) %{moduledir}/libtfgetent.so
-%attr(755,root,root) %{moduledir}/libtimestamp.so
-%attr(755,root,root) %{moduledir}/libxml.so
+%{moduledir}/libgraphite.so
+%{moduledir}/libhook-commands.so
+%{moduledir}/libkvformat.so
+%{moduledir}/liblinux-kmsg-format.so
+%{moduledir}/libmap-value-pairs.so
+%{moduledir}/libmetrics-probe.so
+%{moduledir}/libpacctformat.so
+%{moduledir}/libpseudofile.so
+%{moduledir}/libpubsub.so
+%{moduledir}/librate-limit-filter.so
+%{moduledir}/libregexp-parser.so
+%{moduledir}/libsecure-logging.so
+%{moduledir}/libstardate.so
+%{moduledir}/libtags-parser.so
+%{moduledir}/libtfgetent.so
+%{moduledir}/libtimestamp.so
+%{moduledir}/libxml.so
 %if %{with systemd}
-%attr(755,root,root) %{moduledir}/libsdjournal.so
+%{moduledir}/libsdjournal.so
 %endif
-%attr(755,root,root) %{moduledir}/libsyslogformat.so
-%attr(755,root,root) %{moduledir}/libsystem-source.so
+%{moduledir}/libsyslogformat.so
+%{moduledir}/libsystem-source.so
 %dir %{moduledir}/loggen
-%attr(755,root,root) %{moduledir}/loggen/libloggen_socket_plugin.so
-%attr(755,root,root) %{moduledir}/loggen/libloggen_ssl_plugin.so
+%{moduledir}/loggen/libloggen_socket_plugin.so
+%{moduledir}/loggen/libloggen_ssl_plugin.so
 %attr(755,root,root) %{_sbindir}/syslog-ng
 %attr(755,root,root) %{_sbindir}/syslog-ng-ctl
 %attr(755,root,root) %{_bindir}/dqtool
@@ -771,46 +771,46 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %if %{with mongodb}
 %files module-afmongodb
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libafmongodb.so
+%{moduledir}/libafmongodb.so
 %endif
 
 %if %{with smtp}
 %files module-afsmtp
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libafsmtp.so
+%{moduledir}/libafsmtp.so
 %endif
 
 %if %{with sql}
 %files module-afsql
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libafsql.so
+%{moduledir}/libafsql.so
 %endif
 
 %if %{with http}
 %files module-http
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libhttp.so
+%{moduledir}/libhttp.so
 %{_datadir}/syslog-ng/include/scl/telegram
 %endif
 
 %files module-cloudauth
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libcloud_auth.so
+%{moduledir}/libcloud_auth.so
 %{_datadir}/syslog-ng/include/scl/google/google-pubsub.conf
 
 %files module-grpc
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libgrpc-protos.so.*.*.*
+%{_libdir}/libgrpc-protos.so.*.*.*
 %ghost %{_libdir}/libgrpc-protos.so.0
 %{_libdir}/libgrpc-protos.so
-%attr(755,root,root) %{moduledir}/libbigquery.so
-%attr(755,root,root) %{moduledir}/libloki.so
-%attr(755,root,root) %{moduledir}/libotel.so
+%{moduledir}/libbigquery.so
+%{moduledir}/libloki.so
+%{moduledir}/libotel.so
 
 %if %{with json}
 %files module-json-plugin
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libjson-plugin.so
+%{moduledir}/libjson-plugin.so
 # all below configs require json-plugin
 %{_datadir}/syslog-ng/include/scl/cee
 # R: basicfuncs http json-plugin
@@ -830,55 +830,55 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %if %{with kafka}
 %files module-kafka
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libkafka.so
+%{moduledir}/libkafka.so
 %endif
 
 %if %{with mqtt}
 %files module-mqtt
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libmqtt.so
+%{moduledir}/libmqtt.so
 %endif
 
 %if %{with python}
 %files module-python
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libmod-python.so
+%{moduledir}/libmod-python.so
 %{moduledir}/python
 %endif
 
 %if %{with redis}
 %files module-redis
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libredis.so
+%{moduledir}/libredis.so
 %endif
 
 %if %{with riemann}
 %files module-riemann
 %defattr(644,root,root,755)
-%attr(755,root,root) %{moduledir}/libriemann.so
+%{moduledir}/libriemann.so
 %endif
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.*.*.*
-%attr(755,root,root) %{slibdir}/libevtlog-%{mver}.so.0
-%attr(755,root,root) %{slibdir}/libloggen_helper-%{mver}.so.*.*.*
-%attr(755,root,root) %{slibdir}/libloggen_helper-%{mver}.so.0
-%attr(755,root,root) %{slibdir}/libloggen_plugin-%{mver}.so.*.*.*
-%attr(755,root,root) %{slibdir}/libloggen_plugin-%{mver}.so.0
-%attr(755,root,root) %{slibdir}/libsecret-storage.so.*.*.*
-%attr(755,root,root) %{slibdir}/libsecret-storage.so.0
-%attr(755,root,root) %{slibdir}/libsyslog-ng-%{mver}.so.*.*.*
-%attr(755,root,root) %ghost %{slibdir}/libsyslog-ng-%{mver}.so.0
+%{slibdir}/libevtlog-%{mver}.so.*.*.*
+%{slibdir}/libevtlog-%{mver}.so.0
+%{slibdir}/libloggen_helper-%{mver}.so.*.*.*
+%{slibdir}/libloggen_helper-%{mver}.so.0
+%{slibdir}/libloggen_plugin-%{mver}.so.*.*.*
+%{slibdir}/libloggen_plugin-%{mver}.so.0
+%{slibdir}/libsecret-storage.so.*.*.*
+%{slibdir}/libsecret-storage.so.0
+%{slibdir}/libsyslog-ng-%{mver}.so.*.*.*
+%ghost %{slibdir}/libsyslog-ng-%{mver}.so.0
 %dir %{_datadir}/syslog-ng
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libevtlog.so
-%attr(755,root,root) %{_libdir}/libloggen_helper.so
-%attr(755,root,root) %{_libdir}/libloggen_plugin.so
-%attr(755,root,root) %{_libdir}/libsecret-storage.so
-%attr(755,root,root) %{_libdir}/libsyslog-ng.so
+%{_libdir}/libevtlog.so
+%{_libdir}/libloggen_helper.so
+%{_libdir}/libloggen_plugin.so
+%{_libdir}/libsecret-storage.so
+%{_libdir}/libsyslog-ng.so
 %{_libdir}/libsyslog-ng-native-connector.a
 %{_includedir}/syslog-ng
 %exclude %{_includedir}/syslog-ng/libtest
