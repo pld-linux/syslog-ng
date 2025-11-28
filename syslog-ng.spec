@@ -41,7 +41,7 @@ Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
 Version:	4.10.2
-Release:	2
+Release:	3
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
@@ -119,6 +119,7 @@ BuildRequires:	python3
 BuildRequires:	python3-pep8
 BuildRequires:	python3-ply
 BuildRequires:	python3-pytest-mock
+BuildRequires:	python3-requests
 BuildRequires:	tzdata
 %endif
 %if %{without dynamic}
@@ -263,18 +264,18 @@ Moduł sysloga-ng do obsługi uwierzytelniania w chmurze, używany przez
 Google PubSub.
 
 %package module-grpc
-Summary:	GRPC modules for syslog-ng: bigquery, loki, otel
-Summary(pl.UTF-8):	Moduły GRPC dla sysloga-ng: bigquery, loki, otel
+Summary:	GRPC modules for syslog-ng: bigquery, clickhouse, loki, otel, pubsub
+Summary(pl.UTF-8):	Moduły GRPC dla sysloga-ng: bigquery, clickhouse, loki, otel, pubsub
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description module-grpc
-GRPC protocols support for syslog-ng, currently: bigquery, loki and
-otel.
+GRPC protocols support for syslog-ng, currently: bigquery, clickhouse,
+loki, otel and pubsub.
 
 %description module-grpc -l pl.UTF-8
-Obsługa protokołów GRPC dla sysloga-ng, obecnie: bigquery, loki i
-otel.
+Obsługa protokołów GRPC dla sysloga-ng, obecnie: bigquery, clickhouse,
+loki, otel i pubsub.
 
 %package module-json-plugin
 Summary:	JSON formatting template function for syslog-ng
@@ -642,7 +643,6 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{moduledir}/libazure-auth-header.so
 %{moduledir}/libbasicfuncs.so
 %{moduledir}/libcef.so
-%{moduledir}/libclickhouse.so
 %{moduledir}/libconfgen.so
 %{moduledir}/libcorrelation.so
 %{moduledir}/libcryptofuncs.so
@@ -660,7 +660,6 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{moduledir}/libmetrics-probe.so
 %{moduledir}/libpacctformat.so
 %{moduledir}/libpseudofile.so
-%{moduledir}/libpubsub.so
 %{moduledir}/librate-limit-filter.so
 %{moduledir}/libregexp-parser.so
 %{moduledir}/libsecure-logging.so
@@ -729,6 +728,7 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{_datadir}/syslog-ng/include/scl/snmptrap
 %{_datadir}/syslog-ng/include/scl/solaris
 %{_datadir}/syslog-ng/include/scl/splunk
+%{_datadir}/syslog-ng/include/scl/stats-exporter
 %{_datadir}/syslog-ng/include/scl/sudo
 %{_datadir}/syslog-ng/include/scl/sumologic
 %{_datadir}/syslog-ng/include/scl/websense
@@ -796,6 +796,7 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %files module-cloudauth
 %defattr(644,root,root,755)
 %{moduledir}/libcloud_auth.so
+%{_datadir}/syslog-ng/include/scl/azure
 %{_datadir}/syslog-ng/include/scl/google
 
 %files module-grpc
@@ -804,8 +805,10 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %ghost %{_libdir}/libgrpc-protos.so.0
 %{_libdir}/libgrpc-protos.so
 %{moduledir}/libbigquery.so
+%{moduledir}/libclickhouse.so
 %{moduledir}/libloki.so
 %{moduledir}/libotel.so
+%{moduledir}/libpubsub.so
 
 %if %{with json}
 %files module-json-plugin
