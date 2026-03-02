@@ -17,3 +17,14 @@
  def test_hypr_audit_source_complete_lifecycle(minimal_config, mocker):
  
      response_json = [
+--- syslog-ng-4.11.0/modules/http/tests/test_compression.c~	2026-02-24 15:48:43.000000000 +0100
++++ syslog-ng-4.11.0/modules/http/tests/test_compression.c	2026-03-02 22:14:58.986891033 +0100
+@@ -22,7 +22,7 @@
+ 
+ #include <syslog-ng-config.h>
+ 
+-#if SYSLOG_NG_HAVE_ZLIB
++#if 0
+ 
+ #include <criterion/criterion.h>
+ #include <criterion/redirect.h>

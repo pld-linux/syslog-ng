@@ -21,6 +21,7 @@
 %bcond_without	kafka			# support for Apache Kafka protocol
 %bcond_without	riemann			# support for Riemann monitoring system
 %bcond_without	systemd			# systemd (daemon and journal) support
+%bcond_with		tcp_wrappers    # tcp_wrappers/libwrap support
 %bcond_without	amqp			# AMQP support
 %bcond_without	python			# python module
 %bcond_with	java			# java modules and support
@@ -35,18 +36,18 @@
 %define	libivykis_version 0.43.2
 
 %define		glib2_ver	1:2.32.0
-%define		mver	4.10
+%define		mver	4.11
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	4.10.2
-Release:	5
+Version:	4.11.0
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
 Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	0c97637b266efcf932b5fdea5f40235e
+# Source0-md5:	91d6cf2c7ad7e50d2c6ab983ff3386ca
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -60,13 +61,9 @@ Source5:	https://downloads.sourceforge.net/libivykis/ivykis-%{libivykis_version}
 %endif
 Source7:	syslog-ng.service
 Patch0:		%{name}-datadir.patch
-Patch2:		%{name}-nolibs.patch
-Patch3:		%{name}-systemd.patch
-Patch5:		%{name}-link.patch
-Patch6:		no_shared_ivykis.patch
-Patch7:		32bit.patch
-Patch8:		bad-tests.patch
-Patch9:		glib-static.patch
+Patch1:		%{name}-nolibs.patch
+Patch2:		%{name}-systemd.patch
+Patch3:		bad-tests.patch
 URL:		https://syslog-ng.org/
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake
@@ -95,7 +92,7 @@ BuildRequires:	libcap-devel
 BuildRequires:	libnet-devel >= 1:1.1.2.1-3
 %{?with_kafka:BuildRequires:	librdkafka-devel >= 1.1.0}
 BuildRequires:	libtool >= 2:2.0
-BuildRequires:	libwrap-devel
+%{?with_tcp_wrappers:BuildRequires:	libwrap-devel}
 BuildRequires:	libxslt-progs
 BuildRequires:	lz4-devel >= r131-5
 %{?with_mongodb:BuildRequires:	mongo-c-driver-devel >= 1.0.0}
@@ -418,13 +415,9 @@ rmdir lib/ivykis
 %endif
 
 %patch -P0 -p1
+%patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
-%patch -P5 -p1
-%patch -P6 -p1
-%patch -P7 -p1
-%patch -P8 -p1
-%patch -P9 -p1
 cp -p %{SOURCE4} contrib/syslog-ng.conf.simple
 
 %{__sed} -i -e 's|/usr/bin/awk|/bin/awk|' scl/syslogconf/convert-syslogconf.awk
@@ -478,7 +471,7 @@ done
 	--enable-ssl \
 	--enable-systemd%{!?with_systemd:=no} \
 	--with-systemd-journal=auto \
-	--enable-tcp-wrapper \
+	--enable-tcp-wrapper%{!?with_tcp_wrappers:no} \
 %if %{with sql}
 	--enable-sql \
 %endif
@@ -703,7 +696,6 @@ rm -f %{_var}/lib/%{name}/syslog-ng.persist
 %{_datadir}/syslog-ng/include/scl/fortigate
 %{_datadir}/syslog-ng/include/scl/graphite
 %{_datadir}/syslog-ng/include/scl/hdfs
-%{_datadir}/syslog-ng/include/scl/kafka
 %{_datadir}/syslog-ng/include/scl/iptables
 %{_datadir}/syslog-ng/include/scl/jellyfin
 %{_datadir}/syslog-ng/include/scl/junos
