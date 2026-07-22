@@ -1,6 +1,6 @@
---- syslog-ng-4.8.0/configure.ac~	2024-07-23 13:42:10.000000000 +0200
-+++ syslog-ng-4.8.0/configure.ac	2024-08-01 19:20:42.196636751 +0200
-@@ -900,11 +900,10 @@ dnl ************************************
+--- syslog-ng-4.12.0/configure.ac.orig	2026-06-16 15:46:03.000000000 +0200
++++ syslog-ng-4.12.0/configure.ac	2026-07-21 22:05:12.346654595 +0200
+@@ -1259,11 +1259,10 @@ dnl ************************************
  dnl Checks for libraries
  AC_CHECK_LIB(m, round, BASE_LIBS="$BASE_LIBS -lm")
  AC_CHECK_LIB(door, door_create, BASE_LIBS="$BASE_LIBS -ldoor")
@@ -13,5 +13,5 @@
 +AC_CHECK_FUNC([gethostbyname], [:], [AC_CHECK_LIB(nsl, gethostbyname, BASE_LIBS="$BASE_LIBS -lnsl")])
 +AC_CHECK_FUNC([regexec], [:], [AC_CHECK_LIB(regex, regexec, REGEX_LIBS="-lregex")])
  
- CHECK_FUNCS_AND_DEFINE([
-     fmemopen
+ dnl ***************************************************************************
+ dnl jemalloc support

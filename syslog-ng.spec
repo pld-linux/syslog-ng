@@ -36,18 +36,18 @@
 %define	libivykis_version 0.43.2
 
 %define		glib2_ver	1:2.32.0
-%define		mver	4.11
+%define		mver	4.12
 Summary:	Syslog-ng - new generation of the system logger
 Summary(pl.UTF-8):	Syslog-ng - systemowy demon logujący nowej generacji
 Summary(pt_BR.UTF-8):	Daemon de log nova geração
 Name:		syslog-ng
-Version:	4.11.0
-Release:	2
+Version:	4.12.0
+Release:	1
 License:	GPL v2+ with OpenSSL exception
 Group:		Daemons
 #Source0Download: https://github.com/syslog-ng/syslog-ng/releases
 Source0:	https://github.com/syslog-ng/syslog-ng/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	91d6cf2c7ad7e50d2c6ab983ff3386ca
+# Source0-md5:	16051c9ecf959df050d4d50f59069bac
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}.logrotate
@@ -152,7 +152,7 @@ Conflicts:	rsyslog
 Conflicts:	syslog
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	xsl_stylesheets_dir /usr/share/sgml/docbook/xsl-stylesheets
+%define		xsl_stylesheets_dir	/usr/share/sgml/docbook/xsl-stylesheets
 
 %if %{without dynamic}
 # syslog-ng has really crazy linking rules (see their bugzilla).
@@ -170,6 +170,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %endif
 # or just %{_libdir}? modules seem to be always linked dynamically
 %define		moduledir			%{slibdir}/syslog-ng
+
+# non-function symbols: absl::lts_20250814::cord_internal::cordz_next_sample, google::protobuf::internal::ThreadSafeArena::thread_cache_
+%define		skip_post_check_so	libgrpc-protos.so.*
 
 %description
 syslog-ng is a syslogd replacement for Unix and Unix-like systems. It
@@ -466,6 +469,7 @@ done
 	--enable-python%{!?with_python:=no} \
 	--enable-redis%{!?with_redis:=no} \
 	--enable-riemann%{!?with_riemann:=no} \
+	--enable-slog \
 	--enable-smtp%{!?with_smtp:=no} \
 	--enable-spoof-source \
 	--enable-ssl \
@@ -542,6 +546,7 @@ ln -s "%{name}" $RPM_BUILD_ROOT/etc/sysconfig/%{name}@default
 
 %{__rm} $RPM_BUILD_ROOT%{_sbindir}/syslog-ng-debun
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/syslog-ng-debun.1
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/syslog-ng/include/scl/freebsd-audit
 %{__rm} $RPM_BUILD_ROOT%{moduledir}/libexamples.so
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/*.la
 %{__rm} $RPM_BUILD_ROOT%{moduledir}/*.la
