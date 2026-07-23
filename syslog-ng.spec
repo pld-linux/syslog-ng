@@ -115,6 +115,7 @@ BuildRequires:	python3
 %{?with_python:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	python3-pep8
 BuildRequires:	python3-ply
+BuildRequires:	python3-pytest
 BuildRequires:	python3-pytest-mock
 BuildRequires:	python3-requests
 BuildRequires:	tzdata
@@ -496,9 +497,10 @@ done
 %{__make}
 
 %if %{with tests}
-LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
-PYTHONPATH=$(pwd)/tests/functional
-export LD_LIBRARY_PATH PYTHONPATH
+export LD_LIBRARY_PATH=$(find $PWD -name '*.so*' -printf "%h:")
+export PYTHONPATH=$(pwd)/tests/functional
+export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+export PYTEST_PLUGINS=pytest_mock.plugin
 if ! %{__make} check; then
 	cat test-suite.log
 	exit 1
